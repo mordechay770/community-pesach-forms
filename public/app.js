@@ -550,10 +550,11 @@ form.addEventListener("submit", async (event) => {
   submitOutput.textContent = "Отправляем форму...";
   try {
     const data = await callJson("/.netlify/functions/submit-form", buildSubmitPayload());
-    submitOutput.textContent = JSON.stringify(data, null, 2);
+    submitOutput.textContent = "Форма успешно отправлена. Переходим к странице завершения...";
     if (data.ok) {
+      currentPayload = null;
       setTimeout(() => {
-        window.location.href = "./success.html";
+        window.location.replace("./success.html");
       }, 700);
     }
   } catch (error) {
