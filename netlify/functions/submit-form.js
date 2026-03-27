@@ -181,11 +181,16 @@ function stripOptionalSubmitFields(fields) {
 
 async function updateRecordWithFallback(recordId, fields) {
   try {
-    return await airtableUpdateRecord({
+    const result = await airtableUpdateRecord({
       table: getEnvConfig().executionTable,
       recordId,
       fields
     });
+    return {
+      result,
+      appliedFields: fields,
+      fallbackApplied: false
+    };
   } catch (error) {
     error.debugFields = buildDebugFieldPreview(fields);
     const message = String(error.message || "");
@@ -199,11 +204,16 @@ async function updateRecordWithFallback(recordId, fields) {
     if (optionalFieldNames.some((name) => name && message.includes(name))) {
       const reducedFields = stripOptionalSubmitFields(fields);
       try {
-        return await airtableUpdateRecord({
+        const result = await airtableUpdateRecord({
           table: getEnvConfig().executionTable,
           recordId,
           fields: reducedFields
         });
+        return {
+          result,
+          appliedFields: reducedFields,
+          fallbackApplied: true
+        };
       } catch (fallbackError) {
         fallbackError.debugFields = buildDebugFieldPreview(reducedFields);
         throw fallbackError;
@@ -281,13 +291,17 @@ exports.handler = async function (event) {
     );
 
     let updatedCount = 0;
+    const updatedFieldNames = new Set();
+    let fallbackApplied = false;
     for (const record of matchingRows) {
       const person = personsByExecutionId.get(record.id);
       if (!person) {
         continue;
       }
 
-      await updateRecordWithFallback(record.id, buildPersonUpdate(person, body));
+      const updateResult = await updateRecordWithFallback(record.id, buildPersonUpdate(person, body));
+      Object.keys(updateResult.appliedFields || {}).forEach((field) => updatedFieldNames.add(field));
+      fallbackApplied = fallbackApplied || Boolean(updateResult.fallbackApplied);
       updatedCount += 1;
     }
 
@@ -299,7 +313,9 @@ exports.handler = async function (event) {
         request_id: body.request_id,
         form_id: body.form_id,
         updated_rows: updatedCount,
-        token_status: "submitted"
+        token_status: "submitted",
+        updated_fields: Array.from(updatedFieldNames),
+        fallback_applied: fallbackApplied
       })
     };
   } catch (error) {
