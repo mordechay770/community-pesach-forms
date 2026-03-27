@@ -158,6 +158,18 @@ function buildPersonUpdate(person, fullPayload) {
   return fields;
 }
 
+function buildDebugFieldPreview(fields) {
+  return Object.fromEntries(
+    Object.entries(fields).map(([key, value]) => [
+      key,
+      {
+        value,
+        type: typeof value
+      }
+    ])
+  );
+}
+
 function stripOptionalSubmitFields(fields) {
   const reduced = { ...fields };
   delete reduced[fieldName("detailsConfirmedField")];
@@ -174,6 +186,7 @@ async function updateRecordWithFallback(recordId, fields) {
       fields
     });
   } catch (error) {
+    error.debugFields = buildDebugFieldPreview(fields);
     const message = String(error.message || "");
     const optionalFieldNames = [
       fieldName("detailsConfirmedField"),
@@ -182,11 +195,17 @@ async function updateRecordWithFallback(recordId, fields) {
     ];
 
     if (optionalFieldNames.some((name) => name && message.includes(name))) {
-      return airtableUpdateRecord({
-        table: getEnvConfig().executionTable,
-        recordId,
-        fields: stripOptionalSubmitFields(fields)
-      });
+      const reducedFields = stripOptionalSubmitFields(fields);
+      try {
+        return await airtableUpdateRecord({
+          table: getEnvConfig().executionTable,
+          recordId,
+          fields: reducedFields
+        });
+      } catch (fallbackError) {
+        fallbackError.debugFields = buildDebugFieldPreview(reducedFields);
+        throw fallbackError;
+      }
     }
 
     throw error;
@@ -284,7 +303,10 @@ exports.handler = async function (event) {
   } catch (error) {
     return {
       ...jsonHeaders(500),
-      body: JSON.stringify({ error: error.message })
+      body: JSON.stringify({
+        error: error.message,
+        debug_fields: error.debugFields || null
+      })
     };
   }
 };
