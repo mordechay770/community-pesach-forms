@@ -15,14 +15,14 @@ const defaults = {
   genderField: "Род",
   birthDateField: "Григор дата рождения",
   inCityField: "Нахожусь в Казахстане:",
-  relationshipField: "relationship",
+  relationshipField: "קרבה לממלא הטופס",
   roleField: "form_role",
   motherNationalityField: "национальность матери",
   fatherNationalityField: "национальность отца",
   contactsJsonField: "contacts_json",
   onlineStatusField: "Статус - онлайн-форма",
-  detailsConfirmedField: "details_confirmed",
-  chametzConfirmedField: "chametz_sale_confirmation",
+  detailsConfirmedField: "Я подтверждаю, что данные заполняются правильно.",
+  chametzConfirmedField: "Я прошу раввина продать мой хамец в канун праздника в этом году.",
   submittedAtField: "submitted_at",
   payloadJsonField: "last_payload_json"
 };

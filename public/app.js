@@ -310,8 +310,7 @@ function addContactToPerson(personIndex) {
   currentPayload.persons[personIndex].contacts.push({
     number: "",
     owner_type: "",
-    whatsapp: "",
-    status: ""
+    whatsapp: ""
   });
 
   renderPersons(currentPayload.persons, currentPayload.mode);
@@ -419,7 +418,7 @@ addMemberBtn.addEventListener("click", () => {
     parent_mother_nationality: "",
     parent_father_nationality: "",
     contacts: [
-      { number: "", owner_type: "", whatsapp: "", status: "" }
+      { number: "", owner_type: "", whatsapp: "" }
     ]
   });
 
