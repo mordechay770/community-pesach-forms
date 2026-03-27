@@ -102,7 +102,7 @@ function renderPersonCard(person, index) {
       <div class="contact-grid">
         <label>
           <span>Номер ${contactIndex + 1}</span>
-          <input type="text" value="${contact.number || ""}" data-person-index="${index}" data-contact-index="${contactIndex}" data-field="number">
+          <input type="text" value="${contact.number || ""}" placeholder="Например: 77015888488" inputmode="numeric" minlength="11" pattern="[0-9]{11,}" data-person-index="${index}" data-contact-index="${contactIndex}" data-field="number">
         </label>
         <label>
           <span>Кому принадлежит номер</span>
@@ -119,15 +119,6 @@ function renderPersonCard(person, index) {
             <option value="">Выберите</option>
             <option value="yes"${contact.whatsapp === "yes" ? " selected" : ""}>Да</option>
             <option value="no"${contact.whatsapp === "no" ? " selected" : ""}>Нет</option>
-          </select>
-        </label>
-        <label>
-          <span>Статус номера</span>
-          <select data-person-index="${index}" data-contact-index="${contactIndex}" data-field="status">
-            <option value="">Выберите</option>
-            <option value="active"${contact.status === "active" ? " selected" : ""}>Активный</option>
-            <option value="inactive"${contact.status === "inactive" ? " selected" : ""}>Неактивный</option>
-            <option value="unknown"${contact.status === "unknown" ? " selected" : ""}>Нужно уточнить</option>
           </select>
         </label>
       </div>
@@ -198,7 +189,7 @@ function renderPersonCard(person, index) {
         </label>
         <label>
           <span>Дата рождения</span>
-          <input type="text" value="${person.birth_date || ""}" data-person-index="${index}" data-field="birth_date">
+          <input type="text" value="${person.birth_date || ""}" placeholder="ДД.ММ.ГГГГ" data-person-index="${index}" data-field="birth_date">
         </label>
         <label>
           <span>Будет в городе на Песах *</span>
@@ -285,6 +276,10 @@ function syncFieldFromEvent(target) {
   currentPayload.persons[Number(personIndex)][field] = target.value;
 }
 
+function normalizeContactNumber(value) {
+  return String(value || "").replace(/\D+/g, "");
+}
+
 function addContactToPerson(personIndex) {
   if (!currentPayload?.persons?.[personIndex]) {
     return;
@@ -302,6 +297,14 @@ function addContactToPerson(personIndex) {
 }
 
 function buildSubmitPayload() {
+  const normalizedPersons = (currentPayload?.persons || []).map((person) => ({
+    ...person,
+    contacts: (person.contacts || []).map((contact) => ({
+      ...contact,
+      number: normalizeContactNumber(contact.number)
+    }))
+  }));
+
   return {
     token: tokenInput.value.trim(),
     form_id: fields.formId.value,
@@ -315,7 +318,7 @@ function buildSubmitPayload() {
     },
     details_confirmed: fields.detailsConfirmed.checked,
     chametz_sale_confirmation: fields.chametz.checked,
-    persons: currentPayload?.persons || []
+    persons: normalizedPersons
   };
 }
 
@@ -407,6 +410,18 @@ form.addEventListener("submit", async (event) => {
 
   if (!fields.detailsConfirmed.checked || !fields.chametz.checked) {
     submitOutput.textContent = "Перед отправкой нужно подтвердить данные и продажу хамеца.";
+    return;
+  }
+
+  const invalidPhone = (currentPayload?.persons || []).some((person) =>
+    (person.contacts || []).some((contact) => {
+      const normalized = normalizeContactNumber(contact.number);
+      return normalized && normalized.length < 11;
+    })
+  );
+
+  if (invalidPhone) {
+    submitOutput.textContent = "Номер телефона нужно указывать с кодом страны, например: 77015888488.";
     return;
   }
 
