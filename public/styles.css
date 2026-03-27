@@ -143,6 +143,19 @@ button.secondary{
   display:grid;
   gap:14px;
 }
+.tech-box{
+  border:1px dashed var(--line);
+  border-radius:18px;
+  padding:10px 14px 14px;
+  background:#faf6ef;
+}
+.tech-box summary{
+  cursor:pointer;
+  color:var(--navy);
+  font-size:13px;
+  font-weight:800;
+  margin-bottom:10px;
+}
 .meta-grid{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));

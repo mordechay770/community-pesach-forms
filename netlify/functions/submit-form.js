@@ -106,7 +106,6 @@ function buildPersonUpdate(person, fullPayload) {
     [fieldName("lastNameField")]: person.last_name || "",
     [fieldName("firstNameField")]: person.first_name || "",
     [fieldName("middleNameField")]: person.middle_name || "",
-    [fieldName("iinField")]: person.iin || "",
     [fieldName("genderField")]: person.gender || "",
     [fieldName("birthDateField")]: person.birth_date || "",
     [fieldName("inCityField")]: person.will_be_in_city || "",
@@ -133,6 +132,11 @@ function buildPersonUpdate(person, fullPayload) {
   if (fieldName("payloadJsonField")) {
     fields[fieldName("payloadJsonField")] = JSON.stringify(fullPayload);
   }
+
+  // For now we avoid writing IIN back during the general submit flow.
+  // The Airtable field currently rejects updates, and we don't want that
+  // to block the whole online process. We can re-enable this once the
+  // editable target field for IIN is fully verified.
 
   return fields;
 }

@@ -28,6 +28,27 @@ const fields = {
 
 let currentPayload = null;
 
+function translateError(message) {
+  const text = String(message || "");
+
+  if (text.includes('Field "ИИН" cannot accept the provided value')) {
+    return 'Поле "ИИН" сейчас не принимает такое значение. Скорее всего, нужно сохранять ИИН в отдельное редактируемое поле, а не в lookup или формулу.';
+  }
+
+  if (text.includes("Token is required")) return "Не найден токен формы.";
+  if (text.includes("Form ID is required")) return "Не найден идентификатор формы.";
+  if (text.includes("At least one person is required")) return "В форме должен быть хотя бы один человек.";
+  if (text.includes("Each person must answer whether they will be in the city on Pesach")) return "Для каждого человека нужно указать, будет ли он в городе на Песах.";
+  if (text.includes("Details confirmation is required")) return "Нужно подтвердить, что данные проверены.";
+  if (text.includes("Chametz authorization is required")) return "Нужно подтвердить продажу хамеца.";
+  if (text.includes("Invalid or expired token")) return "Ссылка недействительна или срок её действия истёк.";
+  if (text.includes("This form has already been submitted")) return "Эта форма уже была отправлена.";
+  if (text.includes("Form ID does not match the token")) return "Ссылка не соответствует этой форме.";
+  if (text.includes("Airtable environment variables are not configured yet")) return "Интеграция сайта ещё не завершена.";
+
+  return text || "Произошла ошибка.";
+}
+
 async function callJson(url, payload = {}) {
   const response = await fetch(url, {
     method: "POST",
@@ -37,7 +58,7 @@ async function callJson(url, payload = {}) {
 
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.error || "Request failed");
+    throw new Error(translateError(data.error || "Request failed"));
   }
 
   return data;
@@ -75,6 +96,7 @@ function relationshipOptions(selected = "") {
 
 function renderPersonCard(person, index) {
   const contacts = person.contacts || [];
+  const isPrimaryApplicant = index === 0 && (person.role === "self" || person.role === "mother");
   const contactsMarkup = contacts.map((contact, contactIndex) => `
     <div class="contact-item">
       <div class="contact-grid">
@@ -112,6 +134,23 @@ function renderPersonCard(person, index) {
     </div>
   `).join("");
 
+  const iinBlock = isPrimaryApplicant ? "" : `
+        <label>
+          <span>ИИН</span>
+          <input type="text" value="${person.iin || ""}" data-person-index="${index}" data-field="iin">
+        </label>
+  `;
+
+  const relationshipBlock = isPrimaryApplicant ? "" : `
+        <label>
+          <span>Кем этот человек приходится основному заявителю</span>
+          <select data-person-index="${index}" data-field="relationship">
+            <option value="">Выберите</option>
+            ${relationshipOptions(person.relationship)}
+          </select>
+        </label>
+  `;
+
   const parentBlock = person.show_parent_fields ? `
     <div class="person-grid">
       <label>
@@ -148,10 +187,7 @@ function renderPersonCard(person, index) {
           <span>Отчество</span>
           <input type="text" value="${person.middle_name || ""}" data-person-index="${index}" data-field="middle_name">
         </label>
-        <label>
-          <span>ИИН</span>
-          <input type="text" value="${person.iin || ""}" data-person-index="${index}" data-field="iin"${person.require_iin ? "" : ""}>
-        </label>
+        ${iinBlock}
         <label>
           <span>Пол</span>
           <select data-person-index="${index}" data-field="gender">
@@ -172,13 +208,7 @@ function renderPersonCard(person, index) {
             <option value="no"${person.will_be_in_city === "no" ? " selected" : ""}>Нет</option>
           </select>
         </label>
-        <label>
-          <span>Родство к заявителю</span>
-          <select data-person-index="${index}" data-field="relationship">
-            <option value="">Выберите</option>
-            ${relationshipOptions(person.relationship)}
-          </select>
-        </label>
+        ${relationshipBlock}
       </div>
 
       ${parentBlock}
@@ -187,6 +217,9 @@ function renderPersonCard(person, index) {
 
       <div class="contact-list">
         ${contactsMarkup}
+      </div>
+      <div class="inline-actions">
+        <button type="button" class="secondary add-contact-btn" data-person-index="${index}">Добавить номер</button>
       </div>
     </article>
   `;
@@ -252,6 +285,22 @@ function syncFieldFromEvent(target) {
   currentPayload.persons[Number(personIndex)][field] = target.value;
 }
 
+function addContactToPerson(personIndex) {
+  if (!currentPayload?.persons?.[personIndex]) {
+    return;
+  }
+
+  currentPayload.persons[personIndex].contacts ||= [];
+  currentPayload.persons[personIndex].contacts.push({
+    number: "",
+    owner_type: "",
+    whatsapp: "",
+    status: ""
+  });
+
+  renderPersons(currentPayload.persons, currentPayload.mode);
+}
+
 function buildSubmitPayload() {
   return {
     token: tokenInput.value.trim(),
@@ -282,7 +331,7 @@ healthBtn.addEventListener("click", async () => {
 
 loadBtn.addEventListener("click", async () => {
   submitOutput.textContent = "No submit yet.";
-  payloadSummary.textContent = "Loading payload...";
+  payloadSummary.textContent = "Загружаем данные формы...";
   try {
     const data = await callJson("/.netlify/functions/load-form", {
       token: tokenInput.value.trim()
@@ -304,6 +353,15 @@ personsContainer.addEventListener("input", (event) => {
 
 personsContainer.addEventListener("change", (event) => {
   syncFieldFromEvent(event.target);
+});
+
+personsContainer.addEventListener("click", (event) => {
+  const button = event.target.closest(".add-contact-btn");
+  if (!button) {
+    return;
+  }
+
+  addContactToPerson(Number(button.dataset.personIndex));
 });
 
 addMemberBtn.addEventListener("click", () => {
@@ -338,21 +396,21 @@ form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   if (!currentPayload) {
-    submitOutput.textContent = "Load a form first.";
+    submitOutput.textContent = "Сначала откройте форму по ссылке.";
     return;
   }
 
   if (!ensureAllCityAnswers()) {
-    submitOutput.textContent = "Each person must have an answer for in-city status before submit.";
+    submitOutput.textContent = "Для каждого человека нужно отдельно указать, будет ли он в городе на Песах.";
     return;
   }
 
   if (!fields.detailsConfirmed.checked || !fields.chametz.checked) {
-    submitOutput.textContent = "Please confirm the details and the chametz authorization before submit.";
+    submitOutput.textContent = "Перед отправкой нужно подтвердить данные и продажу хамеца.";
     return;
   }
 
-  submitOutput.textContent = "Submitting...";
+  submitOutput.textContent = "Отправляем форму...";
   try {
     const data = await callJson("/.netlify/functions/submit-form", buildSubmitPayload());
     submitOutput.textContent = JSON.stringify(data, null, 2);
