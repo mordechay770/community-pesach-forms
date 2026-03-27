@@ -37,9 +37,24 @@ function formatDisplayDate(value) {
     return "";
   }
 
+  const dotMatch = text.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if (dotMatch) {
+    return text;
+  }
+
   const isoMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (isoMatch) {
     return `${isoMatch[3]}.${isoMatch[2]}.${isoMatch[1]}`;
+  }
+
+  const isoDateTimeMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})T/);
+  if (isoDateTimeMatch) {
+    return `${isoDateTimeMatch[3]}.${isoDateTimeMatch[2]}.${isoDateTimeMatch[1]}`;
+  }
+
+  const slashMatch = text.match(/^(\d{4})\/(\d{2})\/(\d{2})$/);
+  if (slashMatch) {
+    return `${slashMatch[3]}.${slashMatch[2]}.${slashMatch[1]}`;
   }
 
   return text;
@@ -49,19 +64,23 @@ function translateError(message) {
   const text = String(message || "");
 
   if (text.includes('Field "ИИН" cannot accept the provided value')) {
-    return 'Поле "ИИН" сейчас не принимает такое значение. Скорее всего, нужно сохранять ИИН в отдельное редактируемое поле, а не в lookup или формулу.';
+    return 'Поле "ИИН" сейчас не принимает такое значение. Нужен отдельный редактируемый столбец для записи данных из формы.';
+  }
+
+  if (text.includes('Unknown field name: "relationship"')) {
+    return 'Поле родства в Airtable пока настроено неверно. Мы уже переводим форму на правильное поле.';
   }
 
   if (text.includes("Token is required")) return "Не найден токен формы.";
   if (text.includes("Form ID is required")) return "Не найден идентификатор формы.";
   if (text.includes("At least one person is required")) return "В форме должен быть хотя бы один человек.";
-  if (text.includes("Each person must answer whether they will be in the city on Pesach")) return "Для каждого человека нужно указать, будет ли он в городе на Песах.";
+  if (text.includes("Each person must answer whether they will be in the city on Pesach")) return "Для каждого человека нужно отдельно указать, будет ли он в городе на Песах.";
   if (text.includes("Details confirmation is required")) return "Нужно подтвердить, что данные проверены.";
   if (text.includes("Chametz authorization is required")) return "Нужно подтвердить продажу хамеца.";
-  if (text.includes("Invalid or expired token")) return "Ссылка недействительна или срок её действия истёк.";
+  if (text.includes("Invalid or expired token")) return "Ссылка недействительна или срок ее действия истек.";
   if (text.includes("This form has already been submitted")) return "Эта форма уже была отправлена.";
   if (text.includes("Form ID does not match the token")) return "Ссылка не соответствует этой форме.";
-  if (text.includes("Airtable environment variables are not configured yet")) return "Интеграция сайта ещё не завершена.";
+  if (text.includes("Airtable environment variables are not configured yet")) return "Интеграция сайта еще не завершена.";
 
   return text || "Произошла ошибка.";
 }
@@ -114,6 +133,11 @@ function relationshipOptions(selected = "") {
 function renderPersonCard(person, index) {
   const contacts = person.contacts || [];
   const isPrimaryApplicant = index === 0 && (person.role === "self" || person.role === "mother");
+  const codeBadges = [
+    person.member_code ? `<div class="role-badge">${person.member_code}</div>` : "",
+    person.address_code ? `<div class="role-badge">${person.address_code}</div>` : ""
+  ].filter(Boolean).join("");
+
   const contactsMarkup = contacts.map((contact, contactIndex) => `
     <div class="contact-item">
       <div class="contact-grid">
@@ -138,6 +162,9 @@ function renderPersonCard(person, index) {
             <option value="no"${contact.whatsapp === "no" ? " selected" : ""}>Нет</option>
           </select>
         </label>
+      </div>
+      <div class="inline-actions">
+        <button type="button" class="secondary remove-contact-btn" data-person-index="${index}" data-contact-index="${contactIndex}">Удалить номер</button>
       </div>
     </div>
   `).join("");
@@ -179,7 +206,7 @@ function renderPersonCard(person, index) {
           <strong>${person.full_name || "Без имени"}</strong>
           <div class="role-badge">${roleLabel(person.role)}</div>
         </div>
-        <div class="role-badge">${person.member_code || "Новая запись"}</div>
+        <div class="person-badges">${codeBadges || '<div class="role-badge">Новая запись</div>'}</div>
       </div>
 
       <div class="person-grid">
@@ -206,7 +233,7 @@ function renderPersonCard(person, index) {
         </label>
         <label>
           <span>Дата рождения</span>
-          <input type="text" value="${person.birth_date || ""}" placeholder="ДД.ММ.ГГГГ" data-person-index="${index}" data-field="birth_date">
+          <input type="text" value="${formatDisplayDate(person.birth_date) || ""}" placeholder="ДД.ММ.ГГГГ" data-person-index="${index}" data-field="birth_date">
         </label>
         <label>
           <span>Будет в городе на Песах *</span>
@@ -241,7 +268,13 @@ function renderContactsSummary(persons) {
         <div class="role-badge">${roleLabel(person.role)}</div>
       </div>
       <div class="summary">
-        ${person.contacts?.length ? `Количество номеров: ${person.contacts.length}` : "Контактные данные еще не заполнены."}
+        ${person.contacts?.length
+          ? person.contacts.map((contact) => {
+              const owner = contact.owner_type ? ` · ${contact.owner_type}` : "";
+              const whatsapp = contact.whatsapp === "yes" ? " · WhatsApp" : "";
+              return `<div>${contact.number || "Без номера"}${owner}${whatsapp}</div>`;
+            }).join("")
+          : "Контактные данные еще не заполнены."}
       </div>
     </article>
   `).join("");
@@ -263,8 +296,8 @@ function fillForm(data) {
   fields.requestId.value = data.request_id || "";
   fields.groupFormId.value = data.group_form_id || "";
   fields.modeField.value = data.mode || "";
-  fields.memberCode.value = data.meta?.member_code || "";
-  fields.addressCode.value = data.meta?.address_code || "";
+  fields.memberCode.textContent = data.meta?.member_code || "—";
+  fields.addressCode.textContent = data.meta?.address_code || "—";
   fields.address.value = data.address?.full || "";
   fields.addressConfirmed.value = "";
   fields.newAddress.value = "";
@@ -272,7 +305,7 @@ function fillForm(data) {
   fields.chametz.checked = false;
   modeBadge.textContent = `mode: ${data.mode || "unknown"}`;
   payloadSummary.textContent = data.summary || `Loaded form ${data.form_id || ""}`.trim();
-  renderPersons(data.persons || [], data.mode);
+  renderPersons(currentPayload.persons || [], data.mode);
 }
 
 function ensureAllCityAnswers() {
@@ -291,6 +324,7 @@ function syncFieldFromEvent(target) {
 
   if (contactIndex !== undefined) {
     currentPayload.persons[Number(personIndex)].contacts[Number(contactIndex)][field] = target.value;
+    renderContactsSummary(currentPayload.persons);
     return;
   }
 
@@ -316,9 +350,29 @@ function addContactToPerson(personIndex) {
   renderPersons(currentPayload.persons, currentPayload.mode);
 }
 
+function removeContactFromPerson(personIndex, contactIndex) {
+  const person = currentPayload?.persons?.[personIndex];
+  if (!person?.contacts) {
+    return;
+  }
+
+  if (person.contacts.length <= 1) {
+    person.contacts[0] = {
+      number: "",
+      owner_type: "",
+      whatsapp: ""
+    };
+  } else {
+    person.contacts.splice(contactIndex, 1);
+  }
+
+  renderPersons(currentPayload.persons, currentPayload.mode);
+}
+
 function buildSubmitPayload() {
   const normalizedPersons = (currentPayload?.persons || []).map((person) => ({
     ...person,
+    birth_date: formatDisplayDate(person.birth_date),
     contacts: (person.contacts || []).map((contact) => ({
       ...contact,
       number: normalizeContactNumber(contact.number)
@@ -343,7 +397,7 @@ function buildSubmitPayload() {
 }
 
 async function loadCurrentToken() {
-  submitOutput.textContent = "No submit yet.";
+  submitOutput.textContent = "Нет отправки.";
   payloadSummary.textContent = "Загружаем данные формы...";
   const data = await callJson("/.netlify/functions/load-form", {
     token: tokenInput.value.trim()
@@ -389,12 +443,19 @@ personsContainer.addEventListener("change", (event) => {
 });
 
 personsContainer.addEventListener("click", (event) => {
-  const button = event.target.closest(".add-contact-btn");
-  if (!button) {
+  const addButton = event.target.closest(".add-contact-btn");
+  if (addButton) {
+    addContactToPerson(Number(addButton.dataset.personIndex));
     return;
   }
 
-  addContactToPerson(Number(button.dataset.personIndex));
+  const removeButton = event.target.closest(".remove-contact-btn");
+  if (removeButton) {
+    removeContactFromPerson(
+      Number(removeButton.dataset.personIndex),
+      Number(removeButton.dataset.contactIndex)
+    );
+  }
 });
 
 addMemberBtn.addEventListener("click", () => {
@@ -465,7 +526,7 @@ form.addEventListener("submit", async (event) => {
       }, 700);
     }
   } catch (error) {
-    submitOutput.textContent = `Submit failed: ${error.message}`;
+    submitOutput.textContent = `Ошибка отправки: ${error.message}`;
   }
 });
 

@@ -14,25 +14,24 @@ const DEMO_FORMS = {
     },
     persons: [
       {
+        execution_record_id: "demo-self-1",
         role: "self",
-        relationship: "other",
+        relationship: "",
+        member_code: "CM-10294",
+        address_code: "AD-7781",
         full_name: "Коген Мордехай",
         last_name: "Коген",
         first_name: "Мордехай",
         middle_name: "",
         iin: "860314450921",
-        require_iin: true,
-        gender: "M",
+        gender: "М",
         birth_date: "14.03.1986",
         will_be_in_city: "",
         show_parent_fields: false,
+        parent_mother_nationality: "",
+        parent_father_nationality: "",
         contacts: [
-          {
-            number: "77012345678",
-            owner_type: "self",
-            whatsapp: "yes",
-            status: "active"
-          }
+          { number: "77012345678", owner_type: "self", whatsapp: "yes" }
         ]
       }
     ]
@@ -52,91 +51,24 @@ const DEMO_FORMS = {
     },
     persons: [
       {
+        execution_record_id: "demo-mother-1",
         role: "mother",
-        relationship: "mother",
+        relationship: "",
+        member_code: "CM-20511",
+        address_code: "AD-5532",
         full_name: "Коэн Ривка",
         last_name: "Коэн",
         first_name: "Ривка",
         middle_name: "",
         iin: "830421550912",
-        require_iin: true,
-        gender: "F",
+        gender: "Ж",
         birth_date: "21.04.1983",
         will_be_in_city: "",
         show_parent_fields: false,
+        parent_mother_nationality: "",
+        parent_father_nationality: "",
         contacts: [
-          {
-            number: "77071234567",
-            owner_type: "self",
-            whatsapp: "yes",
-            status: "active"
-          }
-        ]
-      },
-      {
-        role: "child",
-        relationship: "son",
-        full_name: "Коэн Ицхак",
-        last_name: "Коэн",
-        first_name: "Ицхак",
-        middle_name: "",
-        iin: "120101500001",
-        require_iin: true,
-        gender: "M",
-        birth_date: "01.01.2012",
-        will_be_in_city: "",
-        show_parent_fields: false,
-        contacts: [
-          {
-            number: "77071234567",
-            owner_type: "parent",
-            whatsapp: "yes",
-            status: "active"
-          }
-        ]
-      },
-      {
-        role: "child",
-        relationship: "daughter",
-        full_name: "Коэн Сара",
-        last_name: "Коэн",
-        first_name: "Сара",
-        middle_name: "",
-        iin: "150505500002",
-        require_iin: true,
-        gender: "F",
-        birth_date: "05.05.2015",
-        will_be_in_city: "",
-        show_parent_fields: false,
-        contacts: [
-          {
-            number: "77071234567",
-            owner_type: "parent",
-            whatsapp: "yes",
-            status: "active"
-          }
-        ]
-      },
-      {
-        role: "child",
-        relationship: "son",
-        full_name: "Коэн Меир",
-        last_name: "Коэн",
-        first_name: "Меир",
-        middle_name: "",
-        iin: "180808500003",
-        require_iin: true,
-        gender: "M",
-        birth_date: "08.08.2018",
-        will_be_in_city: "",
-        show_parent_fields: false,
-        contacts: [
-          {
-            number: "",
-            owner_type: "parent",
-            whatsapp: "",
-            status: ""
-          }
+          { number: "77071234567", owner_type: "self", whatsapp: "yes" }
         ]
       }
     ]
@@ -156,28 +88,23 @@ const DEMO_FORMS = {
     },
     persons: [
       {
+        execution_record_id: "demo-new-1",
         role: "new_member",
         relationship: "other",
+        member_code: "",
+        address_code: "",
         full_name: "",
         last_name: "",
         first_name: "",
         middle_name: "",
         iin: "",
-        require_iin: true,
         gender: "",
         birth_date: "",
         will_be_in_city: "",
         show_parent_fields: true,
         parent_mother_nationality: "",
         parent_father_nationality: "",
-        contacts: [
-          {
-            number: "",
-            owner_type: "",
-            whatsapp: "",
-            status: ""
-          }
-        ]
+        contacts: [{ number: "", owner_type: "", whatsapp: "" }]
       }
     ]
   }
@@ -193,6 +120,7 @@ const defaults = {
   contactWhatsappField: "Whatsapp",
   contactActivityField: "Активность номера",
   contactOwnerField: "Кому принадлежит номер",
+  sourceContactsField: "КонтактныеДанные",
   tokenField: "token",
   tokenStatusField: "token_status",
   expiresAtField: "expires_at",
@@ -204,7 +132,7 @@ const defaults = {
   addressCodeField: "Код (from Код адреса) (from כרטיס אישי של חבר קהילה)",
   addressField: "Домашний адрес",
   roleField: "form_role",
-  relationshipField: "relationship",
+  relationshipField: "קרבה לממלא הטופס",
   fullNameField: "full_name",
   lastNameField: "Фамилия",
   firstNameField: "Имя",
@@ -212,7 +140,7 @@ const defaults = {
   iinField: "ИИН",
   genderField: "Род",
   birthDateField: "Григор дата рождения",
-  inCityField: "Нахожусь в Казахстане:",
+  inCityField: "на песах буду в городе",
   motherNationalityField: "национальность матери",
   fatherNationalityField: "национальность отца",
   contactsJsonField: "contacts_json",
@@ -220,7 +148,7 @@ const defaults = {
   sourceLastNameField: "Фамилия",
   sourceFirstNameField: "Имя",
   sourceMiddleNameField: "Отчество",
-  sourceIinField: "",
+  sourceIinField: "ИИН",
   sourceGenderField: "Род",
   sourceBirthDateField: "Григор год рождения",
   sourceAddressField: "כתובת מלאה (from Код адреса)",
@@ -243,11 +171,7 @@ function getEnvConfig() {
     return null;
   }
 
-  return {
-    apiToken,
-    baseId,
-    executionTable
-  };
+  return { apiToken, baseId, executionTable };
 }
 
 function jsonHeaders(statusCode = 200) {
@@ -270,9 +194,7 @@ async function airtableListRecords({ table, filterByFormula, maxRecords = 100 })
   }
 
   const response = await fetch(url.toString(), {
-    headers: {
-      Authorization: `Bearer ${config.apiToken}`
-    }
+    headers: { Authorization: `Bearer ${config.apiToken}` }
   });
 
   const data = await response.json();
@@ -286,11 +208,8 @@ async function airtableListRecords({ table, filterByFormula, maxRecords = 100 })
 async function airtableGetRecord({ table, recordId }) {
   const config = getEnvConfig();
   const url = `https://api.airtable.com/v0/${config.baseId}/${encodeURIComponent(table)}/${recordId}`;
-
   const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${config.apiToken}`
-    }
+    headers: { Authorization: `Bearer ${config.apiToken}` }
   });
 
   const data = await response.json();
@@ -304,7 +223,6 @@ async function airtableGetRecord({ table, recordId }) {
 async function airtableUpdateRecord({ table, recordId, fields }) {
   const config = getEnvConfig();
   const url = `https://api.airtable.com/v0/${config.baseId}/${encodeURIComponent(table)}/${recordId}`;
-
   const response = await fetch(url, {
     method: "PATCH",
     headers: {
@@ -320,6 +238,10 @@ async function airtableUpdateRecord({ table, recordId, fields }) {
   }
 
   return data;
+}
+
+function firstNonEmpty(...values) {
+  return values.find((value) => value !== undefined && value !== null && value !== "") || "";
 }
 
 function parseContacts(rawValue) {
@@ -338,6 +260,132 @@ function parseContacts(rawValue) {
   }
 }
 
+function formatBirthDate(value) {
+  const text = String(value || "").trim();
+  if (!text) {
+    return "";
+  }
+
+  const dotMatch = text.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if (dotMatch) {
+    return text;
+  }
+
+  const isoMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (isoMatch) {
+    return `${isoMatch[3]}.${isoMatch[2]}.${isoMatch[1]}`;
+  }
+
+  return text;
+}
+
+function normalizeGender(value) {
+  const text = String(value || "").trim().toLowerCase();
+  if (!text) {
+    return "";
+  }
+  if (text === "m" || text === "м") {
+    return "М";
+  }
+  if (text === "f" || text === "ж") {
+    return "Ж";
+  }
+  return String(value || "");
+}
+
+function isActiveContact(activityValue) {
+  const value = String(activityValue || "").toLowerCase();
+  if (!value) {
+    return true;
+  }
+  return !value.includes("неакт") && !value.includes("inactive") && !value.includes("ошиб");
+}
+
+function normalizeWhatsapp(value) {
+  if (value === true) {
+    return "yes";
+  }
+  const text = String(value || "").trim().toLowerCase();
+  if (!text) {
+    return "";
+  }
+  if (["yes", "да", "true", "1"].includes(text)) {
+    return "yes";
+  }
+  if (["no", "нет", "false", "0"].includes(text)) {
+    return "no";
+  }
+  return "";
+}
+
+function normalizeContact(fields) {
+  const number = String(firstNonEmpty(
+    fields[fieldName("contactNumberField")],
+    fields["Мобильный телефон"]
+  ) || "").replace(/\D+/g, "");
+
+  return {
+    number,
+    owner_type: fields[fieldName("contactOwnerField")] || "",
+    whatsapp: normalizeWhatsapp(fields[fieldName("contactWhatsappField")])
+  };
+}
+
+async function getLinkedMemberRecord(executionFields) {
+  const linked = executionFields[fieldName("memberLinkField")];
+  const memberRecordId = Array.isArray(linked) ? linked[0] : linked;
+  if (!memberRecordId) {
+    return null;
+  }
+
+  return airtableGetRecord({
+    table: fieldName("memberTable"),
+    recordId: memberRecordId
+  });
+}
+
+async function getContactsFromIds(contactIds) {
+  const records = await Promise.all(
+    contactIds.map((contactId) =>
+      airtableGetRecord({
+        table: fieldName("contactTable"),
+        recordId: contactId
+      }).catch(() => null)
+    )
+  );
+
+  return records
+    .filter(Boolean)
+    .map((record) => record.fields || {})
+    .filter((fields) => isActiveContact(fields[fieldName("contactActivityField")]))
+    .map(normalizeContact)
+    .filter((contact) => contact.number || contact.owner_type || contact.whatsapp === "yes");
+}
+
+async function getContactsForMember(memberRecordId, memberFields) {
+  const linkedContacts = memberFields[fieldName("sourceContactsField")];
+  if (Array.isArray(linkedContacts) && linkedContacts.length) {
+    return getContactsFromIds(linkedContacts);
+  }
+
+  if (!memberRecordId) {
+    return [];
+  }
+
+  const formula = `FIND("${escapeFormulaValue(memberRecordId)}", ARRAYJOIN({${fieldName("contactMemberLinkField")}}))`;
+  const rows = await airtableListRecords({
+    table: fieldName("contactTable"),
+    filterByFormula: formula,
+    maxRecords: 50
+  });
+
+  return rows
+    .map((row) => row.fields || {})
+    .filter((fields) => isActiveContact(fields[fieldName("contactActivityField")]))
+    .map(normalizeContact)
+    .filter((contact) => contact.number || contact.owner_type || contact.whatsapp === "yes");
+}
+
 function roleRank(role) {
   const order = {
     self: 1,
@@ -350,144 +398,49 @@ function roleRank(role) {
   return order[role] || 99;
 }
 
-function firstNonEmpty(...values) {
-  return values.find((value) => value !== undefined && value !== null && value !== "") || "";
-}
-
-function sourceFieldOrFallback(sourceKey, fallbackKey) {
-  return process.env[`AIRTABLE_${sourceKey}`] || fieldName(fallbackKey);
-}
-
-async function getLinkedMemberRecord(executionFields) {
-  const memberLinkField = fieldName("memberLinkField");
-  const memberTable = fieldName("memberTable");
-
-  if (!memberLinkField) {
-    return null;
-  }
-
-  const linked = executionFields[memberLinkField];
-  const memberRecordId = Array.isArray(linked) ? linked[0] : linked;
-
-  if (!memberRecordId) {
-    return null;
-  }
-
-  return airtableGetRecord({
-    table: memberTable,
-    recordId: memberRecordId
-  });
-}
-
-function isActiveContact(activityValue) {
-  const value = String(activityValue || "").toLowerCase();
-  if (!value) {
-    return true;
-  }
-
-  return !value.includes("неакт") && !value.includes("inactive") && !value.includes("ошиб");
-}
-
-async function getContactsForMember(memberRecordId) {
-  if (!memberRecordId) {
-    return [];
-  }
-
-  const table = fieldName("contactTable");
-  const memberField = fieldName("contactMemberLinkField");
-  const formula = `FIND("${escapeFormulaValue(memberRecordId)}", ARRAYJOIN({${memberField}}))`;
-  const rows = await airtableListRecords({
-    table,
-    filterByFormula: formula,
-    maxRecords: 50
-  });
-
-  return rows
-    .map((row) => row.fields || {})
-    .filter((fields) => isActiveContact(fields[fieldName("contactActivityField")]))
-    .map((fields) => ({
-      number: String(fields[fieldName("contactNumberField")] || "").replace(/\D+/g, ""),
-      owner_type: fields[fieldName("contactOwnerField")] || "",
-      whatsapp: fields[fieldName("contactWhatsappField")] ? "yes" : "no"
-    }))
-    .filter((contact) => contact.number || contact.owner_type || contact.whatsapp === "yes");
-}
-
 async function buildPersonFromRecord(record) {
   const fields = record.fields || {};
   const memberRecord = await getLinkedMemberRecord(fields);
   const memberFields = memberRecord?.fields || {};
   const memberRecordId = memberRecord?.id;
   const role = fields[fieldName("roleField")] || "self";
-  const firstName = firstNonEmpty(
-    fields[fieldName("firstNameField")],
-    memberFields[sourceFieldOrFallback("sourceFirstNameField", "firstNameField")]
-  );
-  const lastName = firstNonEmpty(
-    fields[fieldName("lastNameField")],
-    memberFields[sourceFieldOrFallback("sourceLastNameField", "lastNameField")]
-  );
-  const middleName = firstNonEmpty(
-    fields[fieldName("middleNameField")],
-    memberFields[sourceFieldOrFallback("sourceMiddleNameField", "middleNameField")]
-  );
 
-  const contacts = parseContacts(fields[fieldName("contactsJsonField")]);
-  const resolvedContacts = contacts.length ? contacts : await getContactsForMember(memberRecordId);
+  const lastName = firstNonEmpty(fields[fieldName("lastNameField")], memberFields[fieldName("sourceLastNameField")]);
+  const firstName = firstNonEmpty(fields[fieldName("firstNameField")], memberFields[fieldName("sourceFirstNameField")]);
+  const middleName = firstNonEmpty(fields[fieldName("middleNameField")], memberFields[fieldName("sourceMiddleNameField")]);
+
+  const savedContacts = parseContacts(fields[fieldName("contactsJsonField")]);
+  const resolvedContacts = savedContacts.length ? savedContacts : await getContactsForMember(memberRecordId, memberFields);
 
   return {
     execution_record_id: record.id,
     role,
     relationship: fields[fieldName("relationshipField")] || "",
-    member_code: firstNonEmpty(
-      fields[fieldName("memberCodeField")],
-      memberFields[sourceFieldOrFallback("sourceMemberCodeField", "memberCodeField")]
-    ),
+    member_code: firstNonEmpty(fields[fieldName("memberCodeField")], memberFields[fieldName("sourceMemberCodeField")]),
+    address_code: firstNonEmpty(fields[fieldName("addressCodeField")], memberFields[fieldName("sourceAddressCodeField")]),
     full_name: firstNonEmpty(
       fields[fieldName("fullNameField")],
-      memberFields[sourceFieldOrFallback("sourceFullNameField", "fullNameField")],
+      memberFields[fieldName("sourceFullNameField")],
       `${lastName} ${firstName} ${middleName}`.trim()
     ),
     last_name: lastName,
     first_name: firstName,
     middle_name: middleName,
-    iin: firstNonEmpty(
-      fields[fieldName("iinField")],
-      memberFields[sourceFieldOrFallback("sourceIinField", "iinField")]
-    ),
+    iin: firstNonEmpty(fields[fieldName("iinField")], memberFields[fieldName("sourceIinField")]),
     require_iin: true,
-    gender: firstNonEmpty(
-      fields[fieldName("genderField")],
-      memberFields[sourceFieldOrFallback("sourceGenderField", "genderField")]
-    ),
-    birth_date: firstNonEmpty(
-      fields[fieldName("birthDateField")],
-      memberFields[sourceFieldOrFallback("sourceBirthDateField", "birthDateField")]
-    ),
+    gender: normalizeGender(firstNonEmpty(fields[fieldName("genderField")], memberFields[fieldName("sourceGenderField")])),
+    birth_date: formatBirthDate(firstNonEmpty(fields[fieldName("birthDateField")], memberFields[fieldName("sourceBirthDateField")])),
     will_be_in_city: fields[fieldName("inCityField")] || "",
     show_parent_fields: Boolean(
       fields[fieldName("motherNationalityField")] ||
       fields[fieldName("fatherNationalityField")] ||
-      memberFields[sourceFieldOrFallback("sourceMotherNationalityField", "motherNationalityField")] ||
-      memberFields[sourceFieldOrFallback("sourceFatherNationalityField", "fatherNationalityField")] ||
+      memberFields[fieldName("sourceMotherNationalityField")] ||
+      memberFields[fieldName("sourceFatherNationalityField")] ||
       role === "new_member"
     ),
-    parent_mother_nationality: firstNonEmpty(
-      fields[fieldName("motherNationalityField")],
-      memberFields[sourceFieldOrFallback("sourceMotherNationalityField", "motherNationalityField")]
-    ),
-    parent_father_nationality: firstNonEmpty(
-      fields[fieldName("fatherNationalityField")],
-      memberFields[sourceFieldOrFallback("sourceFatherNationalityField", "fatherNationalityField")]
-    ),
-    address_code: firstNonEmpty(
-      fields[fieldName("addressCodeField")],
-      memberFields[sourceFieldOrFallback("sourceAddressCodeField", "addressCodeField")]
-    ),
-    address: firstNonEmpty(
-      fields[fieldName("addressField")],
-      memberFields[sourceFieldOrFallback("sourceAddressField", "addressField")]
-    ),
+    parent_mother_nationality: firstNonEmpty(fields[fieldName("motherNationalityField")], memberFields[fieldName("sourceMotherNationalityField")]),
+    parent_father_nationality: firstNonEmpty(fields[fieldName("fatherNationalityField")], memberFields[fieldName("sourceFatherNationalityField")]),
+    address: firstNonEmpty(fields[fieldName("addressField")], memberFields[fieldName("sourceAddressField")]),
     contacts: resolvedContacts
   };
 }
@@ -500,7 +453,6 @@ async function buildPayloadFromRecords(records) {
   const first = records[0].fields || {};
   const persons = (await Promise.all(records.map(buildPersonFromRecord)))
     .sort((a, b) => roleRank(a.role) - roleRank(b.role));
-
   const primaryPerson = persons[0] || {};
 
   return {
@@ -510,33 +462,21 @@ async function buildPayloadFromRecords(records) {
     mode: first[fieldName("modeField")] || "single_update",
     summary: `Loaded ${persons.length} person record(s) for this form.`,
     meta: {
-      member_code: primaryPerson.member_code || first[fieldName("memberCodeField")] || "",
-      address_code: primaryPerson.address_code || first[fieldName("addressCodeField")] || ""
+      member_code: primaryPerson.member_code || "",
+      address_code: primaryPerson.address_code || ""
     },
     address: {
-      full: firstNonEmpty(
-        primaryPerson.address,
-        first[fieldName("addressField")],
-        records[0]?.fields?.[fieldName("addressField")]
-      )
+      full: firstNonEmpty(primaryPerson.address, first[fieldName("addressField")])
     },
     persons
   };
 }
 
 async function loadRealTokenPayload(token) {
-  const tokenField = fieldName("tokenField");
-  const tokenStatusField = fieldName("tokenStatusField");
-  const expiresAtField = fieldName("expiresAtField");
-  const formIdField = fieldName("formIdField");
-  const groupFormIdField = fieldName("groupFormIdField");
-  const executionTable = getEnvConfig().executionTable;
-
-  const tokenFormula = `{${tokenField}} = "${escapeFormulaValue(token)}"`;
   const matchingRows = await airtableListRecords({
-    table: executionTable,
-    filterByFormula: tokenFormula,
-    maxRecords: 50
+    table: getEnvConfig().executionTable,
+    filterByFormula: `{${fieldName("tokenField")}} = "${escapeFormulaValue(token)}"`,
+    maxRecords: 100
   });
 
   if (!matchingRows.length) {
@@ -545,8 +485,8 @@ async function loadRealTokenPayload(token) {
 
   const firstRecord = matchingRows[0];
   const firstFields = firstRecord.fields || {};
-  const tokenStatus = firstFields[tokenStatusField] || "";
-  const expiresAt = firstFields[expiresAtField];
+  const tokenStatus = firstFields[fieldName("tokenStatusField")] || "";
+  const expiresAt = firstFields[fieldName("expiresAtField")];
 
   if (tokenStatus === "submitted" || tokenStatus === "expired") {
     throw new Error("This form link is no longer active");
@@ -556,30 +496,30 @@ async function loadRealTokenPayload(token) {
     throw new Error("This form link has expired");
   }
 
-  const groupFormId = firstFields[groupFormIdField];
-  const formId = firstFields[formIdField];
-
   let allRows = matchingRows;
+  const groupFormId = firstFields[fieldName("groupFormIdField")];
+  const formId = firstFields[fieldName("formIdField")];
+
   if (groupFormId) {
     allRows = await airtableListRecords({
-      table: executionTable,
-      filterByFormula: `{${groupFormIdField}} = "${escapeFormulaValue(groupFormId)}"`,
+      table: getEnvConfig().executionTable,
+      filterByFormula: `{${fieldName("groupFormIdField")}} = "${escapeFormulaValue(groupFormId)}"`,
       maxRecords: 100
     });
   } else if (formId) {
     allRows = await airtableListRecords({
-      table: executionTable,
-      filterByFormula: `{${formIdField}} = "${escapeFormulaValue(formId)}"`,
+      table: getEnvConfig().executionTable,
+      filterByFormula: `{${fieldName("formIdField")}} = "${escapeFormulaValue(formId)}"`,
       maxRecords: 100
     });
   }
 
   if (tokenStatus !== "opened") {
     await airtableUpdateRecord({
-      table: executionTable,
+      table: getEnvConfig().executionTable,
       recordId: firstRecord.id,
       fields: {
-        [tokenStatusField]: "opened"
+        [fieldName("tokenStatusField")]: "opened"
       }
     });
   }
@@ -606,13 +546,10 @@ exports.handler = async function (event) {
       };
     }
 
-    const config = getEnvConfig();
-    if (!config) {
+    if (!getEnvConfig()) {
       return {
         ...jsonHeaders(503),
-        body: JSON.stringify({
-          error: "Airtable environment variables are not configured yet"
-        })
+        body: JSON.stringify({ error: "Airtable environment variables are not configured yet" })
       };
     }
 

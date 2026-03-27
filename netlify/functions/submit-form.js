@@ -14,7 +14,7 @@ const defaults = {
   iinField: "ИИН",
   genderField: "Род",
   birthDateField: "Григор дата рождения",
-  inCityField: "Нахожусь в Казахстане:",
+  inCityField: "на песах буду в городе",
   relationshipField: "קרבה לממלא הטופס",
   roleField: "form_role",
   motherNationalityField: "национальность матери",
@@ -40,11 +40,7 @@ function getEnvConfig() {
     return null;
   }
 
-  return {
-    apiToken,
-    baseId,
-    executionTable
-  };
+  return { apiToken, baseId, executionTable };
 }
 
 function jsonHeaders(statusCode = 200) {
@@ -67,9 +63,7 @@ async function airtableListRecords({ table, filterByFormula, maxRecords = 100 })
   }
 
   const response = await fetch(url.toString(), {
-    headers: {
-      Authorization: `Bearer ${config.apiToken}`
-    }
+    headers: { Authorization: `Bearer ${config.apiToken}` }
   });
 
   const data = await response.json();
@@ -83,7 +77,6 @@ async function airtableListRecords({ table, filterByFormula, maxRecords = 100 })
 async function airtableUpdateRecord({ table, recordId, fields }) {
   const config = getEnvConfig();
   const url = `https://api.airtable.com/v0/${config.baseId}/${encodeURIComponent(table)}/${recordId}`;
-
   const response = await fetch(url, {
     method: "PATCH",
     headers: {
@@ -101,46 +94,6 @@ async function airtableUpdateRecord({ table, recordId, fields }) {
   return data;
 }
 
-function buildPersonUpdate(person, fullPayload) {
-  const fields = {
-    [fieldName("lastNameField")]: person.last_name || "",
-    [fieldName("firstNameField")]: person.first_name || "",
-    [fieldName("middleNameField")]: person.middle_name || "",
-    [fieldName("genderField")]: person.gender || "",
-    [fieldName("birthDateField")]: person.birth_date || "",
-    [fieldName("inCityField")]: person.will_be_in_city || "",
-    [fieldName("relationshipField")]: person.relationship || "",
-    [fieldName("roleField")]: person.role || "",
-    [fieldName("motherNationalityField")]: person.parent_mother_nationality || "",
-    [fieldName("fatherNationalityField")]: person.parent_father_nationality || "",
-    [fieldName("contactsJsonField")]: JSON.stringify(person.contacts || []),
-    [fieldName("detailsConfirmedField")]: fullPayload.details_confirmed ? "yes" : "no",
-    [fieldName("chametzConfirmedField")]: fullPayload.chametz_sale_confirmation ? "yes" : "no",
-    [fieldName("submittedAtField")]: new Date().toISOString(),
-    [fieldName("tokenStatusField")]: "submitted",
-    [fieldName("onlineStatusField")]: "Ответ получен в онлайн-форме."
-  };
-
-  if (fullPayload.address?.confirmed === "yes") {
-    fields[fieldName("addressField")] = fullPayload.address.full || "";
-  }
-
-  if (fullPayload.address?.confirmed === "no") {
-    fields[fieldName("addressField")] = fullPayload.address.new_address || fullPayload.address.full || "";
-  }
-
-  if (fieldName("payloadJsonField")) {
-    fields[fieldName("payloadJsonField")] = JSON.stringify(fullPayload);
-  }
-
-  // For now we avoid writing IIN back during the general submit flow.
-  // The Airtable field currently rejects updates, and we don't want that
-  // to block the whole online process. We can re-enable this once the
-  // editable target field for IIN is fully verified.
-
-  return fields;
-}
-
 function validatePayload(body) {
   if (!body.token) {
     throw new Error("Token is required");
@@ -154,8 +107,7 @@ function validatePayload(body) {
     throw new Error("At least one person is required");
   }
 
-  const missingCityAnswer = body.persons.find((person) => !["yes", "no"].includes(person.will_be_in_city));
-  if (missingCityAnswer) {
+  if (body.persons.some((person) => !["yes", "no"].includes(person.will_be_in_city))) {
     throw new Error("Each person must answer whether they will be in the city on Pesach");
   }
 
@@ -168,13 +120,48 @@ function validatePayload(body) {
   }
 }
 
-async function loadRowsByToken(token) {
-  const tokenField = fieldName("tokenField");
-  const executionTable = getEnvConfig().executionTable;
+function buildPersonUpdate(person, fullPayload) {
+  const fields = {
+    [fieldName("lastNameField")]: person.last_name || "",
+    [fieldName("firstNameField")]: person.first_name || "",
+    [fieldName("middleNameField")]: person.middle_name || "",
+    [fieldName("genderField")]: person.gender || "",
+    [fieldName("birthDateField")]: person.birth_date || "",
+    [fieldName("inCityField")]: person.will_be_in_city || "",
+    [fieldName("roleField")]: person.role || "",
+    [fieldName("motherNationalityField")]: person.parent_mother_nationality || "",
+    [fieldName("fatherNationalityField")]: person.parent_father_nationality || "",
+    [fieldName("contactsJsonField")]: JSON.stringify(person.contacts || []),
+    [fieldName("detailsConfirmedField")]: fullPayload.details_confirmed ? "yes" : "no",
+    [fieldName("chametzConfirmedField")]: fullPayload.chametz_sale_confirmation ? "yes" : "no",
+    [fieldName("submittedAtField")]: new Date().toISOString(),
+    [fieldName("tokenStatusField")]: "submitted",
+    [fieldName("onlineStatusField")]: "Ответ получен в онлайн-форме."
+  };
 
+  if (person.relationship) {
+    fields[fieldName("relationshipField")] = person.relationship;
+  } else {
+    fields[fieldName("relationshipField")] = "";
+  }
+
+  if (fullPayload.address?.confirmed === "yes") {
+    fields[fieldName("addressField")] = fullPayload.address.full || "";
+  } else if (fullPayload.address?.confirmed === "no") {
+    fields[fieldName("addressField")] = fullPayload.address.new_address || fullPayload.address.full || "";
+  }
+
+  if (fieldName("payloadJsonField")) {
+    fields[fieldName("payloadJsonField")] = JSON.stringify(fullPayload);
+  }
+
+  return fields;
+}
+
+async function loadRowsByToken(token) {
   return airtableListRecords({
-    table: executionTable,
-    filterByFormula: `{${tokenField}} = "${escapeFormulaValue(token)}"`,
+    table: getEnvConfig().executionTable,
+    filterByFormula: `{${fieldName("tokenField")}} = "${escapeFormulaValue(token)}"`,
     maxRecords: 100
   });
 }
@@ -183,7 +170,6 @@ function createDemoSubmitResponse(body) {
   return {
     ok: true,
     message: "Submit received successfully",
-    next_step: "Update Airtable, generate PDF, close token",
     submitted_people: body.persons.length,
     request_id: body.request_id,
     form_id: body.form_id
@@ -202,13 +188,10 @@ exports.handler = async function (event) {
       };
     }
 
-    const config = getEnvConfig();
-    if (!config) {
+    if (!getEnvConfig()) {
       return {
         ...jsonHeaders(503),
-        body: JSON.stringify({
-          error: "Airtable environment variables are not configured yet"
-        })
+        body: JSON.stringify({ error: "Airtable environment variables are not configured yet" })
       };
     }
 
@@ -220,19 +203,14 @@ exports.handler = async function (event) {
       };
     }
 
-    const rowMap = new Map(matchingRows.map((record) => [record.id, record]));
-    const formIdField = fieldName("formIdField");
-    const tokenStatusField = fieldName("tokenStatusField");
-
-    const submittedAlready = matchingRows.some((record) => (record.fields || {})[tokenStatusField] === "submitted");
-    if (submittedAlready) {
+    if (matchingRows.some((record) => (record.fields || {})[fieldName("tokenStatusField")] === "submitted")) {
       return {
         ...jsonHeaders(409),
         body: JSON.stringify({ error: "This form has already been submitted" })
       };
     }
 
-    const expectedFormId = (matchingRows[0].fields || {})[formIdField];
+    const expectedFormId = (matchingRows[0].fields || {})[fieldName("formIdField")];
     if (expectedFormId && expectedFormId !== body.form_id) {
       return {
         ...jsonHeaders(409),
@@ -254,7 +232,7 @@ exports.handler = async function (event) {
       }
 
       await airtableUpdateRecord({
-        table: config.executionTable,
+        table: getEnvConfig().executionTable,
         recordId: record.id,
         fields: buildPersonUpdate(person, body)
       });
@@ -269,8 +247,7 @@ exports.handler = async function (event) {
         request_id: body.request_id,
         form_id: body.form_id,
         updated_rows: updatedCount,
-        token_status: "submitted",
-        next_step: "Generate PDF, update additional records, and notify systems"
+        token_status: "submitted"
       })
     };
   } catch (error) {

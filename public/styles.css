@@ -170,9 +170,24 @@ button.secondary{
   display:grid;
   gap:6px;
 }
+.info-field{
+  display:grid;
+  gap:6px;
+}
 .grid span,.full span,.meta-grid span,.person-grid span,.contact-grid span{
   color:var(--navy);
   font-size:12px;
+  font-weight:800;
+}
+.info-value{
+  min-height:48px;
+  display:flex;
+  align-items:center;
+  padding:12px 14px;
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  background:#f7f2e8;
+  color:var(--navy);
   font-weight:800;
 }
 .full input{
@@ -230,6 +245,12 @@ button.secondary{
   color:var(--navy);
   font-size:12px;
   font-weight:800;
+}
+.person-badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:flex-end;
 }
 .person-grid,.contact-grid{
   display:grid;
