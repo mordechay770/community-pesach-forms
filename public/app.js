@@ -111,7 +111,19 @@ async function callJson(url, payload = {}) {
     body: JSON.stringify(payload)
   });
 
-  const data = await response.json();
+  const rawText = await response.text();
+  let data;
+
+  try {
+    data = JSON.parse(rawText);
+  } catch {
+    const looksLikeHtml = rawText.trim().startsWith("<");
+    const fallbackMessage = looksLikeHtml
+      ? "Сервер вернул HTML вместо JSON. Скорее всего, функция Netlify сейчас недоступна или deploy завершился с ошибкой."
+      : rawText || "Request failed";
+    throw new Error(translateError(fallbackMessage));
+  }
+
   if (!response.ok) {
     throw new Error(translateError(data.error || "Request failed"));
   }
