@@ -20,7 +20,7 @@
         Личная форма открывается по одноразовой ссылке. Здесь можно проверить данные,
         дополнить недостающую информацию и подтвердить участие семьи в подготовке к Песаху.
       </p>
-      <div class="token-box">
+      <div id="tokenBox" class="token-box">
         <label for="tokenInput">Token</label>
         <div class="token-row">
           <input id="tokenInput" type="text" placeholder="Use demo-single, demo-family, or demo-new">
@@ -30,7 +30,7 @@
       </div>
     </section>
 
-    <section class="panel">
+    <section id="healthPanel" class="panel">
       <div class="panel-head">
         <h2>Connection status</h2>
         <button id="healthBtn" type="button" class="secondary">Run health check</button>
@@ -46,7 +46,7 @@
       <div id="payloadSummary" class="summary">Загрузите форму по личной ссылке, чтобы продолжить.</div>
 
       <form id="form" class="form">
-        <details class="tech-box">
+        <details id="techBox" class="tech-box">
           <summary>Техническая информация</summary>
           <div class="meta-grid">
             <label>

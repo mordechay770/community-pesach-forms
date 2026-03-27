@@ -11,6 +11,9 @@ const contactsContainer = document.getElementById("contactsContainer");
 const addMemberWrap = document.getElementById("addMemberWrap");
 const addMemberBtn = document.getElementById("addMemberBtn");
 const newAddressWrap = document.getElementById("newAddressWrap");
+const tokenBox = document.getElementById("tokenBox");
+const healthPanel = document.getElementById("healthPanel");
+const techBox = document.getElementById("techBox");
 
 const fields = {
   formId: document.getElementById("formId"),
@@ -27,6 +30,20 @@ const fields = {
 };
 
 let currentPayload = null;
+
+function formatDisplayDate(value) {
+  const text = String(value || "").trim();
+  if (!text) {
+    return "";
+  }
+
+  const isoMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) {
+    return `${isoMatch[3]}.${isoMatch[2]}.${isoMatch[1]}`;
+  }
+
+  return text;
+}
 
 function translateError(message) {
   const text = String(message || "");
@@ -183,8 +200,8 @@ function renderPersonCard(person, index) {
           <span>Пол</span>
           <select data-person-index="${index}" data-field="gender">
             <option value="">Выберите</option>
-            <option value="M"${person.gender === "M" ? " selected" : ""}>М</option>
-            <option value="F"${person.gender === "F" ? " selected" : ""}>Ж</option>
+            <option value="М"${person.gender === "М" || person.gender === "M" ? " selected" : ""}>М</option>
+            <option value="Ж"${person.gender === "Ж" || person.gender === "F" ? " selected" : ""}>Ж</option>
           </select>
         </label>
         <label>
@@ -238,6 +255,10 @@ function renderPersons(persons, mode) {
 
 function fillForm(data) {
   currentPayload = structuredClone(data);
+  currentPayload.persons = (currentPayload.persons || []).map((person) => ({
+    ...person,
+    birth_date: formatDisplayDate(person.birth_date)
+  }));
   fields.formId.value = data.form_id || "";
   fields.requestId.value = data.request_id || "";
   fields.groupFormId.value = data.group_form_id || "";
@@ -322,6 +343,21 @@ function buildSubmitPayload() {
   };
 }
 
+async function loadCurrentToken() {
+  submitOutput.textContent = "No submit yet.";
+  payloadSummary.textContent = "Загружаем данные формы...";
+  const data = await callJson("/.netlify/functions/load-form", {
+    token: tokenInput.value.trim()
+  });
+  fillForm(data);
+}
+
+function enableLiveMode() {
+  tokenBox?.classList.add("hidden");
+  healthPanel?.classList.add("hidden");
+  techBox?.classList.add("hidden");
+}
+
 healthBtn.addEventListener("click", async () => {
   healthOutput.textContent = "Checking...";
   try {
@@ -333,15 +369,10 @@ healthBtn.addEventListener("click", async () => {
 });
 
 loadBtn.addEventListener("click", async () => {
-  submitOutput.textContent = "No submit yet.";
-  payloadSummary.textContent = "Загружаем данные формы...";
   try {
-    const data = await callJson("/.netlify/functions/load-form", {
-      token: tokenInput.value.trim()
-    });
-    fillForm(data);
+    await loadCurrentToken();
   } catch (error) {
-    payloadSummary.textContent = `Load failed: ${error.message}`;
+    payloadSummary.textContent = `Ошибка загрузки: ${error.message}`;
   }
 });
 
@@ -442,4 +473,8 @@ form.addEventListener("submit", async (event) => {
 const queryToken = new URLSearchParams(window.location.search).get("t");
 if (queryToken) {
   tokenInput.value = queryToken;
+  enableLiveMode();
+  loadCurrentToken().catch((error) => {
+    payloadSummary.textContent = `Ошибка загрузки: ${error.message}`;
+  });
 }

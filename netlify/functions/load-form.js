@@ -187,6 +187,12 @@ const defaults = {
   executionTable: "для незарегистрированных в общине",
   memberTable: "Члены_семьи",
   memberLinkField: "כרטיס אישי של חבר קהילה",
+  contactTable: "КонтактныеДанные",
+  contactMemberLinkField: "Label",
+  contactNumberField: "Полный номер",
+  contactWhatsappField: "Whatsapp",
+  contactActivityField: "Активность номера",
+  contactOwnerField: "Кому принадлежит номер",
   tokenField: "token",
   tokenStatusField: "token_status",
   expiresAtField: "expires_at",
@@ -211,17 +217,17 @@ const defaults = {
   fatherNationalityField: "национальность отца",
   contactsJsonField: "contacts_json",
   sourceFullNameField: "",
-  sourceLastNameField: "",
-  sourceFirstNameField: "",
-  sourceMiddleNameField: "",
+  sourceLastNameField: "Фамилия",
+  sourceFirstNameField: "Имя",
+  sourceMiddleNameField: "Отчество",
   sourceIinField: "",
-  sourceGenderField: "",
-  sourceBirthDateField: "",
-  sourceAddressField: "",
-  sourceMemberCodeField: "",
-  sourceAddressCodeField: "",
-  sourceMotherNationalityField: "",
-  sourceFatherNationalityField: ""
+  sourceGenderField: "Род",
+  sourceBirthDateField: "Григор год рождения",
+  sourceAddressField: "כתובת מלאה (from Код адреса)",
+  sourceMemberCodeField: "КодЧлены семьи",
+  sourceAddressCodeField: "Код (from Код адреса)",
+  sourceMotherNationalityField: "Нац мамы",
+  sourceFatherNationalityField: "Нац папы"
 };
 
 function fieldName(key) {
@@ -373,10 +379,45 @@ async function getLinkedMemberRecord(executionFields) {
   });
 }
 
+function isActiveContact(activityValue) {
+  const value = String(activityValue || "").toLowerCase();
+  if (!value) {
+    return true;
+  }
+
+  return !value.includes("неакт") && !value.includes("inactive") && !value.includes("ошиб");
+}
+
+async function getContactsForMember(memberRecordId) {
+  if (!memberRecordId) {
+    return [];
+  }
+
+  const table = fieldName("contactTable");
+  const memberField = fieldName("contactMemberLinkField");
+  const formula = `FIND("${escapeFormulaValue(memberRecordId)}", ARRAYJOIN({${memberField}}))`;
+  const rows = await airtableListRecords({
+    table,
+    filterByFormula: formula,
+    maxRecords: 50
+  });
+
+  return rows
+    .map((row) => row.fields || {})
+    .filter((fields) => isActiveContact(fields[fieldName("contactActivityField")]))
+    .map((fields) => ({
+      number: String(fields[fieldName("contactNumberField")] || "").replace(/\D+/g, ""),
+      owner_type: fields[fieldName("contactOwnerField")] || "",
+      whatsapp: fields[fieldName("contactWhatsappField")] ? "yes" : "no"
+    }))
+    .filter((contact) => contact.number || contact.owner_type || contact.whatsapp === "yes");
+}
+
 async function buildPersonFromRecord(record) {
   const fields = record.fields || {};
   const memberRecord = await getLinkedMemberRecord(fields);
   const memberFields = memberRecord?.fields || {};
+  const memberRecordId = memberRecord?.id;
   const role = fields[fieldName("roleField")] || "self";
   const firstName = firstNonEmpty(
     fields[fieldName("firstNameField")],
@@ -390,6 +431,9 @@ async function buildPersonFromRecord(record) {
     fields[fieldName("middleNameField")],
     memberFields[sourceFieldOrFallback("sourceMiddleNameField", "middleNameField")]
   );
+
+  const contacts = parseContacts(fields[fieldName("contactsJsonField")]);
+  const resolvedContacts = contacts.length ? contacts : await getContactsForMember(memberRecordId);
 
   return {
     execution_record_id: record.id,
@@ -436,7 +480,15 @@ async function buildPersonFromRecord(record) {
       fields[fieldName("fatherNationalityField")],
       memberFields[sourceFieldOrFallback("sourceFatherNationalityField", "fatherNationalityField")]
     ),
-    contacts: parseContacts(fields[fieldName("contactsJsonField")])
+    address_code: firstNonEmpty(
+      fields[fieldName("addressCodeField")],
+      memberFields[sourceFieldOrFallback("sourceAddressCodeField", "addressCodeField")]
+    ),
+    address: firstNonEmpty(
+      fields[fieldName("addressField")],
+      memberFields[sourceFieldOrFallback("sourceAddressField", "addressField")]
+    ),
+    contacts: resolvedContacts
   };
 }
 
@@ -449,6 +501,8 @@ async function buildPayloadFromRecords(records) {
   const persons = (await Promise.all(records.map(buildPersonFromRecord)))
     .sort((a, b) => roleRank(a.role) - roleRank(b.role));
 
+  const primaryPerson = persons[0] || {};
+
   return {
     form_id: first[fieldName("formIdField")] || "",
     request_id: first[fieldName("requestIdField")] || "",
@@ -456,11 +510,12 @@ async function buildPayloadFromRecords(records) {
     mode: first[fieldName("modeField")] || "single_update",
     summary: `Loaded ${persons.length} person record(s) for this form.`,
     meta: {
-      member_code: first[fieldName("memberCodeField")] || "",
-      address_code: first[fieldName("addressCodeField")] || ""
+      member_code: primaryPerson.member_code || first[fieldName("memberCodeField")] || "",
+      address_code: primaryPerson.address_code || first[fieldName("addressCodeField")] || ""
     },
     address: {
       full: firstNonEmpty(
+        primaryPerson.address,
         first[fieldName("addressField")],
         records[0]?.fields?.[fieldName("addressField")]
       )
