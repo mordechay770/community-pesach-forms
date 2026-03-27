@@ -175,6 +175,7 @@ function stripOptionalSubmitFields(fields) {
   delete reduced[fieldName("detailsConfirmedField")];
   delete reduced[fieldName("chametzConfirmedField")];
   delete reduced[fieldName("payloadJsonField")];
+  delete reduced[fieldName("submittedAtField")];
   return reduced;
 }
 
@@ -191,7 +192,8 @@ async function updateRecordWithFallback(recordId, fields) {
     const optionalFieldNames = [
       fieldName("detailsConfirmedField"),
       fieldName("chametzConfirmedField"),
-      fieldName("payloadJsonField")
+      fieldName("payloadJsonField"),
+      fieldName("submittedAtField")
     ];
 
     if (optionalFieldNames.some((name) => name && message.includes(name))) {
