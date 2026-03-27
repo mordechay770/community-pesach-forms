@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pesach Form</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="brand">
+        <img src="./assets/logo/logo2%20-.png" alt="Organization logo" class="logo">
+        <div>
+          <p class="eyebrow">Pesach 5786</p>
+          <h1>Проверка и обновление данных</h1>
+        </div>
+      </div>
+      <p class="intro">
+        Личная форма открывается по одноразовой ссылке. Здесь можно проверить данные,
+        дополнить недостающую информацию и подтвердить участие семьи в подготовке к Песаху.
+      </p>
+      <div class="token-box">
+        <label for="tokenInput">Token</label>
+        <div class="token-row">
+          <input id="tokenInput" type="text" placeholder="Use demo-single, demo-family, or demo-new">
+          <button id="loadBtn" type="button">Load form</button>
+        </div>
+        <p class="token-hint">For local demo: <code>demo-single</code>, <code>demo-family</code>, <code>demo-new</code></p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Connection status</h2>
+        <button id="healthBtn" type="button" class="secondary">Run health check</button>
+      </div>
+      <pre id="healthOutput" class="output">No checks yet.</pre>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Loaded payload</h2>
+        <span id="modeBadge" class="badge">mode: not loaded</span>
+      </div>
+      <div id="payloadSummary" class="summary">Load a token to see the payload summary.</div>
+
+      <form id="form" class="form">
+        <div class="meta-grid">
+          <label>
+            <span>Form ID</span>
+            <input id="formId" name="form_id" type="text" readonly>
+          </label>
+          <label>
+            <span>Request ID</span>
+            <input id="requestId" name="request_id" type="text" readonly>
+          </label>
+          <label>
+            <span>Group Form ID</span>
+            <input id="groupFormId" name="group_form_id" type="text" readonly>
+          </label>
+          <label>
+            <span>Mode</span>
+            <input id="modeField" name="mode" type="text" readonly>
+          </label>
+        </div>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Step 1</p>
+              <h3>Общая информация</h3>
+            </div>
+            <span class="section-note">Сначала проверьте основную информацию по заявке.</span>
+          </div>
+
+          <div class="grid">
+            <label>
+              <span>Код члена общины</span>
+              <input id="memberCode" name="member_code" type="text" readonly>
+            </label>
+            <label>
+              <span>Код адреса</span>
+              <input id="addressCode" name="address_code" type="text" readonly>
+            </label>
+          </div>
+
+          <label class="full">
+            <span>Адрес проживания</span>
+            <input id="address" name="address" type="text">
+          </label>
+
+          <div class="grid">
+            <label>
+              <span>Подтвердить адрес</span>
+              <select id="addressConfirmed" name="address_confirmed">
+                <option value="">Выберите</option>
+                <option value="yes">Да</option>
+                <option value="no">Нет, нужно исправить</option>
+              </select>
+            </label>
+            <label id="newAddressWrap" class="hidden">
+              <span>Новый адрес</span>
+              <input id="newAddress" name="new_address" type="text">
+            </label>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Step 2</p>
+              <h3>Участники формы</h3>
+            </div>
+            <span class="section-note">Для каждого человека нужно отдельно указать, будет ли он в городе на Песах.</span>
+          </div>
+
+          <div id="personsContainer" class="person-stack"></div>
+
+          <div id="addMemberWrap" class="inline-actions hidden">
+            <button id="addMemberBtn" type="button" class="secondary">Добавить члена семьи</button>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Step 3</p>
+              <h3>Контактные данные</h3>
+            </div>
+            <span class="section-note">Номера можно подтвердить, исправить или дополнить.</span>
+          </div>
+
+          <div id="contactsContainer" class="contact-stack"></div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Step 4</p>
+              <h3>Подтверждение и продажа хамеца</h3>
+            </div>
+            <span class="section-note">Завершающий шаг перед отправкой формы.</span>
+          </div>
+
+          <label class="check">
+            <input id="detailsConfirmed" name="details_confirmed" type="checkbox">
+            <span>Подтверждаю, что проверил(а) данные и при необходимости внёс(внесла) исправления.</span>
+          </label>
+
+          <label class="check">
+            <input id="chametz" name="chametz_sale_confirmation" type="checkbox">
+            <span>Подтверждаю, что даю полномочия раввину продать мой хамец перед Песахом, как положено по еврейским законам.</span>
+          </label>
+
+          <div class="actions">
+            <button id="submitBtn" type="submit">Отправить форму</button>
+          </div>
+        </section>
+      </form>
+
+      <pre id="submitOutput" class="output">No submit yet.</pre>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
