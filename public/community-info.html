@@ -81,52 +81,20 @@
     }
   </style>
 </head>
-<body>
+<body data-page-type="community">
   <main class="info-shell">
     <section class="info-hero">
-      <p class="eyebrow">Community Information</p>
-      <h1>Полезная информация и программы центра</h1>
-      <p>Эта страница может стать общей точкой входа к информации о Песахе, календаре праздников и программах еврейского центра в течение года.</p>
+      <p class="eyebrow" data-content="community-eyebrow">Community Information</p>
+      <h1 data-content="community-title">Полезная информация и программы центра</h1>
+      <p data-content="community-description">Эта страница может стать общей точкой входа к информации о Песахе, календаре праздников и программах еврейского центра в течение года.</p>
     </section>
 
     <section class="nav-panel">
-      <div class="nav-links">
-        <a href="#pesach">Песах</a>
-        <a href="#holiday-info">Информация о праздниках</a>
-        <a href="#programs">Программы центра</a>
-        <a href="#seniors">Клуб золотого возраста</a>
-      </div>
+      <div class="nav-links" data-content="community-nav"></div>
     </section>
 
-    <section id="pesach" class="section-panel">
-      <h2>Песах</h2>
-      <p>Здесь можно разместить ссылки и краткие пояснения для всего, что связано с Песахом.</p>
-      <div class="bullet-list">
-        <div class="bullet"><strong>Когда начинается Песах</strong><span>Краткая информация о датах, времени и порядке.</span></div>
-        <div class="bullet"><strong>Продажа хамеца</strong><span>Ссылка на форму или страницу продажи хамеца.</span></div>
-        <div class="bullet"><strong>Запись на седер</strong><span>Переход к регистрации или к контактам центра.</span></div>
-      </div>
-    </section>
-
-    <section id="holiday-info" class="section-panel">
-      <h2>Общая информация о праздниках</h2>
-      <p>Этот блок можно использовать для шаблонной публикации контента по праздникам, времени зажигания свечей и важным датам.</p>
-    </section>
-
-    <section id="programs" class="section-panel">
-      <h2>Программы центра</h2>
-      <p>Общий раздел с программами центра по возрасту и интересам.</p>
-      <div class="bullet-list">
-        <div class="bullet"><strong>Для детей и семей</strong><span>Семейные программы, кружки и детские мероприятия.</span></div>
-        <div class="bullet"><strong>Для молодёжи</strong><span>Учебные и социальные активности, встречи и клубы.</span></div>
-        <div class="bullet"><strong>Для взрослых</strong><span>Образовательные, культурные и общинные программы.</span></div>
-      </div>
-    </section>
-
-    <section id="seniors" class="section-panel">
-      <h2>Клуб золотого возраста</h2>
-      <p>Здесь можно выделить отдельный блок с программами для пожилых членов общины.</p>
-    </section>
+    <div data-content="community-sections"></div>
   </main>
+  <script src="./content-pages.js"></script>
 </body>
 </html>

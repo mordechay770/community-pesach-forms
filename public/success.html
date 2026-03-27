@@ -67,27 +67,16 @@
     }
   </style>
 </head>
-<body>
+<body data-page-type="success">
   <main class="success-shell">
     <section class="success-hero">
-      <p class="eyebrow">Pesach 5786</p>
-      <h1>Спасибо, форма успешно отправлена</h1>
-      <p>Ваши данные получены и сохранены в системе. Если потребуется дополнительная проверка, с вами свяжутся. Ниже можно перейти к полезной информации о Песахе и о программах еврейского центра.</p>
+      <p class="eyebrow" data-content="success-eyebrow">Pesach 5786</p>
+      <h1 data-content="success-title">Спасибо, форма успешно отправлена</h1>
+      <p data-content="success-description">Ваши данные получены и сохранены в системе. Если потребуется дополнительная проверка, с вами свяжутся. Ниже можно перейти к полезной информации о Песахе и о программах еврейского центра.</p>
     </section>
 
-    <section class="link-grid">
-      <article class="link-card">
-        <h2>Информация о Песахе</h2>
-        <p>Когда начинается Песах, основные законы, продажа хамеца, запись на седер и дополнительные ссылки.</p>
-        <a href="./community-info.html#pesach">Открыть раздел Песаха</a>
-      </article>
-
-      <article class="link-card">
-        <h2>Программы центра</h2>
-        <p>Общая информация о программах центра, клубах, мероприятиях и возможностях участия в течение года.</p>
-        <a href="./community-info.html#programs">Открыть программы центра</a>
-      </article>
-    </section>
+    <section class="link-grid" data-content="success-cards"></section>
   </main>
+  <script src="./content-pages.js"></script>
 </body>
 </html>
