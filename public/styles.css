@@ -90,7 +90,7 @@ h1,h2{margin:0}
   gap:12px;
   align-items:center;
 }
-.token-row input,.grid input,.grid select,.full input,.meta-grid input,.person-grid input,.person-grid select,.contact-grid input,.contact-grid select{
+.token-row input,.grid input,.grid select,.grid textarea,.full input,.full textarea,.meta-grid input,.person-grid input,.person-grid select,.contact-grid input,.contact-grid select{
   width:100%;
   border:1.5px solid var(--line);
   border-radius:14px;
@@ -190,8 +190,13 @@ button.secondary{
   color:var(--navy);
   font-weight:800;
 }
-.full input{
+.full input,.full textarea{
   background:#fff;
+}
+.full textarea,
+.grid textarea{
+  resize:vertical;
+  min-height:88px;
 }
 .section-card{
   border:1px solid var(--line);

@@ -132,8 +132,8 @@ function buildPersonUpdate(person, fullPayload) {
     [fieldName("motherNationalityField")]: person.parent_mother_nationality || "",
     [fieldName("fatherNationalityField")]: person.parent_father_nationality || "",
     [fieldName("contactsJsonField")]: JSON.stringify(person.contacts || []),
-    [fieldName("detailsConfirmedField")]: fullPayload.details_confirmed ? "yes" : "no",
-    [fieldName("chametzConfirmedField")]: fullPayload.chametz_sale_confirmation ? "yes" : "no",
+    [fieldName("detailsConfirmedField")]: Boolean(fullPayload.details_confirmed),
+    [fieldName("chametzConfirmedField")]: Boolean(fullPayload.chametz_sale_confirmation),
     [fieldName("submittedAtField")]: new Date().toISOString(),
     [fieldName("tokenStatusField")]: "submitted",
     [fieldName("onlineStatusField")]: "Ответ получен в онлайн-форме."
