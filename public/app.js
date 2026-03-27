@@ -32,7 +32,8 @@ const fields = {
 let currentPayload = null;
 
 function formatDisplayDate(value) {
-  const text = String(value || "").trim();
+  const raw = Array.isArray(value) ? value[0] : value;
+  const text = String(raw || "").trim();
   if (!text) {
     return "";
   }
@@ -55,6 +56,24 @@ function formatDisplayDate(value) {
   const slashMatch = text.match(/^(\d{4})\/(\d{2})\/(\d{2})$/);
   if (slashMatch) {
     return `${slashMatch[3]}.${slashMatch[2]}.${slashMatch[1]}`;
+  }
+
+  const dayFirstSlashMatch = text.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (dayFirstSlashMatch) {
+    return `${dayFirstSlashMatch[1]}.${dayFirstSlashMatch[2]}.${dayFirstSlashMatch[3]}`;
+  }
+
+  const dayFirstDashMatch = text.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+  if (dayFirstDashMatch) {
+    return `${dayFirstDashMatch[1]}.${dayFirstDashMatch[2]}.${dayFirstDashMatch[3]}`;
+  }
+
+  const parsed = new Date(text);
+  if (!Number.isNaN(parsed.getTime())) {
+    const day = String(parsed.getUTCDate()).padStart(2, "0");
+    const month = String(parsed.getUTCMonth() + 1).padStart(2, "0");
+    const year = String(parsed.getUTCFullYear());
+    return `${day}.${month}.${year}`;
   }
 
   return text;

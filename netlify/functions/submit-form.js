@@ -158,6 +158,41 @@ function buildPersonUpdate(person, fullPayload) {
   return fields;
 }
 
+function stripOptionalSubmitFields(fields) {
+  const reduced = { ...fields };
+  delete reduced[fieldName("detailsConfirmedField")];
+  delete reduced[fieldName("chametzConfirmedField")];
+  delete reduced[fieldName("payloadJsonField")];
+  return reduced;
+}
+
+async function updateRecordWithFallback(recordId, fields) {
+  try {
+    return await airtableUpdateRecord({
+      table: getEnvConfig().executionTable,
+      recordId,
+      fields
+    });
+  } catch (error) {
+    const message = String(error.message || "");
+    const optionalFieldNames = [
+      fieldName("detailsConfirmedField"),
+      fieldName("chametzConfirmedField"),
+      fieldName("payloadJsonField")
+    ];
+
+    if (optionalFieldNames.some((name) => name && message.includes(name))) {
+      return airtableUpdateRecord({
+        table: getEnvConfig().executionTable,
+        recordId,
+        fields: stripOptionalSubmitFields(fields)
+      });
+    }
+
+    throw error;
+  }
+}
+
 async function loadRowsByToken(token) {
   return airtableListRecords({
     table: getEnvConfig().executionTable,
@@ -231,11 +266,7 @@ exports.handler = async function (event) {
         continue;
       }
 
-      await airtableUpdateRecord({
-        table: getEnvConfig().executionTable,
-        recordId: record.id,
-        fields: buildPersonUpdate(person, body)
-      });
+      await updateRecordWithFallback(record.id, buildPersonUpdate(person, body));
       updatedCount += 1;
     }
 
