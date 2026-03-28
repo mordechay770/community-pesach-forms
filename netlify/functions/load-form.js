@@ -1,4 +1,5 @@
-const LOAD_FORM_RUNTIME_VERSION = "load-form-local-2026-03-29-debug-1";
+const LOAD_FORM_RUNTIME_VERSION = "load-form";
+const GENERIC_LOAD_ERROR = "Unable to load form data";
 
 const DEMO_FORMS = {
   "demo-single": {
@@ -151,6 +152,77 @@ const defaults = {
   sourceFatherBirthPlaceField: "МестоРожденияОтца"
 };
 
+Object.assign(defaults, {
+  executionTable: "для незарегистрированных в общине",
+  memberTable: "Члены_семьи",
+  memberLinkField: "כרטיס אישי של חבר קהילה",
+  contactTable: "КонтактныеДанные",
+  contactNumberField: "Полный номер",
+  contactActivityField: "Активность номера",
+  contactOwnerField: "Кому принадлежит номер",
+  sourceContactsField: "КонтактныеДанные",
+  requestIdField: "RECORD ID (from קישור לפגישה)",
+  memberCodeField: "КодЧлены семьи (from כרטיס אישי של חבר קהילה)",
+  addressCodeField: "Код (from Код адреса) (from כרטיס אישי של חבר קהילה)",
+  addressField: "Домашний адрес",
+  relationshipField: "קרבה לממלא הטופס",
+  lastNameField: "Фамилия",
+  firstNameField: "Имя",
+  middleNameField: "Отчество",
+  iinField: "ИИН",
+  genderField: "Род",
+  birthDateField: "Григор дата рождения",
+  inCityField: "на песах буду в городе",
+  motherNationalityField: "национальность матери",
+  fatherNationalityField: "национальность отца",
+  maidenNameField: "Девичья фамилия",
+  hebrewNameField: "Еврейское имя",
+  birthPlaceField: "Место рождения",
+  educationField: "Образование",
+  specialtyField: "Специальность",
+  schoolField: "Номер школы",
+  motherLastNameField: "Фамилия Матери",
+  motherFirstNameField: "Имя матери",
+  motherHebrewNameField: "Евр Имя Матери",
+  motherMiddleNameField: "Отчество Матери",
+  motherBirthDateField: "ДатаРожденияМатери",
+  motherBirthPlaceField: "Место Рождения Матери",
+  fatherLastNameField: "Фамилия Отца",
+  fatherFirstNameField: "Имя отца",
+  fatherHebrewNameField: "Евр Имя Отца",
+  fatherMiddleNameField: "Отчество Отца",
+  fatherBirthDateField: "Дата Рождения Отца",
+  fatherBirthPlaceField: "Место Рождения Отца",
+  sourceLastNameField: "Фамилия",
+  sourceFirstNameField: "Имя",
+  sourceMiddleNameField: "Отчество",
+  sourceIinField: "ИИН",
+  sourceGenderField: "Род",
+  sourceBirthDateField: "Григор год рождения",
+  sourceAltBirthDateField: "Григор дата рождения",
+  sourceAddressField: "כתובת מלאה (from Код адреса)",
+  sourceMemberCodeField: "КодЧлены семьи",
+  sourceAddressCodeField: "Код (from Код адреса)",
+  sourceMotherNationalityField: "Нац мамы",
+  sourceFatherNationalityField: "Нац папы",
+  sourceMaidenNameField: "ДевичьяФамилия",
+  sourceHebrewNameField: "ЕврИмя",
+  sourceBirthPlaceField: "МестоРождения",
+  sourceEducationField: "Образование",
+  sourceSpecialtyField: "Специальность",
+  sourceMotherLastNameField: "ФамилияМатери",
+  sourceMotherFirstNameField: "Имя матери",
+  sourceMotherHebrewNameField: "ЕврИмяМатери",
+  sourceMotherBirthDateField: "ДатаРожденияМатери",
+  sourceMotherBirthPlaceField: "МестоРожденияМатери",
+  sourceFatherLastNameField: "ФамилияОтца",
+  sourceFatherFirstNameField: "ИмяОтца",
+  sourceFatherHebrewNameField: "ЕврИмяОтца",
+  sourceFatherMiddleNameField: "ОтчествоОтца",
+  sourceFatherBirthDateField: "ДатаРожденияОтца",
+  sourceFatherBirthPlaceField: "МестоРожденияОтца"
+});
+
 function fieldName(key) {
   return process.env[`AIRTABLE_${key}`] || defaults[key];
 }
@@ -184,20 +256,8 @@ async function airtableListRecords({ table, filterByFormula, maxRecords = 100 })
   let data = {};
   try {
     data = rawText ? JSON.parse(rawText) : {};
-  } catch {
-    data = { raw: rawText };
-  }
-  if (!response.ok) {
-    throw new Error(
-      [
-        "airtable_list_failed",
-        `status=${response.status}`,
-        `table=${table}`,
-        `url=${url.pathname}`,
-        `body=${rawText || "<empty>"}`
-      ].join(" | ")
-    );
-  }
+  } catch {}
+  if (!response.ok) throw new Error(data.error?.message || GENERIC_LOAD_ERROR);
   return data.records || [];
 }
 
@@ -213,20 +273,8 @@ async function airtableGetRecord({ table, recordId }) {
   let data = {};
   try {
     data = rawText ? JSON.parse(rawText) : {};
-  } catch {
-    data = { raw: rawText };
-  }
-  if (!response.ok) {
-    throw new Error(
-      [
-        "airtable_get_failed",
-        `status=${response.status}`,
-        `table=${table}`,
-        `record_id=${recordId}`,
-        `body=${rawText || "<empty>"}`
-      ].join(" | ")
-    );
-  }
+  } catch {}
+  if (!response.ok) throw new Error(data.error?.message || GENERIC_LOAD_ERROR);
   return data;
 }
 
@@ -247,20 +295,8 @@ async function airtableUpdateRecord({ table, recordId, fields }) {
   let data = {};
   try {
     data = rawText ? JSON.parse(rawText) : {};
-  } catch {
-    data = { raw: rawText };
-  }
-  if (!response.ok) {
-    throw new Error(
-      [
-        "airtable_update_failed",
-        `status=${response.status}`,
-        `table=${table}`,
-        `record_id=${recordId}`,
-        `body=${rawText || "<empty>"}`
-      ].join(" | ")
-    );
-  }
+  } catch {}
+  if (!response.ok) throw new Error(data.error?.message || GENERIC_LOAD_ERROR);
   return data;
 }
 
@@ -612,13 +648,18 @@ async function loadRealTokenPayload(token) {
   }
 }
 
-function buildDebugError(stage, error, extra = {}) {
-  return {
-    error: error?.message || "Unknown load-form error",
-    stage,
-    runtime_version: LOAD_FORM_RUNTIME_VERSION,
-    ...extra
-  };
+function sanitizeLoadError(error) {
+  const text = String(error?.message || "");
+  if (
+    text.includes("Token is required") ||
+    text.includes("Invalid or expired token") ||
+    text.includes("This form link is no longer active") ||
+    text.includes("This form link has expired") ||
+    text.includes("Airtable environment variables are not configured yet")
+  ) {
+    return text;
+  }
+  return GENERIC_LOAD_ERROR;
 }
 
 exports.handler = async function (event) {
@@ -629,7 +670,7 @@ exports.handler = async function (event) {
     } catch (error) {
       return {
         ...jsonHeaders(400),
-        body: JSON.stringify(buildDebugError("parse_request_body", error))
+        body: JSON.stringify({ error: "Invalid request body" })
       };
     }
 
@@ -638,32 +679,21 @@ exports.handler = async function (event) {
     if (!token) {
       return {
         ...jsonHeaders(400),
-        body: JSON.stringify({
-          error: "Token is required",
-          stage: "validate_token",
-          runtime_version: LOAD_FORM_RUNTIME_VERSION
-        })
+        body: JSON.stringify({ error: "Token is required" })
       };
     }
 
-    if (DEMO_FORMS[token]) {
+    if (false && DEMO_FORMS[token]) {
       return {
         ...jsonHeaders(200),
-        body: JSON.stringify({
-          ...DEMO_FORMS[token],
-          runtime_version: LOAD_FORM_RUNTIME_VERSION
-        })
+        body: JSON.stringify(DEMO_FORMS[token])
       };
     }
 
     if (!getEnvConfig()) {
       return {
         ...jsonHeaders(503),
-        body: JSON.stringify({
-          error: "Airtable environment variables are not configured yet",
-          stage: "validate_airtable_env",
-          runtime_version: LOAD_FORM_RUNTIME_VERSION
-        })
+        body: JSON.stringify({ error: "Airtable environment variables are not configured yet" })
       };
     }
 
@@ -671,18 +701,20 @@ exports.handler = async function (event) {
       const payload = await loadRealTokenPayload(token);
       return {
         ...jsonHeaders(200),
-        body: JSON.stringify({ ...payload, runtime_version: LOAD_FORM_RUNTIME_VERSION })
+        body: JSON.stringify(payload)
       };
     } catch (error) {
+      console.error("load-form failed", error);
       return {
         ...jsonHeaders(500),
-        body: JSON.stringify(buildDebugError("load_real_token_payload", error, { token }))
+        body: JSON.stringify({ error: sanitizeLoadError(error) })
       };
     }
   } catch (error) {
+    console.error("load-form unexpected handler error", error);
     return {
       ...jsonHeaders(500),
-      body: JSON.stringify(buildDebugError("unexpected_handler_error", error))
+      body: JSON.stringify({ error: GENERIC_LOAD_ERROR })
     };
   }
 };

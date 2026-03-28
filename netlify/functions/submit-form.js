@@ -268,18 +268,6 @@ function buildPersonUpdate(person, fullPayload) {
   return fields;
 }
 
-function buildDebugFieldPreview(fields) {
-  return Object.fromEntries(
-    Object.entries(fields).map(([key, value]) => [
-      key,
-      {
-        value,
-        type: typeof value
-      }
-    ])
-  );
-}
-
 function stripOptionalSubmitFields(fields) {
   const reduced = { ...fields };
   delete reduced[fieldName("detailsConfirmedField")];
@@ -359,7 +347,6 @@ async function updateRecordWithFallback(recordId, fields) {
     });
     return { result, appliedFields: fields, fallbackApplied: false };
   } catch (error) {
-    error.debugFields = buildDebugFieldPreview(fields);
     const message = String(error.message || "");
     const optionalFieldNames = [
       fieldName("detailsConfirmedField"),
@@ -378,7 +365,6 @@ async function updateRecordWithFallback(recordId, fields) {
         });
         return { result, appliedFields: reducedFields, fallbackApplied: true };
       } catch (fallbackError) {
-        fallbackError.debugFields = buildDebugFieldPreview(reducedFields);
         throw fallbackError;
       }
     }
@@ -395,27 +381,10 @@ async function loadRowsByToken(token) {
   });
 }
 
-function createDemoSubmitResponse(body) {
-  return {
-    ok: true,
-    message: "Submit received successfully",
-    submitted_people: body.persons.length,
-    request_id: body.request_id,
-    form_id: body.form_id
-  };
-}
-
 exports.handler = async function (event) {
   try {
     const body = JSON.parse(event.body || "{}");
     validatePayload(body);
-
-    if ((body.token || "").startsWith("demo-")) {
-      return {
-        ...jsonHeaders(200),
-        body: JSON.stringify(createDemoSubmitResponse(body))
-      };
-    }
 
     if (!getEnvConfig()) {
       return {
@@ -458,8 +427,6 @@ exports.handler = async function (event) {
     );
 
     let updatedCount = 0;
-    const updatedFieldNames = new Set();
-    let fallbackApplied = false;
     let updatedContacts = 0;
     let createdContacts = 0;
 
@@ -468,8 +435,6 @@ exports.handler = async function (event) {
       if (!person) continue;
 
       const updateResult = await updateRecordWithFallback(record.id, buildPersonUpdate(person, body));
-      Object.keys(updateResult.appliedFields || {}).forEach((field) => updatedFieldNames.add(field));
-      fallbackApplied = fallbackApplied || Boolean(updateResult.fallbackApplied);
       updatedCount += 1;
     }
 
@@ -484,20 +449,14 @@ exports.handler = async function (event) {
         request_id: body.request_id,
         form_id: body.form_id,
         updated_rows: updatedCount,
-        token_status: "submitted",
-        updated_fields: Array.from(updatedFieldNames),
-        fallback_applied: fallbackApplied,
-        updated_contacts: updatedContacts,
-        created_contacts: createdContacts
+        token_status: "submitted"
       })
     };
   } catch (error) {
+    console.error("submit-form failed", error);
     return {
       ...jsonHeaders(500),
-      body: JSON.stringify({
-        error: error.message,
-        debug_fields: error.debugFields || null
-      })
+      body: JSON.stringify({ error: error.message || "Submit failed" })
     };
   }
 };
