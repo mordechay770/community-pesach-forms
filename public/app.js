@@ -91,6 +91,13 @@ function isMinor(person) {
   return age !== null && age < 18;
 }
 
+function shouldUseSchoolField(person) {
+  if (!person) return false;
+  if (person.role === "child") return true;
+  if (person.role === "new_member") return isMinor(person);
+  return false;
+}
+
 function isFilled(value) {
   return String(value ?? "").trim() !== "";
 }
@@ -112,7 +119,7 @@ function isPersonComplete(person, index) {
     if (!["yes", "no"].includes(person.same_as_primary_address)) return false;
     if (person.same_as_primary_address === "no" && !isFilled(person.child_address)) return false;
   }
-  if (person.role === "child" && !isFilled(person.school_number)) return false;
+  if (shouldUseSchoolField(person) && !isFilled(person.school_number)) return false;
   return (person.contacts || []).every(isContactComplete);
 }
 
@@ -217,7 +224,7 @@ function renderPersonCard(person, index) {
   const codeBadges = [person.member_code ? `<div class="role-badge">${escapeHtml(person.member_code)}</div>` : "", person.address_code ? `<div class="role-badge">${escapeHtml(person.address_code)}</div>` : ""].filter(Boolean).join("");
   const iinBlock = isPrimaryApplicant ? "" : `<label><span>ИИН</span><input type="text" value="${escapeHtml(person.iin || "")}" data-person-index="${index}" data-field="iin"></label>`;
   const relationshipBlock = isPrimaryApplicant ? "" : `<label><span>Кем этот человек приходится основному заявителю</span><select data-person-index="${index}" data-field="relationship"><option value="">Выберите</option>${relationshipOptions(person.relationship)}</select></label>`;
-  const showChildEducation = person.role !== "child";
+  const useSchoolField = shouldUseSchoolField(person);
   const childAddressBlock = (person.role === "child" || person.role === "new_member") ? `
     <div class="subsection-title">Адрес этого человека</div>
     <div class="person-grid">
@@ -231,8 +238,8 @@ function renderPersonCard(person, index) {
       <label><span>Девичья фамилия</span><input type="text" value="${escapeHtml(person.maiden_name || "")}" data-person-index="${index}" data-field="maiden_name"></label>
       <label><span>Еврейское имя</span><input type="text" value="${escapeHtml(person.hebrew_name || "")}" data-person-index="${index}" data-field="hebrew_name"></label>
       <label><span>Место рождения</span><input type="text" value="${escapeHtml(person.birth_place || "")}" data-person-index="${index}" data-field="birth_place"></label>
-      ${showChildEducation ? `<label><span>Образование</span><input type="text" value="${escapeHtml(person.education || "")}" data-person-index="${index}" data-field="education"></label>` : `<label><span>Номер школы</span><input type="text" value="${escapeHtml(person.school_number || "")}" data-person-index="${index}" data-field="school_number"></label>`}
-      ${showChildEducation ? `<label class="full-span"><span>Род занятий / специальность</span><input type="text" value="${escapeHtml(person.specialty || "")}" data-person-index="${index}" data-field="specialty"></label>` : ""}
+      ${useSchoolField ? `<label><span>Номер школы</span><input type="text" value="${escapeHtml(person.school_number || "")}" data-person-index="${index}" data-field="school_number"></label>` : `<label><span>Образование</span><input type="text" value="${escapeHtml(person.education || "")}" data-person-index="${index}" data-field="education"></label>`}
+      ${useSchoolField ? "" : `<label class="full-span"><span>Род занятий / специальность</span><input type="text" value="${escapeHtml(person.specialty || "")}" data-person-index="${index}" data-field="specialty"></label>`}
     </div>
   ` : "";
   const parentBlock = person.show_parent_fields ? `

@@ -52,6 +52,47 @@ defaults.contactActivityField = "РђРєС‚РёРІРЅРѕСЃС‚СЊ РЅ
 defaults.contactOwnerField = "РљРѕРјСѓ РїСЂРёРЅР°РґР»РµР¶РёС‚ РЅРѕРјРµСЂ";
 defaults.contactMemberLinkField = "Label";
 
+Object.assign(defaults, {
+  executionTable: "для незарегистрированных в общине",
+  requestIdField: "RECORD ID (from קישור לפגישה)",
+  addressField: "Домашний адрес",
+  lastNameField: "Фамилия",
+  firstNameField: "Имя",
+  middleNameField: "Отчество",
+  iinField: "ИИН",
+  genderField: "Род",
+  birthDateField: "Григор дата рождения",
+  inCityField: "на песах буду в городе",
+  relationshipField: "קרבה לממלא הטופס",
+  motherNationalityField: "национальность матери",
+  fatherNationalityField: "национальность отца",
+  maidenNameField: "Девичья фамилия",
+  hebrewNameField: "Еврейское имя",
+  birthPlaceField: "Место рождения",
+  educationField: "Образование",
+  specialtyField: "Специальность",
+  schoolField: "Номер школы",
+  motherLastNameField: "Фамилия Матери",
+  motherFirstNameField: "Имя матери",
+  motherHebrewNameField: "Евр Имя Матери",
+  motherMiddleNameField: "Отчество Матери",
+  motherBirthDateField: "ДатаРожденияМатери",
+  motherBirthPlaceField: "Место Рождения Матери",
+  fatherLastNameField: "Фамилия Отца",
+  fatherFirstNameField: "Имя отца",
+  fatherHebrewNameField: "Евр Имя Отца",
+  fatherMiddleNameField: "Отчество Отца",
+  fatherBirthDateField: "Дата Рождения Отца",
+  fatherBirthPlaceField: "Место Рождения Отца",
+  onlineStatusField: "Статус - онлайн-форма",
+  detailsConfirmedField: "Я подтверждаю, что данные заполняются правильно.",
+  chametzConfirmedField: "Я прошу раввина продать мой хамец в канун праздника в этом году.",
+  contactTable: "КонтактныеДанные",
+  contactNumberField: "Полный номер",
+  contactActivityField: "Активность номера",
+  contactOwnerField: "Кому принадлежит номер"
+});
+
 function fieldName(key) {
   return process.env[`AIRTABLE_${key}`] || defaults[key];
 }
@@ -93,8 +134,8 @@ function normalizeWhatsappValue(value) {
   return "";
 }
 function toContactActivityValue(value) {
-  if (value === "yes") return "????????";
-  if (value === "no") return "??????????";
+  if (value === "yes") return "Активный";
+  if (value === "no") return "Не активный";
   return "";
 }
 
@@ -168,21 +209,6 @@ function validatePayload(body) {
     )
   ) {
     throw new Error("All contact fields must be completed");
-  }
-  if (
-    body.persons.some((person) => {
-      if (person.role !== "new_member") return false;
-      const match = String(person.birth_date || "").match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-      if (!match) return false;
-      const today = new Date();
-      let age = today.getFullYear() - Number(match[3]);
-      const monthDelta = today.getMonth() + 1 - Number(match[2]);
-      const dayDelta = today.getDate() - Number(match[1]);
-      if (monthDelta < 0 || (monthDelta === 0 && dayDelta < 0)) age -= 1;
-      return age > 12;
-    })
-  ) {
-    throw new Error("New family member must be age 12 or younger");
   }
 }
 
