@@ -1,3 +1,5 @@
+const LOAD_FORM_RUNTIME_VERSION = "load-form-local-2026-03-29-debug-1";
+
 const DEMO_FORMS = {
   "demo-single": {
     form_id: "FORM-recREQ001",
@@ -541,29 +543,77 @@ async function loadRealTokenPayload(token) {
   return buildPayloadFromRecords(allRows);
 }
 
+function buildDebugError(stage, error, extra = {}) {
+  return {
+    error: error?.message || "Unknown load-form error",
+    stage,
+    runtime_version: LOAD_FORM_RUNTIME_VERSION,
+    ...extra
+  };
+}
+
 exports.handler = async function (event) {
   try {
-    const body = JSON.parse(event.body || "{}");
+    let body;
+    try {
+      body = JSON.parse(event.body || "{}");
+    } catch (error) {
+      return {
+        ...jsonHeaders(400),
+        body: JSON.stringify(buildDebugError("parse_request_body", error))
+      };
+    }
+
     const token = body.token;
 
     if (!token) {
-      return { ...jsonHeaders(400), body: JSON.stringify({ error: "Token is required" }) };
+      return {
+        ...jsonHeaders(400),
+        body: JSON.stringify({
+          error: "Token is required",
+          stage: "validate_token",
+          runtime_version: LOAD_FORM_RUNTIME_VERSION
+        })
+      };
     }
 
     if (DEMO_FORMS[token]) {
-      return { ...jsonHeaders(200), body: JSON.stringify(DEMO_FORMS[token]) };
+      return {
+        ...jsonHeaders(200),
+        body: JSON.stringify({
+          ...DEMO_FORMS[token],
+          runtime_version: LOAD_FORM_RUNTIME_VERSION
+        })
+      };
     }
 
     if (!getEnvConfig()) {
       return {
         ...jsonHeaders(503),
-        body: JSON.stringify({ error: "Airtable environment variables are not configured yet" })
+        body: JSON.stringify({
+          error: "Airtable environment variables are not configured yet",
+          stage: "validate_airtable_env",
+          runtime_version: LOAD_FORM_RUNTIME_VERSION
+        })
       };
     }
 
-    const payload = await loadRealTokenPayload(token);
-    return { ...jsonHeaders(200), body: JSON.stringify(payload) };
+    try {
+      const payload = await loadRealTokenPayload(token);
+      return {
+        ...jsonHeaders(200),
+        body: JSON.stringify({ ...payload, runtime_version: LOAD_FORM_RUNTIME_VERSION })
+      };
+    } catch (error) {
+      return {
+        ...jsonHeaders(500),
+        body: JSON.stringify(buildDebugError("load_real_token_payload", error, { token }))
+      };
+    }
   } catch (error) {
-    return { ...jsonHeaders(500), body: JSON.stringify({ error: error.message }) };
+    return {
+      ...jsonHeaders(500),
+      body: JSON.stringify(buildDebugError("unexpected_handler_error", error))
+    };
   }
 };
