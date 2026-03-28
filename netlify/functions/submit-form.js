@@ -1,54 +1,56 @@
-const defaults = {
-  executionTable: "для незарегистрированных в общине",
+﻿const defaults = {
+  executionTable: "РґР»СЏ РЅРµР·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹С… РІ РѕР±С‰РёРЅРµ",
   tokenField: "token",
   tokenStatusField: "token_status",
   expiresAtField: "expires_at",
   formIdField: "form_id",
   groupFormIdField: "group_form_id",
-  requestIdField: "RECORD ID (from קישור לפגישה)",
+  requestIdField: "RECORD ID (from Ч§Ч™Ч©Ч•ЧЁ ЧњЧ¤Ч’Ч™Ч©Ч”)",
   modeField: "form_mode",
-  addressField: "Домашний адрес",
-  lastNameField: "Фамилия",
-  firstNameField: "Имя",
-  middleNameField: "Отчество",
-  iinField: "ИИН",
-  genderField: "Род",
-  birthDateField: "Григор дата рождения",
-  inCityField: "на песах буду в городе",
-  relationshipField: "קרבה לממלא הטופס",
+  addressField: "Р”РѕРјР°С€РЅРёР№ Р°РґСЂРµСЃ",
+  lastNameField: "Р¤Р°РјРёР»РёСЏ",
+  firstNameField: "РРјСЏ",
+  middleNameField: "РћС‚С‡РµСЃС‚РІРѕ",
+  iinField: "РРРќ",
+  genderField: "Р РѕРґ",
+  birthDateField: "Р“СЂРёРіРѕСЂ РґР°С‚Р° СЂРѕР¶РґРµРЅРёСЏ",
+  inCityField: "РЅР° РїРµСЃР°С… Р±СѓРґСѓ РІ РіРѕСЂРѕРґРµ",
+  relationshipField: "Ч§ЧЁЧ‘Ч” ЧњЧћЧћЧњЧђ Ч”ЧЧ•Ч¤ЧЎ",
   roleField: "form_role",
-  motherNationalityField: "национальность матери",
-  fatherNationalityField: "национальность отца",
+  motherNationalityField: "РЅР°С†РёРѕРЅР°Р»СЊРЅРѕСЃС‚СЊ РјР°С‚РµСЂРё",
+  fatherNationalityField: "РЅР°С†РёРѕРЅР°Р»СЊРЅРѕСЃС‚СЊ РѕС‚С†Р°",
   contactsJsonField: "contacts_json",
-  maidenNameField: "Девичья фамилия",
-  hebrewNameField: "Еврейское имя",
-  birthPlaceField: "Место рождения",
-  educationField: "Образование",
-  specialtyField: "Специальность",
-  motherLastNameField: "Фамилия Матери",
-  motherFirstNameField: "Имя матери",
-  motherHebrewNameField: "Евр Имя Матери",
-  motherMiddleNameField: "Отчество Матери",
-  motherBirthDateField: "ДатаРожденияМатери",
-  motherBirthPlaceField: "Место Рождения Матери",
-  fatherLastNameField: "Фамилия Отца",
-  fatherFirstNameField: "Имя отца",
-  fatherHebrewNameField: "Евр Имя Отца",
-  fatherMiddleNameField: "Отчество Отца",
-  fatherBirthDateField: "Дата Рождения Отца",
-  fatherBirthPlaceField: "Место Рождения Отца",
-  onlineStatusField: "Статус - онлайн-форма",
-  detailsConfirmedField: "Я подтверждаю, что данные заполняются правильно.",
-  chametzConfirmedField: "Я прошу раввина продать мой хамец в канун праздника в этом году.",
+  maidenNameField: "Р”РµРІРёС‡СЊСЏ С„Р°РјРёР»РёСЏ",
+  hebrewNameField: "Р•РІСЂРµР№СЃРєРѕРµ РёРјСЏ",
+  birthPlaceField: "РњРµСЃС‚Рѕ СЂРѕР¶РґРµРЅРёСЏ",
+  educationField: "РћР±СЂР°Р·РѕРІР°РЅРёРµ",
+  specialtyField: "РЎРїРµС†РёР°Р»СЊРЅРѕСЃС‚СЊ",
+  schoolField: "Номер школы",
+  motherLastNameField: "Р¤Р°РјРёР»РёСЏ РњР°С‚РµСЂРё",
+  motherFirstNameField: "РРјСЏ РјР°С‚РµСЂРё",
+  motherHebrewNameField: "Р•РІСЂ РРјСЏ РњР°С‚РµСЂРё",
+  motherMiddleNameField: "РћС‚С‡РµСЃС‚РІРѕ РњР°С‚РµСЂРё",
+  motherBirthDateField: "Р”Р°С‚Р°Р РѕР¶РґРµРЅРёСЏРњР°С‚РµСЂРё",
+  motherBirthPlaceField: "РњРµСЃС‚Рѕ Р РѕР¶РґРµРЅРёСЏ РњР°С‚РµСЂРё",
+  fatherLastNameField: "Р¤Р°РјРёР»РёСЏ РћС‚С†Р°",
+  fatherFirstNameField: "РРјСЏ РѕС‚С†Р°",
+  fatherHebrewNameField: "Р•РІСЂ РРјСЏ РћС‚С†Р°",
+  fatherMiddleNameField: "РћС‚С‡РµСЃС‚РІРѕ РћС‚С†Р°",
+  fatherBirthDateField: "Р”Р°С‚Р° Р РѕР¶РґРµРЅРёСЏ РћС‚С†Р°",
+  fatherBirthPlaceField: "РњРµСЃС‚Рѕ Р РѕР¶РґРµРЅРёСЏ РћС‚С†Р°",
+  onlineStatusField: "РЎС‚Р°С‚СѓСЃ - РѕРЅР»Р°Р№РЅ-С„РѕСЂРјР°",
+  detailsConfirmedField: "РЇ РїРѕРґС‚РІРµСЂР¶РґР°СЋ, С‡С‚Рѕ РґР°РЅРЅС‹Рµ Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ РїСЂР°РІРёР»СЊРЅРѕ.",
+  chametzConfirmedField: "РЇ РїСЂРѕС€Сѓ СЂР°РІРІРёРЅР° РїСЂРѕРґР°С‚СЊ РјРѕР№ С…Р°РјРµС† РІ РєР°РЅСѓРЅ РїСЂР°Р·РґРЅРёРєР° РІ СЌС‚РѕРј РіРѕРґСѓ.",
   submittedAtField: "submitted_at",
   payloadJsonField: "last_payload_json"
 };
 
-defaults.contactTable = "КонтактныеДанные";
-defaults.contactNumberField = "Полный номер";
+defaults.contactTable = "РљРѕРЅС‚Р°РєС‚РЅС‹РµР”Р°РЅРЅС‹Рµ";
+defaults.contactNumberField = "РџРѕР»РЅС‹Р№ РЅРѕРјРµСЂ";
 defaults.contactWhatsappField = "Whatsapp";
-defaults.contactActivityField = "Активность номера";
-defaults.contactOwnerField = "Кому принадлежит номер";
+defaults.contactActivityField = "РђРєС‚РёРІРЅРѕСЃС‚СЊ РЅРѕРјРµСЂР°";
+defaults.contactOwnerField = "РљРѕРјСѓ РїСЂРёРЅР°РґР»РµР¶РёС‚ РЅРѕРјРµСЂ";
+defaults.contactMemberLinkField = "Label";
 
 function fieldName(key) {
   return process.env[`AIRTABLE_${key}`] || defaults[key];
@@ -127,6 +129,23 @@ async function airtableUpdateRecord({ table, recordId, fields }) {
   return data;
 }
 
+async function airtableCreateRecord({ table, fields }) {
+  const config = getEnvConfig();
+  const url = `https://api.airtable.com/v0/${config.baseId}/${encodeURIComponent(table)}`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${config.apiToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ fields })
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error?.message || "Airtable create failed");
+  return data;
+}
+
 function validatePayload(body) {
   if (!body.token) throw new Error("Token is required");
   if (!body.form_id) throw new Error("Form ID is required");
@@ -138,6 +157,18 @@ function validatePayload(body) {
   }
   if (!body.details_confirmed) throw new Error("Details confirmation is required");
   if (!body.chametz_sale_confirmation) throw new Error("Chametz authorization is required");
+  if (
+    body.persons.some((person) =>
+      (person.contacts || []).some((contact) => {
+        if (!contact.number || !contact.owner_type) return true;
+        if ((contact.kind || "phone") !== "email" && !["yes", "no"].includes(contact.whatsapp)) return true;
+        if (contact.is_existing_source && !["yes", "no"].includes(contact.active)) return true;
+        return false;
+      })
+    )
+  ) {
+    throw new Error("All contact fields must be completed");
+  }
   if (
     body.persons.some((person) => {
       if (person.role !== "new_member") return false;
@@ -161,23 +192,23 @@ function buildPersonUpdate(person, fullPayload) {
       ? fullPayload.address.new_address || fullPayload.address.full || ""
       : fullPayload.address?.full || "";
 
-  const fields = {
-    [fieldName("lastNameField")]: person.last_name || "",
-    [fieldName("firstNameField")]: person.first_name || "",
-    [fieldName("middleNameField")]: person.middle_name || "",
-    [fieldName("iinField")]: person.iin || "",
-    [fieldName("genderField")]: person.gender || "",
-    [fieldName("birthDateField")]: toAirtableDate(person.birth_date),
+    const fields = {
+      [fieldName("lastNameField")]: person.last_name || "",
+      [fieldName("firstNameField")]: person.first_name || "",
+      [fieldName("middleNameField")]: person.middle_name || "",
+      [fieldName("genderField")]: person.gender || "",
+      [fieldName("birthDateField")]: toAirtableDate(person.birth_date),
     [fieldName("inCityField")]: person.will_be_in_city || "",
     [fieldName("roleField")]: person.role || "",
     [fieldName("relationshipField")]: person.relationship || "",
     [fieldName("motherNationalityField")]: person.parent_mother_nationality || "",
     [fieldName("fatherNationalityField")]: person.parent_father_nationality || "",
     [fieldName("maidenNameField")]: person.maiden_name || "",
-    [fieldName("hebrewNameField")]: person.hebrew_name || "",
-    [fieldName("birthPlaceField")]: person.birth_place || "",
-    [fieldName("educationField")]: person.education || "",
-    [fieldName("specialtyField")]: person.specialty || "",
+      [fieldName("hebrewNameField")]: person.hebrew_name || "",
+      [fieldName("birthPlaceField")]: person.birth_place || "",
+      [fieldName("educationField")]: person.education || "",
+      [fieldName("specialtyField")]: person.specialty || "",
+      [fieldName("schoolField")]: person.school_number || "",
     [fieldName("motherLastNameField")]: person.mother_last_name || "",
     [fieldName("motherFirstNameField")]: person.mother_first_name || "",
     [fieldName("motherHebrewNameField")]: person.mother_hebrew_name || "",
@@ -195,7 +226,7 @@ function buildPersonUpdate(person, fullPayload) {
     [fieldName("chametzConfirmedField")]: Boolean(fullPayload.chametz_sale_confirmation),
     [fieldName("submittedAtField")]: new Date().toISOString(),
     [fieldName("tokenStatusField")]: "submitted",
-    [fieldName("onlineStatusField")]: "Ответ получен в онлайн-форме.",
+    [fieldName("onlineStatusField")]: "РћС‚РІРµС‚ РїРѕР»СѓС‡РµРЅ РІ РѕРЅР»Р°Р№РЅ-С„РѕСЂРјРµ.",
     [fieldName("addressField")]:
       person.role === "child" || person.role === "new_member"
         ? person.same_as_primary_address === "no"
@@ -239,6 +270,25 @@ function buildExistingContactUpdate(contact) {
     [fieldName("contactOwnerField")]: contact.owner_type || ""
   };
 }
+
+function buildNewContactFields(contact, person) {
+  const fields = {
+    [fieldName("contactNumberField")]: contact.number || "",
+    [fieldName("contactOwnerField")]: contact.owner_type || "",
+    [fieldName("contactActivityField")]: "Активный"
+  };
+
+  if ((contact.kind || "phone") !== "email") {
+    fields[fieldName("contactWhatsappField")] = normalizeWhatsappValue(contact.whatsapp);
+  }
+
+  if (person.member_record_id) {
+    fields[fieldName("contactMemberLinkField")] = [person.member_record_id];
+  }
+
+  return fields;
+}
+
 async function updateExistingContacts(persons) {
   const updates = [];
   for (const person of persons || []) {
@@ -255,6 +305,23 @@ async function updateExistingContacts(persons) {
   }
   await Promise.all(updates);
   return updates.length;
+}
+
+async function createNewContacts(persons) {
+  const creates = [];
+  for (const person of persons || []) {
+    for (const contact of person.contacts || []) {
+      if (contact?.contact_record_id || contact.is_existing_source || !contact.number || !person.member_record_id) continue;
+      creates.push(
+        airtableCreateRecord({
+          table: fieldName("contactTable"),
+          fields: buildNewContactFields(contact, person)
+        })
+      );
+    }
+  }
+  await Promise.all(creates);
+  return creates.length;
 }
 
 async function updateRecordWithFallback(recordId, fields) {
@@ -368,6 +435,7 @@ exports.handler = async function (event) {
     const updatedFieldNames = new Set();
     let fallbackApplied = false;
     let updatedContacts = 0;
+    let createdContacts = 0;
 
     for (const record of matchingRows) {
       const person = personsByExecutionId.get(record.id);
@@ -380,6 +448,7 @@ exports.handler = async function (event) {
     }
 
     updatedContacts = await updateExistingContacts(body.persons);
+    createdContacts = await createNewContacts(body.persons);
 
     return {
       ...jsonHeaders(200),
@@ -392,7 +461,8 @@ exports.handler = async function (event) {
         token_status: "submitted",
         updated_fields: Array.from(updatedFieldNames),
         fallback_applied: fallbackApplied,
-        updated_contacts: updatedContacts
+        updated_contacts: updatedContacts,
+        created_contacts: createdContacts
       })
     };
   } catch (error) {

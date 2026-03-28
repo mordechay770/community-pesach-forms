@@ -234,12 +234,29 @@ button.secondary{
   padding:16px;
   background:#fff;
 }
+.person-card.is-collapsed .person-body{
+  display:none;
+}
+.person-toggle{
+  width:100%;
+  background:transparent;
+  border:none;
+  padding:0;
+  text-align:inherit;
+  color:inherit;
+}
+.person-toggle:hover{
+  background:transparent;
+}
 .person-top,.contact-top{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:12px;
   margin-bottom:14px;
+}
+.person-card.is-collapsed .person-top{
+  margin-bottom:0;
 }
 .role-badge{
   display:inline-flex;
@@ -250,6 +267,10 @@ button.secondary{
   color:var(--navy);
   font-size:12px;
   font-weight:800;
+}
+.role-badge-success{
+  background:#e7f4de;
+  color:#345b24;
 }
 .person-badges{
   display:flex;

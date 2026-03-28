@@ -10,7 +10,7 @@ const DEMO_FORMS = {
       address_code: "3567"
     },
     address: {
-      full: "Алматы, ул. Абая 123, кв. 45"
+      full: "РђР»РјР°С‚С‹, СѓР». РђР±Р°СЏ 123, РєРІ. 45"
     },
     persons: [
       {
@@ -20,12 +20,12 @@ const DEMO_FORMS = {
         relationship: "",
         member_code: "6378",
         address_code: "3567",
-        full_name: "Коген Мордехай",
-        last_name: "Коген",
-        first_name: "Мордехай",
+        full_name: "РљРѕРіРµРЅ РњРѕСЂРґРµС…Р°Р№",
+        last_name: "РљРѕРіРµРЅ",
+        first_name: "РњРѕСЂРґРµС…Р°Р№",
         middle_name: "",
         iin: "870309000050",
-        gender: "М",
+        gender: "Рњ",
         birth_date: "09.03.1987",
         will_be_in_city: "",
         show_profile_extra_fields: true,
@@ -65,86 +65,88 @@ const DEMO_FORMS = {
 };
 
 const defaults = {
-  executionTable: "для незарегистрированных в общине",
-  memberTable: "Члены_семьи",
-  memberLinkField: "כרטיס אישי של חבר קהילה",
-  contactTable: "КонтактныеДанные",
+  executionTable: "РґР»СЏ РЅРµР·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹С… РІ РѕР±С‰РёРЅРµ",
+  memberTable: "Р§Р»РµРЅС‹_СЃРµРјСЊРё",
+  memberLinkField: "Ч›ЧЁЧЧ™ЧЎ ЧђЧ™Ч©Ч™ Ч©Чњ Ч—Ч‘ЧЁ Ч§Ч”Ч™ЧњЧ”",
+  contactTable: "РљРѕРЅС‚Р°РєС‚РЅС‹РµР”Р°РЅРЅС‹Рµ",
   contactMemberLinkField: "Label",
-  contactNumberField: "Полный номер",
+  contactNumberField: "РџРѕР»РЅС‹Р№ РЅРѕРјРµСЂ",
   contactWhatsappField: "Whatsapp",
-  contactActivityField: "Активность номера",
-  contactOwnerField: "Кому принадлежит номер",
-  sourceContactsField: "КонтактныеДанные",
+  contactActivityField: "РђРєС‚РёРІРЅРѕСЃС‚СЊ РЅРѕРјРµСЂР°",
+  contactOwnerField: "РљРѕРјСѓ РїСЂРёРЅР°РґР»РµР¶РёС‚ РЅРѕРјРµСЂ",
+  sourceContactsField: "РљРѕРЅС‚Р°РєС‚РЅС‹РµР”Р°РЅРЅС‹Рµ",
   tokenField: "token",
   tokenStatusField: "token_status",
   expiresAtField: "expires_at",
   formIdField: "form_id",
   groupFormIdField: "group_form_id",
-  requestIdField: "RECORD ID (from קישור לפגישה)",
+  requestIdField: "RECORD ID (from Ч§Ч™Ч©Ч•ЧЁ ЧњЧ¤Ч’Ч™Ч©Ч”)",
   modeField: "form_mode",
-  memberCodeField: "КодЧлены семьи (from כרטיס אישי של חבר קהילה)",
-  addressCodeField: "Код (from Код адреса) (from כרטיס אישי של חבר קהילה)",
-  addressField: "Домашний адрес",
+  memberCodeField: "РљРѕРґР§Р»РµРЅС‹ СЃРµРјСЊРё (from Ч›ЧЁЧЧ™ЧЎ ЧђЧ™Ч©Ч™ Ч©Чњ Ч—Ч‘ЧЁ Ч§Ч”Ч™ЧњЧ”)",
+  addressCodeField: "РљРѕРґ (from РљРѕРґ Р°РґСЂРµСЃР°) (from Ч›ЧЁЧЧ™ЧЎ ЧђЧ™Ч©Ч™ Ч©Чњ Ч—Ч‘ЧЁ Ч§Ч”Ч™ЧњЧ”)",
+  addressField: "Р”РѕРјР°С€РЅРёР№ Р°РґСЂРµСЃ",
   roleField: "form_role",
-  relationshipField: "קרבה לממלא הטופס",
+  relationshipField: "Ч§ЧЁЧ‘Ч” ЧњЧћЧћЧњЧђ Ч”ЧЧ•Ч¤ЧЎ",
   fullNameField: "full_name",
-  lastNameField: "Фамилия",
-  firstNameField: "Имя",
-  middleNameField: "Отчество",
-  iinField: "ИИН",
-  genderField: "Род",
-  birthDateField: "Григор дата рождения",
-  inCityField: "на песах буду в городе",
-  motherNationalityField: "национальность матери",
-  fatherNationalityField: "национальность отца",
+  lastNameField: "Р¤Р°РјРёР»РёСЏ",
+  firstNameField: "РРјСЏ",
+  middleNameField: "РћС‚С‡РµСЃС‚РІРѕ",
+  iinField: "РРРќ",
+  genderField: "Р РѕРґ",
+  birthDateField: "Р“СЂРёРіРѕСЂ РґР°С‚Р° СЂРѕР¶РґРµРЅРёСЏ",
+  inCityField: "РЅР° РїРµСЃР°С… Р±СѓРґСѓ РІ РіРѕСЂРѕРґРµ",
+  motherNationalityField: "РЅР°С†РёРѕРЅР°Р»СЊРЅРѕСЃС‚СЊ РјР°С‚РµСЂРё",
+  fatherNationalityField: "РЅР°С†РёРѕРЅР°Р»СЊРЅРѕСЃС‚СЊ РѕС‚С†Р°",
   contactsJsonField: "contacts_json",
-  maidenNameField: "Девичья фамилия",
-  hebrewNameField: "Еврейское имя",
-  birthPlaceField: "Место рождения",
-  educationField: "Образование",
-  specialtyField: "Специальность",
-  motherLastNameField: "Фамилия Матери",
-  motherFirstNameField: "Имя матери",
-  motherHebrewNameField: "Евр Имя Матери",
-  motherMiddleNameField: "Отчество Матери",
-  motherBirthDateField: "ДатаРожденияМатери",
-  motherBirthPlaceField: "Место Рождения Матери",
-  fatherLastNameField: "Фамилия Отца",
-  fatherFirstNameField: "Имя отца",
-  fatherHebrewNameField: "Евр Имя Отца",
-  fatherMiddleNameField: "Отчество Отца",
-  fatherBirthDateField: "Дата Рождения Отца",
-  fatherBirthPlaceField: "Место Рождения Отца",
+  maidenNameField: "Р”РµРІРёС‡СЊСЏ С„Р°РјРёР»РёСЏ",
+  hebrewNameField: "Р•РІСЂРµР№СЃРєРѕРµ РёРјСЏ",
+  birthPlaceField: "РњРµСЃС‚Рѕ СЂРѕР¶РґРµРЅРёСЏ",
+  educationField: "РћР±СЂР°Р·РѕРІР°РЅРёРµ",
+  specialtyField: "РЎРїРµС†РёР°Р»СЊРЅРѕСЃС‚СЊ",
+  schoolField: "Номер школы",
+  motherLastNameField: "Р¤Р°РјРёР»РёСЏ РњР°С‚РµСЂРё",
+  motherFirstNameField: "РРјСЏ РјР°С‚РµСЂРё",
+  motherHebrewNameField: "Р•РІСЂ РРјСЏ РњР°С‚РµСЂРё",
+  motherMiddleNameField: "РћС‚С‡РµСЃС‚РІРѕ РњР°С‚РµСЂРё",
+  motherBirthDateField: "Р”Р°С‚Р°Р РѕР¶РґРµРЅРёСЏРњР°С‚РµСЂРё",
+  motherBirthPlaceField: "РњРµСЃС‚Рѕ Р РѕР¶РґРµРЅРёСЏ РњР°С‚РµСЂРё",
+  fatherLastNameField: "Р¤Р°РјРёР»РёСЏ РћС‚С†Р°",
+  fatherFirstNameField: "РРјСЏ РѕС‚С†Р°",
+  fatherHebrewNameField: "Р•РІСЂ РРјСЏ РћС‚С†Р°",
+  fatherMiddleNameField: "РћС‚С‡РµСЃС‚РІРѕ РћС‚С†Р°",
+  fatherBirthDateField: "Р”Р°С‚Р° Р РѕР¶РґРµРЅРёСЏ РћС‚С†Р°",
+  fatherBirthPlaceField: "РњРµСЃС‚Рѕ Р РѕР¶РґРµРЅРёСЏ РћС‚С†Р°",
   sourceFullNameField: "",
-  sourceLastNameField: "Фамилия",
-  sourceFirstNameField: "Имя",
-  sourceMiddleNameField: "Отчество",
-  sourceIinField: "ИИН",
-  sourceGenderField: "Род",
-  sourceBirthDateField: "Григор год рождения",
-  sourceAltBirthDateField: "Григор дата рождения",
-  sourceAddressField: "כתובת מלאה (from Код адреса)",
-  sourceMemberCodeField: "КодЧлены семьи",
-  sourceAddressCodeField: "Код (from Код адреса)",
-  sourceMotherNationalityField: "Нац мамы",
-  sourceFatherNationalityField: "Нац папы",
-  sourceMaidenNameField: "ДевичьяФамилия",
-  sourceHebrewNameField: "ЕврИмя",
-  sourceBirthPlaceField: "МестоРождения",
-  sourceEducationField: "Образование",
-  sourceSpecialtyField: "Специальность",
-  sourceMotherLastNameField: "ФамилияМатери",
-  sourceMotherFirstNameField: "Имя матери",
-  sourceMotherHebrewNameField: "ЕврИмяМатери",
+  sourceLastNameField: "Р¤Р°РјРёР»РёСЏ",
+  sourceFirstNameField: "РРјСЏ",
+  sourceMiddleNameField: "РћС‚С‡РµСЃС‚РІРѕ",
+  sourceIinField: "РРРќ",
+  sourceGenderField: "Р РѕРґ",
+  sourceBirthDateField: "Р“СЂРёРіРѕСЂ РіРѕРґ СЂРѕР¶РґРµРЅРёСЏ",
+  sourceAltBirthDateField: "Р“СЂРёРіРѕСЂ РґР°С‚Р° СЂРѕР¶РґРµРЅРёСЏ",
+  sourceAddressField: "Ч›ЧЄЧ•Ч‘ЧЄ ЧћЧњЧђЧ” (from РљРѕРґ Р°РґСЂРµСЃР°)",
+  sourceMemberCodeField: "РљРѕРґР§Р»РµРЅС‹ СЃРµРјСЊРё",
+  sourceAddressCodeField: "РљРѕРґ (from РљРѕРґ Р°РґСЂРµСЃР°)",
+  sourceMotherNationalityField: "РќР°С† РјР°РјС‹",
+  sourceFatherNationalityField: "РќР°С† РїР°РїС‹",
+  sourceMaidenNameField: "Р”РµРІРёС‡СЊСЏР¤Р°РјРёР»РёСЏ",
+  sourceHebrewNameField: "Р•РІСЂРРјСЏ",
+  sourceBirthPlaceField: "РњРµСЃС‚РѕР РѕР¶РґРµРЅРёСЏ",
+  sourceEducationField: "РћР±СЂР°Р·РѕРІР°РЅРёРµ",
+  sourceSpecialtyField: "РЎРїРµС†РёР°Р»СЊРЅРѕСЃС‚СЊ",
+  sourceSchoolField: "Номер школы",
+  sourceMotherLastNameField: "Р¤Р°РјРёР»РёСЏРњР°С‚РµСЂРё",
+  sourceMotherFirstNameField: "РРјСЏ РјР°С‚РµСЂРё",
+  sourceMotherHebrewNameField: "Р•РІСЂРРјСЏРњР°С‚РµСЂРё",
   sourceMotherMiddleNameField: "",
-  sourceMotherBirthDateField: "ДатаРожденияМатери",
-  sourceMotherBirthPlaceField: "МестоРожденияМатери",
-  sourceFatherLastNameField: "ФамилияОтца",
-  sourceFatherFirstNameField: "ИмяОтца",
-  sourceFatherHebrewNameField: "ЕврИмяОтца",
-  sourceFatherMiddleNameField: "ОтчествоОтца",
-  sourceFatherBirthDateField: "ДатаРожденияОтца",
-  sourceFatherBirthPlaceField: "МестоРожденияОтца"
+  sourceMotherBirthDateField: "Р”Р°С‚Р°Р РѕР¶РґРµРЅРёСЏРњР°С‚РµСЂРё",
+  sourceMotherBirthPlaceField: "РњРµСЃС‚РѕР РѕР¶РґРµРЅРёСЏРњР°С‚РµСЂРё",
+  sourceFatherLastNameField: "Р¤Р°РјРёР»РёСЏРћС‚С†Р°",
+  sourceFatherFirstNameField: "РРјСЏРћС‚С†Р°",
+  sourceFatherHebrewNameField: "Р•РІСЂРРјСЏРћС‚С†Р°",
+  sourceFatherMiddleNameField: "РћС‚С‡РµСЃС‚РІРѕРћС‚С†Р°",
+  sourceFatherBirthDateField: "Р”Р°С‚Р°Р РѕР¶РґРµРЅРёСЏРћС‚С†Р°",
+  sourceFatherBirthPlaceField: "РњРµСЃС‚РѕР РѕР¶РґРµРЅРёСЏРћС‚С†Р°"
 };
 
 function fieldName(key) {
@@ -260,29 +262,29 @@ function formatBirthDate(value) {
 function normalizeGender(value) {
   const text = String(value || "").trim().toLowerCase();
   if (!text) return "";
-  if (["m", "м"].includes(text)) return "М";
-  if (["f", "ж"].includes(text)) return "Ж";
+  if (["m", "Рј"].includes(text)) return "Рњ";
+  if (["f", "Р¶"].includes(text)) return "Р–";
   return String(value || "");
 }
 
 function isActiveContact(activityValue) {
   const value = String(activityValue || "").toLowerCase();
   if (!value) return true;
-  return !value.includes("неакт") && !value.includes("inactive") && !value.includes("ошиб");
+  return !value.includes("РЅРµР°РєС‚") && !value.includes("inactive") && !value.includes("РѕС€РёР±");
 }
 
 function normalizeWhatsapp(value) {
   if (value === true) return "yes";
   const text = String(value || "").trim().toLowerCase();
-  if (["yes", "да", "true", "1"].includes(text)) return "yes";
-  if (["no", "нет", "false", "0"].includes(text)) return "no";
+  if (["yes", "РґР°", "true", "1"].includes(text)) return "yes";
+  if (["no", "РЅРµС‚", "false", "0"].includes(text)) return "no";
   return "";
 }
 
 function normalizeContact(recordOrFields) {
   const record = recordOrFields && recordOrFields.fields ? recordOrFields : null;
   const fields = record ? record.fields || {} : recordOrFields || {};
-  const raw = firstNonEmpty(fields[fieldName("contactNumberField")], fields["Мобильный телефон"]);
+  const raw = firstNonEmpty(fields[fieldName("contactNumberField")], fields["РњРѕР±РёР»СЊРЅС‹Р№ С‚РµР»РµС„РѕРЅ"]);
   const text = String(raw || "").trim();
   const kind = text.includes("@") ? "email" : "phone";
 
@@ -441,6 +443,7 @@ async function buildPersonFromRecord(record) {
     birth_place: birthPlace,
     education,
     specialty,
+    school_number: firstNonEmpty(fields[fieldName("schoolField")], memberFields[fieldName("sourceSchoolField")]),
     parent_mother_nationality: motherNationality,
     parent_father_nationality: fatherNationality,
     mother_last_name: motherLastName,
@@ -456,7 +459,8 @@ async function buildPersonFromRecord(record) {
     father_birth_date: fatherBirthDate,
     father_birth_place: fatherBirthPlace,
     address: firstNonEmpty(fields[fieldName("addressField")], memberFields[fieldName("sourceAddressField")]),
-    contacts: resolvedContacts
+    contacts: resolvedContacts,
+    member_record_id: memberRecordId || ""
   };
 }
 

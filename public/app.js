@@ -27,6 +27,7 @@ const fields = {
 };
 
 let currentPayload = null;
+let currentExpandedPersonIndex = 0;
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -90,6 +91,38 @@ function isMinor(person) {
   return age !== null && age < 18;
 }
 
+function isFilled(value) {
+  return String(value ?? "").trim() !== "";
+}
+
+function isContactComplete(contact) {
+  if (!contact || !isFilled(contact.number) || !isFilled(contact.owner_type)) return false;
+  if ((contact.kind || "phone") !== "email" && !["yes", "no"].includes(contact.whatsapp)) return false;
+  if (contact.is_existing_source && !["yes", "no"].includes(contact.active)) return false;
+  return true;
+}
+
+function isPersonComplete(person, index) {
+  const isPrimaryApplicant = index === 0 && (person.role === "self" || person.role === "mother");
+  if (!isFilled(person.last_name) || !isFilled(person.first_name)) return false;
+  if (!isFilled(person.gender) || !isFilled(person.birth_date)) return false;
+  if (!["yes", "no"].includes(person.will_be_in_city)) return false;
+  if (!isPrimaryApplicant && !isFilled(person.relationship)) return false;
+  if ((person.role === "child" || person.role === "new_member")) {
+    if (!["yes", "no"].includes(person.same_as_primary_address)) return false;
+    if (person.same_as_primary_address === "no" && !isFilled(person.child_address)) return false;
+  }
+  if (person.role === "child" && !isFilled(person.school_number)) return false;
+  return (person.contacts || []).every(isContactComplete);
+}
+
+function getPreferredExpandedPersonIndex(persons) {
+  if (!Array.isArray(persons) || !persons.length) return 0;
+  const firstIncompleteIndex = persons.findIndex((person, index) => !isPersonComplete(person, index));
+  if (firstIncompleteIndex !== -1) return firstIncompleteIndex;
+  return Math.min(currentExpandedPersonIndex, persons.length - 1);
+}
+
 function translateError(message) {
   const text = String(message || "");
   if (text.includes("Token is required")) return "Не найден токен формы.";
@@ -98,6 +131,7 @@ function translateError(message) {
   if (text.includes("Each person must answer whether they will be in the city on Pesach")) return "Для каждого человека нужно отдельно указать, будет ли он(а) в городе Алматы в период 1-9.4.2026.";
   if (text.includes("Details confirmation is required")) return "Нужно подтвердить правильность данных.";
   if (text.includes("Chametz authorization is required")) return "Нужно подтвердить продажу хамеца.";
+  if (text.includes("All contact fields must be completed")) return "Нужно заполнить все обязательные поля в контактных данных.";
   if (text.includes("Invalid or expired token")) return "Ссылка недействительна или срок её действия истёк.";
   if (text.includes("This form has already been submitted")) return "Эта форма уже была отправлена.";
   if (text.includes("Form ID does not match the token")) return "Ссылка не соответствует этой форме.";
@@ -159,14 +193,16 @@ function safeFullName(person) { return person.full_name || `${person.last_name |
 function renderContactItem(contact, person, personIndex, contactIndex) {
   const kind = contact.kind || "phone";
   const canDelete = !contact.is_existing_source;
+  const whatsappBlock = kind === "email" ? "" : `<label><span>WhatsApp</span><select data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="whatsapp" required><option value="">Выберите</option><option value="yes"${contact.whatsapp === "yes" ? " selected" : ""}>Да</option><option value="no"${contact.whatsapp === "no" ? " selected" : ""}>Нет</option></select></label>`;
+  const activeBlock = contact.is_existing_source ? `<label><span>Активен ли этот контакт</span><select data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="active" required>${contactActivityOptions(contact.active || "")}</select></label>` : "";
   return `
     <div class="contact-item">
       <div class="contact-grid">
-        <label><span>Тип контакта</span><select data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="kind">${contactTypeOptions(kind)}</select></label>
-        <label><span>${kind === "email" ? "Email" : `Номер ${contactIndex + 1}`}</span><input type="${contactInputType(kind)}" value="${escapeHtml(contact.number || "")}" placeholder="${contactPlaceholder(kind)}" ${kind === "email" ? "" : 'inputmode="numeric" minlength="11" pattern="[0-9]{11,}"'} data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="number"></label>
-        <label><span>Кому принадлежит контакт</span><select data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="owner_type"><option value="">Выберите</option><option value="self"${contact.owner_type === "self" ? " selected" : ""}>Ему самому / ей самой</option><option value="parent"${contact.owner_type === "parent" ? " selected" : ""}>Родителям</option><option value="family"${contact.owner_type === "family" ? " selected" : ""}>Члену семьи</option></select></label>
-        <label><span>WhatsApp</span><select data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="whatsapp"><option value="">Выберите</option><option value="yes"${contact.whatsapp === "yes" ? " selected" : ""}>Да</option><option value="no"${contact.whatsapp === "no" ? " selected" : ""}>Нет</option></select></label>
-        ${contact.is_existing_source ? `<label><span>Активен ли этот контакт</span><select data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="active">${contactActivityOptions(contact.active || "")}</select></label>` : ""}
+        <label><span>Тип контакта</span><select data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="kind" required>${contactTypeOptions(kind)}</select></label>
+        <label><span>${kind === "email" ? "Email" : `Номер ${contactIndex + 1}`}</span><input type="${contactInputType(kind)}" value="${escapeHtml(contact.number || "")}" placeholder="${contactPlaceholder(kind)}" ${kind === "email" ? "" : 'inputmode="numeric" minlength="11" pattern="[0-9]{11,}"'} data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="number" required></label>
+        <label><span>Кому принадлежит контакт</span><select data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="owner_type" required><option value="">Выберите</option><option value="self"${contact.owner_type === "self" ? " selected" : ""}>Ему самому / ей самой</option><option value="parent"${contact.owner_type === "parent" ? " selected" : ""}>Родителям</option><option value="family"${contact.owner_type === "family" ? " selected" : ""}>Члену семьи</option></select></label>
+        ${whatsappBlock}
+        ${activeBlock}
       </div>
       <div class="inline-actions">${canDelete ? `<button type="button" class="secondary remove-contact-btn" data-person-index="${personIndex}" data-contact-index="${contactIndex}">Удалить контакт</button>` : '<span class="contact-lock-note">Контакт из системы нельзя удалить из формы. Его можно только отметить как неактивный.</span>'}</div>
     </div>
@@ -176,9 +212,12 @@ function renderContactItem(contact, person, personIndex, contactIndex) {
 function renderPersonCard(person, index) {
   const contacts = person.contacts || [];
   const isPrimaryApplicant = index === 0 && (person.role === "self" || person.role === "mother");
+  const isExpanded = index === currentExpandedPersonIndex;
+  const isComplete = isPersonComplete(person, index);
   const codeBadges = [person.member_code ? `<div class="role-badge">${escapeHtml(person.member_code)}</div>` : "", person.address_code ? `<div class="role-badge">${escapeHtml(person.address_code)}</div>` : ""].filter(Boolean).join("");
   const iinBlock = isPrimaryApplicant ? "" : `<label><span>ИИН</span><input type="text" value="${escapeHtml(person.iin || "")}" data-person-index="${index}" data-field="iin"></label>`;
   const relationshipBlock = isPrimaryApplicant ? "" : `<label><span>Кем этот человек приходится основному заявителю</span><select data-person-index="${index}" data-field="relationship"><option value="">Выберите</option>${relationshipOptions(person.relationship)}</select></label>`;
+  const showChildEducation = person.role !== "child";
   const childAddressBlock = (person.role === "child" || person.role === "new_member") ? `
     <div class="subsection-title">Адрес этого человека</div>
     <div class="person-grid">
@@ -192,8 +231,8 @@ function renderPersonCard(person, index) {
       <label><span>Девичья фамилия</span><input type="text" value="${escapeHtml(person.maiden_name || "")}" data-person-index="${index}" data-field="maiden_name"></label>
       <label><span>Еврейское имя</span><input type="text" value="${escapeHtml(person.hebrew_name || "")}" data-person-index="${index}" data-field="hebrew_name"></label>
       <label><span>Место рождения</span><input type="text" value="${escapeHtml(person.birth_place || "")}" data-person-index="${index}" data-field="birth_place"></label>
-      <label><span>Образование</span><input type="text" value="${escapeHtml(person.education || "")}" data-person-index="${index}" data-field="education"></label>
-      <label class="full-span"><span>Род занятий / специальность</span><input type="text" value="${escapeHtml(person.specialty || "")}" data-person-index="${index}" data-field="specialty"></label>
+      ${showChildEducation ? `<label><span>Образование</span><input type="text" value="${escapeHtml(person.education || "")}" data-person-index="${index}" data-field="education"></label>` : `<label><span>Номер школы</span><input type="text" value="${escapeHtml(person.school_number || "")}" data-person-index="${index}" data-field="school_number"></label>`}
+      ${showChildEducation ? `<label class="full-span"><span>Род занятий / специальность</span><input type="text" value="${escapeHtml(person.specialty || "")}" data-person-index="${index}" data-field="specialty"></label>` : ""}
     </div>
   ` : "";
   const parentBlock = person.show_parent_fields ? `
@@ -217,8 +256,11 @@ function renderPersonCard(person, index) {
   ` : "";
 
   return `
-    <article class="person-card" data-person-index="${index}">
-      <div class="person-top"><div><strong>${escapeHtml(safeFullName(person))}</strong><div class="role-badge">${roleLabel(person.role)}</div></div><div class="person-badges">${codeBadges || '<div class="role-badge">Новая запись</div>'}</div></div>
+    <article class="person-card${isExpanded ? " is-expanded" : " is-collapsed"}" data-person-index="${index}">
+      <button type="button" class="person-toggle" data-person-toggle="${index}" aria-expanded="${isExpanded ? "true" : "false"}">
+        <div class="person-top"><div><strong>${escapeHtml(safeFullName(person))}</strong><div class="role-badge">${roleLabel(person.role)}</div></div><div class="person-badges">${codeBadges || '<div class="role-badge">Новая запись</div>'}${isComplete ? '<div class="role-badge role-badge-success">Заполнено</div>' : ''}</div></div>
+      </button>
+      <div class="person-body"${isExpanded ? "" : ' hidden'}>
       <div class="person-grid">
         <label><span>Фамилия</span><input type="text" value="${escapeHtml(person.last_name || "")}" data-person-index="${index}" data-field="last_name"></label>
         <label><span>Имя</span><input type="text" value="${escapeHtml(person.first_name || "")}" data-person-index="${index}" data-field="first_name"></label>
@@ -234,12 +276,14 @@ function renderPersonCard(person, index) {
       ${parentBlock}
       <div class="requirement">Без отдельного ответа о нахождении в городе Алматы в период 1-9.4.2026 нельзя завершить форму.</div>
       <div class="contact-list">${contacts.map((contact, contactIndex) => renderContactItem(contact, person, index, contactIndex)).join("")}</div>
-      <div class="inline-actions"><button type="button" class="secondary add-contact-btn" data-person-index="${index}">Добавить контакт</button>${person.is_newly_added ? `<button type="button" class="secondary remove-member-btn" data-person-index="${index}">Удалить этого человека</button>` : ""}</div>
+        <div class="inline-actions"><button type="button" class="secondary add-contact-btn" data-person-index="${index}">Добавить личный контакт</button>${person.is_newly_added ? `<button type="button" class="secondary remove-member-btn" data-person-index="${index}">Удалить этого человека</button>` : ""}</div>
+      </div>
     </article>
-  `;
+    `;
 }
 
 function renderPersons(persons, mode) {
+  currentExpandedPersonIndex = getPreferredExpandedPersonIndex(persons);
   personsContainer.innerHTML = persons.map((person, index) => renderPersonCard(person, index)).join("");
   addMemberWrap.classList.toggle("hidden", mode === "single_update");
 }
@@ -257,7 +301,8 @@ function fillForm(data) {
       father_birth_date: formatDisplayDate(person.father_birth_date),
       same_as_primary_address: person.same_as_primary_address || sameAsPrimary,
       child_address: sameAsPrimary === "no" ? (person.child_address || person.address || "") : "",
-      contacts: Array.isArray(person.contacts) ? person.contacts : []
+      contacts: Array.isArray(person.contacts) ? person.contacts : [],
+      school_number: person.school_number || ""
     };
   });
   fields.formId.value = data.form_id || "";
@@ -294,10 +339,23 @@ function syncFieldFromEvent(target) {
       renderPersons(currentPayload.persons, currentPayload.mode);
       return;
     }
-      return;
+    return;
   }
 
   person[field] = target.value;
+  if ((field === "relationship") && (person.role === "child" || person.role === "new_member") && ["son", "daughter"].includes(target.value)) {
+    const primary = currentPayload.persons?.[0];
+    if (primary) {
+      person.mother_last_name = primary.last_name || person.mother_last_name || "";
+      person.mother_first_name = primary.first_name || person.mother_first_name || "";
+      person.mother_middle_name = primary.middle_name || person.mother_middle_name || "";
+      person.mother_birth_date = primary.birth_date || person.mother_birth_date || "";
+      person.mother_birth_place = primary.birth_place || person.mother_birth_place || "";
+      person.mother_hebrew_name = primary.hebrew_name || person.mother_hebrew_name || "";
+    }
+    renderPersons(currentPayload.persons, currentPayload.mode);
+    return;
+  }
   if (field === "same_as_primary_address") {
     if (target.value === "yes") person.child_address = "";
     renderPersons(currentPayload.persons, currentPayload.mode);
@@ -310,7 +368,7 @@ function normalizeContactValue(contact) { return (contact.kind || "phone") === "
 function addContactToPerson(personIndex) {
   if (!currentPayload?.persons?.[personIndex]) return;
   currentPayload.persons[personIndex].contacts ||= [];
-  currentPayload.persons[personIndex].contacts.push({ number: "", kind: "phone", owner_type: "", whatsapp: "", active: "", is_existing_source: false });
+  currentPayload.persons[personIndex].contacts.push({ number: "", kind: "phone", owner_type: "", whatsapp: "", active: "", is_existing_source: false, contact_record_id: "" });
   renderPersons(currentPayload.persons, currentPayload.mode);
 }
 
@@ -318,10 +376,10 @@ function removeContactFromPerson(personIndex, contactIndex) {
   const person = currentPayload?.persons?.[personIndex];
   if (!person?.contacts || person.contacts[contactIndex]?.is_existing_source) return;
   if (person.contacts.length <= 1) {
-    if (isMinor(person)) {
+    if (isMinor(person) || person.role === "new_member") {
       person.contacts = [];
     } else {
-      person.contacts[0] = { number: "", kind: "phone", owner_type: "", whatsapp: "", active: "", is_existing_source: false };
+      person.contacts[0] = { number: "", kind: "phone", owner_type: "", whatsapp: "", active: "", is_existing_source: false, contact_record_id: "" };
     }
   } else {
     person.contacts.splice(contactIndex, 1);
@@ -343,6 +401,7 @@ function buildSubmitPayload() {
     birth_date: formatDisplayDate(person.birth_date),
     mother_birth_date: formatDisplayDate(person.mother_birth_date),
     father_birth_date: formatDisplayDate(person.father_birth_date),
+    school_number: person.school_number || "",
     address: (person.role === "child" || person.role === "new_member") ? (person.same_as_primary_address === "no" ? person.child_address || "" : resolvedMainAddress) : (person.address || resolvedMainAddress),
     contacts: (person.contacts || []).map((contact) => ({ ...contact, number: normalizeContactValue(contact) }))
   }));
@@ -399,6 +458,12 @@ personsContainer.addEventListener("input", (event) => { syncFieldFromEvent(event
 personsContainer.addEventListener("change", (event) => { syncFieldFromEvent(event.target); });
 
 personsContainer.addEventListener("click", (event) => {
+  const toggleButton = event.target.closest("[data-person-toggle]");
+  if (toggleButton) {
+    currentExpandedPersonIndex = Number(toggleButton.dataset.personToggle);
+    renderPersons(currentPayload.persons, currentPayload.mode);
+    return;
+  }
   const addButton = event.target.closest(".add-contact-btn");
   if (addButton) {
     addContactToPerson(Number(addButton.dataset.personIndex));
@@ -436,6 +501,7 @@ addMemberBtn.addEventListener("click", () => {
     birth_place: "",
     education: "",
     specialty: "",
+    school_number: "",
     parent_mother_nationality: "",
     parent_father_nationality: "",
     mother_last_name: "",
@@ -450,7 +516,7 @@ addMemberBtn.addEventListener("click", () => {
     father_middle_name: "",
     father_birth_date: "",
     father_birth_place: "",
-    contacts: [{ number: "", kind: "phone", owner_type: "", whatsapp: "", active: "", is_existing_source: false }]
+    contacts: [{ number: "", kind: "phone", owner_type: "", whatsapp: "", active: "", is_existing_source: false, contact_record_id: "" }]
   });
   renderPersons(currentPayload.persons, currentPayload.mode);
 });
