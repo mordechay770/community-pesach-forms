@@ -262,6 +262,17 @@ button.secondary{
   grid-template-columns:repeat(2,minmax(0,1fr));
   gap:12px;
 }
+.subsection-title{
+  margin:16px 0 2px;
+  color:var(--navy);
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.full-span{
+  grid-column:1 / -1;
+}
 .contact-list{
   display:grid;
   gap:12px;
@@ -281,7 +292,14 @@ button.secondary{
 .inline-actions{
   margin-top:12px;
   display:flex;
+  flex-wrap:wrap;
   justify-content:flex-start;
+  gap:10px;
+}
+.contact-lock-note{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
 }
 .hidden{
   display:none !important;

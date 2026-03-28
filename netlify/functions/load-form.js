@@ -6,8 +6,8 @@ const DEMO_FORMS = {
     mode: "single_update",
     summary: "Single update form for one known community member.",
     meta: {
-      member_code: "CM-10294",
-      address_code: "AD-7781"
+      member_code: "6378",
+      address_code: "3567"
     },
     address: {
       full: "Алматы, ул. Абая 123, кв. 45"
@@ -16,95 +16,49 @@ const DEMO_FORMS = {
       {
         execution_record_id: "demo-self-1",
         role: "self",
+        is_newly_added: false,
         relationship: "",
-        member_code: "CM-10294",
-        address_code: "AD-7781",
+        member_code: "6378",
+        address_code: "3567",
         full_name: "Коген Мордехай",
         last_name: "Коген",
         first_name: "Мордехай",
         middle_name: "",
-        iin: "860314450921",
+        iin: "870309000050",
         gender: "М",
-        birth_date: "14.03.1986",
+        birth_date: "09.03.1987",
         will_be_in_city: "",
-        show_parent_fields: false,
-        parent_mother_nationality: "",
-        parent_father_nationality: "",
-        contacts: [
-          { number: "77012345678", owner_type: "self", whatsapp: "yes" }
-        ]
-      }
-    ]
-  },
-  "demo-family": {
-    form_id: "FORM-recREQ002",
-    request_id: "recREQ002",
-    group_form_id: "GF-recREQ002",
-    mode: "mother_children_update",
-    summary: "Family form with one mother and three children.",
-    meta: {
-      member_code: "CM-20511",
-      address_code: "AD-5532"
-    },
-    address: {
-      full: "Алматы, мкр. Самал 8, дом 19"
-    },
-    persons: [
-      {
-        execution_record_id: "demo-mother-1",
-        role: "mother",
-        relationship: "",
-        member_code: "CM-20511",
-        address_code: "AD-5532",
-        full_name: "Коэн Ривка",
-        last_name: "Коэн",
-        first_name: "Ривка",
-        middle_name: "",
-        iin: "830421550912",
-        gender: "Ж",
-        birth_date: "21.04.1983",
-        will_be_in_city: "",
-        show_parent_fields: false,
-        parent_mother_nationality: "",
-        parent_father_nationality: "",
-        contacts: [
-          { number: "77071234567", owner_type: "self", whatsapp: "yes" }
-        ]
-      }
-    ]
-  },
-  "demo-new": {
-    form_id: "FORM-recREQ003",
-    request_id: "recREQ003",
-    group_form_id: "GF-recREQ003",
-    mode: "new_member_registration",
-    summary: "New member registration with missing parent nationality fields.",
-    meta: {
-      member_code: "NEW",
-      address_code: "AD-NEW"
-    },
-    address: {
-      full: ""
-    },
-    persons: [
-      {
-        execution_record_id: "demo-new-1",
-        role: "new_member",
-        relationship: "other",
-        member_code: "",
-        address_code: "",
-        full_name: "",
-        last_name: "",
-        first_name: "",
-        middle_name: "",
-        iin: "",
-        gender: "",
-        birth_date: "",
-        will_be_in_city: "",
+        show_profile_extra_fields: true,
         show_parent_fields: true,
+        maiden_name: "",
+        hebrew_name: "",
+        birth_place: "",
+        education: "",
+        specialty: "",
         parent_mother_nationality: "",
         parent_father_nationality: "",
-        contacts: [{ number: "", owner_type: "", whatsapp: "" }]
+        mother_last_name: "",
+        mother_first_name: "",
+        mother_hebrew_name: "",
+        mother_middle_name: "",
+        mother_birth_date: "",
+        mother_birth_place: "",
+        father_last_name: "",
+        father_first_name: "",
+        father_hebrew_name: "",
+        father_middle_name: "",
+        father_birth_date: "",
+        father_birth_place: "",
+        contacts: [
+          {
+            number: "77012345678",
+            kind: "phone",
+            owner_type: "self",
+            whatsapp: "yes",
+            active: "yes",
+            is_existing_source: true
+          }
+        ]
       }
     ]
   }
@@ -144,6 +98,23 @@ const defaults = {
   motherNationalityField: "национальность матери",
   fatherNationalityField: "национальность отца",
   contactsJsonField: "contacts_json",
+  maidenNameField: "Девичья фамилия",
+  hebrewNameField: "Еврейское имя",
+  birthPlaceField: "Место рождения",
+  educationField: "Образование",
+  specialtyField: "Специальность",
+  motherLastNameField: "Фамилия Матери",
+  motherFirstNameField: "Имя матери",
+  motherHebrewNameField: "Евр Имя Матери",
+  motherMiddleNameField: "Отчество Матери",
+  motherBirthDateField: "ДатаРожденияМатери",
+  motherBirthPlaceField: "Место Рождения Матери",
+  fatherLastNameField: "Фамилия Отца",
+  fatherFirstNameField: "Имя отца",
+  fatherHebrewNameField: "Евр Имя Отца",
+  fatherMiddleNameField: "Отчество Отца",
+  fatherBirthDateField: "Дата Рождения Отца",
+  fatherBirthPlaceField: "Место Рождения Отца",
   sourceFullNameField: "",
   sourceLastNameField: "Фамилия",
   sourceFirstNameField: "Имя",
@@ -156,7 +127,24 @@ const defaults = {
   sourceMemberCodeField: "КодЧлены семьи",
   sourceAddressCodeField: "Код (from Код адреса)",
   sourceMotherNationalityField: "Нац мамы",
-  sourceFatherNationalityField: "Нац папы"
+  sourceFatherNationalityField: "Нац папы",
+  sourceMaidenNameField: "ДевичьяФамилия",
+  sourceHebrewNameField: "ЕврИмя",
+  sourceBirthPlaceField: "МестоРождения",
+  sourceEducationField: "Образование",
+  sourceSpecialtyField: "Специальность",
+  sourceMotherLastNameField: "ФамилияМатери",
+  sourceMotherFirstNameField: "Имя матери",
+  sourceMotherHebrewNameField: "ЕврИмяМатери",
+  sourceMotherMiddleNameField: "",
+  sourceMotherBirthDateField: "ДатаРожденияМатери",
+  sourceMotherBirthPlaceField: "МестоРожденияМатери",
+  sourceFatherLastNameField: "ФамилияОтца",
+  sourceFatherFirstNameField: "ИмяОтца",
+  sourceFatherHebrewNameField: "ЕврИмяОтца",
+  sourceFatherMiddleNameField: "ОтчествоОтца",
+  sourceFatherBirthDateField: "ДатаРожденияОтца",
+  sourceFatherBirthPlaceField: "МестоРожденияОтца"
 };
 
 function fieldName(key) {
@@ -167,19 +155,12 @@ function getEnvConfig() {
   const apiToken = process.env.AIRTABLE_API_TOKEN;
   const baseId = process.env.AIRTABLE_BASE_ID;
   const executionTable = fieldName("executionTable");
-
-  if (!apiToken || !baseId) {
-    return null;
-  }
-
+  if (!apiToken || !baseId) return null;
   return { apiToken, baseId, executionTable };
 }
 
 function jsonHeaders(statusCode = 200) {
-  return {
-    statusCode,
-    headers: { "Content-Type": "application/json" }
-  };
+  return { statusCode, headers: { "Content-Type": "application/json" } };
 }
 
 function escapeFormulaValue(value) {
@@ -190,54 +171,44 @@ async function airtableListRecords({ table, filterByFormula, maxRecords = 100 })
   const config = getEnvConfig();
   const url = new URL(`https://api.airtable.com/v0/${config.baseId}/${encodeURIComponent(table)}`);
   url.searchParams.set("maxRecords", String(maxRecords));
-  if (filterByFormula) {
-    url.searchParams.set("filterByFormula", filterByFormula);
-  }
+  if (filterByFormula) url.searchParams.set("filterByFormula", filterByFormula);
 
   const response = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${config.apiToken}` }
   });
-
   const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error?.message || "Airtable request failed");
-  }
-
+  if (!response.ok) throw new Error(data.error?.message || "Airtable request failed");
   return data.records || [];
 }
 
 async function airtableGetRecord({ table, recordId }) {
   const config = getEnvConfig();
-  const url = `https://api.airtable.com/v0/${config.baseId}/${encodeURIComponent(table)}/${recordId}`;
-  const response = await fetch(url, {
-    headers: { Authorization: `Bearer ${config.apiToken}` }
-  });
-
+  const response = await fetch(
+    `https://api.airtable.com/v0/${config.baseId}/${encodeURIComponent(table)}/${recordId}`,
+    {
+      headers: { Authorization: `Bearer ${config.apiToken}` }
+    }
+  );
   const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error?.message || "Airtable record request failed");
-  }
-
+  if (!response.ok) throw new Error(data.error?.message || "Airtable record request failed");
   return data;
 }
 
 async function airtableUpdateRecord({ table, recordId, fields }) {
   const config = getEnvConfig();
-  const url = `https://api.airtable.com/v0/${config.baseId}/${encodeURIComponent(table)}/${recordId}`;
-  const response = await fetch(url, {
-    method: "PATCH",
-    headers: {
-      Authorization: `Bearer ${config.apiToken}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ fields })
-  });
-
+  const response = await fetch(
+    `https://api.airtable.com/v0/${config.baseId}/${encodeURIComponent(table)}/${recordId}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${config.apiToken}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ fields })
+    }
+  );
   const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error?.message || "Airtable update failed");
-  }
-
+  if (!response.ok) throw new Error(data.error?.message || "Airtable update failed");
   return data;
 }
 
@@ -246,14 +217,8 @@ function firstNonEmpty(...values) {
 }
 
 function parseContacts(rawValue) {
-  if (!rawValue) {
-    return [];
-  }
-
-  if (Array.isArray(rawValue)) {
-    return rawValue;
-  }
-
+  if (!rawValue) return [];
+  if (Array.isArray(rawValue)) return rawValue;
   try {
     return JSON.parse(rawValue);
   } catch {
@@ -264,34 +229,22 @@ function parseContacts(rawValue) {
 function formatBirthDate(value) {
   const raw = Array.isArray(value) ? value[0] : value;
   const text = String(raw || "").trim();
-  if (!text) {
-    return "";
-  }
+  if (!text) return "";
 
   const dotMatch = text.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-  if (dotMatch) {
-    return text;
-  }
+  if (dotMatch) return text;
 
-  const isoMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (isoMatch) {
-    return `${isoMatch[3]}.${isoMatch[2]}.${isoMatch[1]}`;
-  }
+  const isoMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/);
+  if (isoMatch) return `${isoMatch[3]}.${isoMatch[2]}.${isoMatch[1]}`;
 
   const slashMatch = text.match(/^(\d{4})\/(\d{2})\/(\d{2})$/);
-  if (slashMatch) {
-    return `${slashMatch[3]}.${slashMatch[2]}.${slashMatch[1]}`;
-  }
+  if (slashMatch) return `${slashMatch[3]}.${slashMatch[2]}.${slashMatch[1]}`;
 
   const dayFirstSlashMatch = text.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (dayFirstSlashMatch) {
-    return `${dayFirstSlashMatch[1]}.${dayFirstSlashMatch[2]}.${dayFirstSlashMatch[3]}`;
-  }
+  if (dayFirstSlashMatch) return `${dayFirstSlashMatch[1]}.${dayFirstSlashMatch[2]}.${dayFirstSlashMatch[3]}`;
 
   const dayFirstDashMatch = text.match(/^(\d{2})-(\d{2})-(\d{4})$/);
-  if (dayFirstDashMatch) {
-    return `${dayFirstDashMatch[1]}.${dayFirstDashMatch[2]}.${dayFirstDashMatch[3]}`;
-  }
+  if (dayFirstDashMatch) return `${dayFirstDashMatch[1]}.${dayFirstDashMatch[2]}.${dayFirstDashMatch[3]}`;
 
   const parsed = new Date(text);
   if (!Number.isNaN(parsed.getTime())) {
@@ -306,85 +259,62 @@ function formatBirthDate(value) {
 
 function normalizeGender(value) {
   const text = String(value || "").trim().toLowerCase();
-  if (!text) {
-    return "";
-  }
-  if (text === "m" || text === "м") {
-    return "М";
-  }
-  if (text === "f" || text === "ж") {
-    return "Ж";
-  }
+  if (!text) return "";
+  if (["m", "м"].includes(text)) return "М";
+  if (["f", "ж"].includes(text)) return "Ж";
   return String(value || "");
 }
 
 function isActiveContact(activityValue) {
   const value = String(activityValue || "").toLowerCase();
-  if (!value) {
-    return true;
-  }
+  if (!value) return true;
   return !value.includes("неакт") && !value.includes("inactive") && !value.includes("ошиб");
 }
 
 function normalizeWhatsapp(value) {
-  if (value === true) {
-    return "yes";
-  }
+  if (value === true) return "yes";
   const text = String(value || "").trim().toLowerCase();
-  if (!text) {
-    return "";
-  }
-  if (["yes", "да", "true", "1"].includes(text)) {
-    return "yes";
-  }
-  if (["no", "нет", "false", "0"].includes(text)) {
-    return "no";
-  }
+  if (["yes", "да", "true", "1"].includes(text)) return "yes";
+  if (["no", "нет", "false", "0"].includes(text)) return "no";
   return "";
 }
 
-function normalizeContact(fields) {
-  const number = String(firstNonEmpty(
-    fields[fieldName("contactNumberField")],
-    fields["Мобильный телефон"]
-  ) || "").replace(/\D+/g, "");
+function normalizeContact(recordOrFields) {
+  const record = recordOrFields && recordOrFields.fields ? recordOrFields : null;
+  const fields = record ? record.fields || {} : recordOrFields || {};
+  const raw = firstNonEmpty(fields[fieldName("contactNumberField")], fields["Мобильный телефон"]);
+  const text = String(raw || "").trim();
+  const kind = text.includes("@") ? "email" : "phone";
 
   return {
-    number,
+    contact_record_id: record?.id || fields.contact_record_id || "",
+    number: kind === "email" ? text : text.replace(/\D+/g, ""),
+    kind,
     owner_type: fields[fieldName("contactOwnerField")] || "",
-    whatsapp: normalizeWhatsapp(fields[fieldName("contactWhatsappField")])
+    whatsapp: normalizeWhatsapp(fields[fieldName("contactWhatsappField")]),
+    active: isActiveContact(fields[fieldName("contactActivityField")]) ? "yes" : "no",
+    is_existing_source: true
   };
 }
 
 async function getLinkedMemberRecord(executionFields) {
   const linked = executionFields[fieldName("memberLinkField")];
   const memberRecordId = Array.isArray(linked) ? linked[0] : linked;
-  if (!memberRecordId) {
-    return null;
-  }
-
-  return airtableGetRecord({
-    table: fieldName("memberTable"),
-    recordId: memberRecordId
-  });
+  if (!memberRecordId) return null;
+  return airtableGetRecord({ table: fieldName("memberTable"), recordId: memberRecordId });
 }
 
 async function getContactsFromIds(contactIds) {
   const records = await Promise.all(
     contactIds.map((contactId) =>
-      airtableGetRecord({
-        table: fieldName("contactTable"),
-        recordId: contactId
-      }).catch(() => null)
+      airtableGetRecord({ table: fieldName("contactTable"), recordId: contactId }).catch(() => null)
     )
   );
 
   return records
     .filter(Boolean)
-    .map((record) => record.fields || {})
-    .filter((fields) => isActiveContact(fields[fieldName("contactActivityField")]))
     .map(normalizeContact)
-    .filter((contact) => contact.number || contact.owner_type || contact.whatsapp === "yes");
+    .filter((contact) => contact.number);
 }
 
 async function getContactsForMember(memberRecordId, memberFields) {
@@ -393,9 +323,7 @@ async function getContactsForMember(memberRecordId, memberFields) {
     return getContactsFromIds(linkedContacts);
   }
 
-  if (!memberRecordId) {
-    return [];
-  }
+  if (!memberRecordId) return [];
 
   const formula = `FIND("${escapeFormulaValue(memberRecordId)}", ARRAYJOIN({${fieldName("contactMemberLinkField")}}))`;
   const rows = await airtableListRecords({
@@ -405,22 +333,16 @@ async function getContactsForMember(memberRecordId, memberFields) {
   });
 
   return rows
-    .map((row) => row.fields || {})
-    .filter((fields) => isActiveContact(fields[fieldName("contactActivityField")]))
     .map(normalizeContact)
-    .filter((contact) => contact.number || contact.owner_type || contact.whatsapp === "yes");
+    .filter((contact) => contact.number);
 }
 
 function roleRank(role) {
-  const order = {
-    self: 1,
-    mother: 1,
-    spouse: 2,
-    child: 3,
-    new_member: 4
-  };
+  return { self: 1, mother: 1, spouse: 2, child: 3, new_member: 4 }[role] || 99;
+}
 
-  return order[role] || 99;
+function shouldShowWhenMissing(values, role) {
+  return values.some((value) => !String(value || "").trim()) || role === "new_member";
 }
 
 async function buildPersonFromRecord(record) {
@@ -433,13 +355,43 @@ async function buildPersonFromRecord(record) {
   const lastName = firstNonEmpty(fields[fieldName("lastNameField")], memberFields[fieldName("sourceLastNameField")]);
   const firstName = firstNonEmpty(fields[fieldName("firstNameField")], memberFields[fieldName("sourceFirstNameField")]);
   const middleName = firstNonEmpty(fields[fieldName("middleNameField")], memberFields[fieldName("sourceMiddleNameField")]);
+  const maidenName = firstNonEmpty(fields[fieldName("maidenNameField")], memberFields[fieldName("sourceMaidenNameField")]);
+  const hebrewName = firstNonEmpty(fields[fieldName("hebrewNameField")], memberFields[fieldName("sourceHebrewNameField")]);
+  const birthPlace = firstNonEmpty(fields[fieldName("birthPlaceField")], memberFields[fieldName("sourceBirthPlaceField")]);
+  const education = firstNonEmpty(fields[fieldName("educationField")], memberFields[fieldName("sourceEducationField")]);
+  const specialty = firstNonEmpty(fields[fieldName("specialtyField")], memberFields[fieldName("sourceSpecialtyField")]);
+  const motherNationality = firstNonEmpty(fields[fieldName("motherNationalityField")], memberFields[fieldName("sourceMotherNationalityField")]);
+  const fatherNationality = firstNonEmpty(fields[fieldName("fatherNationalityField")], memberFields[fieldName("sourceFatherNationalityField")]);
+  const motherLastName = firstNonEmpty(fields[fieldName("motherLastNameField")], memberFields[fieldName("sourceMotherLastNameField")]);
+  const motherFirstName = firstNonEmpty(fields[fieldName("motherFirstNameField")], memberFields[fieldName("sourceMotherFirstNameField")]);
+  const motherHebrewName = firstNonEmpty(fields[fieldName("motherHebrewNameField")], memberFields[fieldName("sourceMotherHebrewNameField")]);
+  const motherMiddleName = firstNonEmpty(fields[fieldName("motherMiddleNameField")], memberFields[fieldName("sourceMotherMiddleNameField")]);
+  const motherBirthDate = formatBirthDate(firstNonEmpty(fields[fieldName("motherBirthDateField")], memberFields[fieldName("sourceMotherBirthDateField")]));
+  const motherBirthPlace = firstNonEmpty(fields[fieldName("motherBirthPlaceField")], memberFields[fieldName("sourceMotherBirthPlaceField")]);
+  const fatherLastName = firstNonEmpty(fields[fieldName("fatherLastNameField")], memberFields[fieldName("sourceFatherLastNameField")]);
+  const fatherFirstName = firstNonEmpty(fields[fieldName("fatherFirstNameField")], memberFields[fieldName("sourceFatherFirstNameField")]);
+  const fatherHebrewName = firstNonEmpty(fields[fieldName("fatherHebrewNameField")], memberFields[fieldName("sourceFatherHebrewNameField")]);
+  const fatherMiddleName = firstNonEmpty(fields[fieldName("fatherMiddleNameField")], memberFields[fieldName("sourceFatherMiddleNameField")]);
+  const fatherBirthDate = formatBirthDate(firstNonEmpty(fields[fieldName("fatherBirthDateField")], memberFields[fieldName("sourceFatherBirthDateField")]));
+  const fatherBirthPlace = firstNonEmpty(fields[fieldName("fatherBirthPlaceField")], memberFields[fieldName("sourceFatherBirthPlaceField")]);
 
-  const savedContacts = parseContacts(fields[fieldName("contactsJsonField")]);
-  const resolvedContacts = savedContacts.length ? savedContacts : await getContactsForMember(memberRecordId, memberFields);
+  const savedContacts = parseContacts(fields[fieldName("contactsJsonField")]).map((contact) => ({
+    kind: "phone",
+    owner_type: "",
+    whatsapp: "",
+    active: "",
+    is_existing_source: false,
+    ...contact
+  }));
+
+  const resolvedContacts = savedContacts.length
+    ? savedContacts
+    : await getContactsForMember(memberRecordId, memberFields);
 
   return {
     execution_record_id: record.id,
     role,
+    is_newly_added: false,
     relationship: fields[fieldName("relationshipField")] || "",
     member_code: firstNonEmpty(fields[fieldName("memberCodeField")], memberFields[fieldName("sourceMemberCodeField")]),
     address_code: firstNonEmpty(fields[fieldName("addressCodeField")], memberFields[fieldName("sourceAddressCodeField")]),
@@ -452,37 +404,69 @@ async function buildPersonFromRecord(record) {
     first_name: firstName,
     middle_name: middleName,
     iin: firstNonEmpty(fields[fieldName("iinField")], memberFields[fieldName("sourceIinField")]),
-    require_iin: true,
     gender: normalizeGender(firstNonEmpty(fields[fieldName("genderField")], memberFields[fieldName("sourceGenderField")])),
-    birth_date: formatBirthDate(firstNonEmpty(
-      fields[fieldName("birthDateField")],
-      memberFields[fieldName("sourceBirthDateField")],
-      memberFields[fieldName("sourceAltBirthDateField")],
-      memberFields[fieldName("birthDateField")]
-    )),
-    will_be_in_city: fields[fieldName("inCityField")] || "",
-    show_parent_fields: Boolean(
-      fields[fieldName("motherNationalityField")] ||
-      fields[fieldName("fatherNationalityField")] ||
-      memberFields[fieldName("sourceMotherNationalityField")] ||
-      memberFields[fieldName("sourceFatherNationalityField")] ||
-      role === "new_member"
+    birth_date: formatBirthDate(
+      firstNonEmpty(
+        fields[fieldName("birthDateField")],
+        memberFields[fieldName("sourceBirthDateField")],
+        memberFields[fieldName("sourceAltBirthDateField")]
+      )
     ),
-    parent_mother_nationality: firstNonEmpty(fields[fieldName("motherNationalityField")], memberFields[fieldName("sourceMotherNationalityField")]),
-    parent_father_nationality: firstNonEmpty(fields[fieldName("fatherNationalityField")], memberFields[fieldName("sourceFatherNationalityField")]),
+    will_be_in_city: fields[fieldName("inCityField")] || "",
+    show_profile_extra_fields: shouldShowWhenMissing(
+      [maidenName, hebrewName, birthPlace, education, specialty],
+      role
+    ),
+    show_parent_fields: shouldShowWhenMissing(
+      [
+        motherNationality,
+        fatherNationality,
+        motherLastName,
+        motherFirstName,
+        motherHebrewName,
+        motherMiddleName,
+        motherBirthDate,
+        motherBirthPlace,
+        fatherLastName,
+        fatherFirstName,
+        fatherHebrewName,
+        fatherMiddleName,
+        fatherBirthDate,
+        fatherBirthPlace
+      ],
+      role
+    ),
+    maiden_name: maidenName,
+    hebrew_name: hebrewName,
+    birth_place: birthPlace,
+    education,
+    specialty,
+    parent_mother_nationality: motherNationality,
+    parent_father_nationality: fatherNationality,
+    mother_last_name: motherLastName,
+    mother_first_name: motherFirstName,
+    mother_hebrew_name: motherHebrewName,
+    mother_middle_name: motherMiddleName,
+    mother_birth_date: motherBirthDate,
+    mother_birth_place: motherBirthPlace,
+    father_last_name: fatherLastName,
+    father_first_name: fatherFirstName,
+    father_hebrew_name: fatherHebrewName,
+    father_middle_name: fatherMiddleName,
+    father_birth_date: fatherBirthDate,
+    father_birth_place: fatherBirthPlace,
     address: firstNonEmpty(fields[fieldName("addressField")], memberFields[fieldName("sourceAddressField")]),
     contacts: resolvedContacts
   };
 }
 
 async function buildPayloadFromRecords(records) {
-  if (!records.length) {
-    throw new Error("No execution rows found for this token");
-  }
+  if (!records.length) throw new Error("No execution rows found for this token");
 
   const first = records[0].fields || {};
-  const persons = (await Promise.all(records.map(buildPersonFromRecord)))
-    .sort((a, b) => roleRank(a.role) - roleRank(b.role));
+  const persons = (await Promise.all(records.map(buildPersonFromRecord))).sort(
+    (a, b) => roleRank(a.role) - roleRank(b.role)
+  );
   const primaryPerson = persons[0] || {};
 
   return {
@@ -509,9 +493,7 @@ async function loadRealTokenPayload(token) {
     maxRecords: 100
   });
 
-  if (!matchingRows.length) {
-    throw new Error("Invalid or expired token");
-  }
+  if (!matchingRows.length) throw new Error("Invalid or expired token");
 
   const firstRecord = matchingRows[0];
   const firstFields = firstRecord.fields || {};
@@ -548,9 +530,7 @@ async function loadRealTokenPayload(token) {
     await airtableUpdateRecord({
       table: getEnvConfig().executionTable,
       recordId: firstRecord.id,
-      fields: {
-        [fieldName("tokenStatusField")]: "opened"
-      }
+      fields: { [fieldName("tokenStatusField")]: "opened" }
     });
   }
 
@@ -563,17 +543,11 @@ exports.handler = async function (event) {
     const token = body.token;
 
     if (!token) {
-      return {
-        ...jsonHeaders(400),
-        body: JSON.stringify({ error: "Token is required" })
-      };
+      return { ...jsonHeaders(400), body: JSON.stringify({ error: "Token is required" }) };
     }
 
     if (DEMO_FORMS[token]) {
-      return {
-        ...jsonHeaders(200),
-        body: JSON.stringify(DEMO_FORMS[token])
-      };
+      return { ...jsonHeaders(200), body: JSON.stringify(DEMO_FORMS[token]) };
     }
 
     if (!getEnvConfig()) {
@@ -584,14 +558,8 @@ exports.handler = async function (event) {
     }
 
     const payload = await loadRealTokenPayload(token);
-    return {
-      ...jsonHeaders(200),
-      body: JSON.stringify(payload)
-    };
+    return { ...jsonHeaders(200), body: JSON.stringify(payload) };
   } catch (error) {
-    return {
-      ...jsonHeaders(500),
-      body: JSON.stringify({ error: error.message })
-    };
+    return { ...jsonHeaders(500), body: JSON.stringify({ error: error.message }) };
   }
 };
