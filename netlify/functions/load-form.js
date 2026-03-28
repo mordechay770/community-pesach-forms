@@ -180,8 +180,24 @@ async function airtableListRecords({ table, filterByFormula, maxRecords = 100 })
   const response = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${config.apiToken}` }
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error?.message || "Airtable request failed");
+  const rawText = await response.text();
+  let data = {};
+  try {
+    data = rawText ? JSON.parse(rawText) : {};
+  } catch {
+    data = { raw: rawText };
+  }
+  if (!response.ok) {
+    throw new Error(
+      [
+        "airtable_list_failed",
+        `status=${response.status}`,
+        `table=${table}`,
+        `url=${url.pathname}`,
+        `body=${rawText || "<empty>"}`
+      ].join(" | ")
+    );
+  }
   return data.records || [];
 }
 
@@ -193,8 +209,24 @@ async function airtableGetRecord({ table, recordId }) {
       headers: { Authorization: `Bearer ${config.apiToken}` }
     }
   );
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error?.message || "Airtable record request failed");
+  const rawText = await response.text();
+  let data = {};
+  try {
+    data = rawText ? JSON.parse(rawText) : {};
+  } catch {
+    data = { raw: rawText };
+  }
+  if (!response.ok) {
+    throw new Error(
+      [
+        "airtable_get_failed",
+        `status=${response.status}`,
+        `table=${table}`,
+        `record_id=${recordId}`,
+        `body=${rawText || "<empty>"}`
+      ].join(" | ")
+    );
+  }
   return data;
 }
 
@@ -211,8 +243,24 @@ async function airtableUpdateRecord({ table, recordId, fields }) {
       body: JSON.stringify({ fields })
     }
   );
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error?.message || "Airtable update failed");
+  const rawText = await response.text();
+  let data = {};
+  try {
+    data = rawText ? JSON.parse(rawText) : {};
+  } catch {
+    data = { raw: rawText };
+  }
+  if (!response.ok) {
+    throw new Error(
+      [
+        "airtable_update_failed",
+        `status=${response.status}`,
+        `table=${table}`,
+        `record_id=${recordId}`,
+        `body=${rawText || "<empty>"}`
+      ].join(" | ")
+    );
+  }
   return data;
 }
 
@@ -493,11 +541,16 @@ async function buildPayloadFromRecords(records) {
 }
 
 async function loadRealTokenPayload(token) {
-  const matchingRows = await airtableListRecords({
-    table: getEnvConfig().executionTable,
-    filterByFormula: `{${fieldName("tokenField")}} = "${escapeFormulaValue(token)}"`,
-    maxRecords: 100
-  });
+  let matchingRows;
+  try {
+    matchingRows = await airtableListRecords({
+      table: getEnvConfig().executionTable,
+      filterByFormula: `{${fieldName("tokenField")}} = "${escapeFormulaValue(token)}"`,
+      maxRecords: 100
+    });
+  } catch (error) {
+    throw new Error(`initial_execution_lookup | ${error.message}`);
+  }
 
   if (!matchingRows.length) throw new Error("Invalid or expired token");
 
@@ -519,28 +572,44 @@ async function loadRealTokenPayload(token) {
   const formId = firstFields[fieldName("formIdField")];
 
   if (groupFormId) {
-    allRows = await airtableListRecords({
-      table: getEnvConfig().executionTable,
-      filterByFormula: `{${fieldName("groupFormIdField")}} = "${escapeFormulaValue(groupFormId)}"`,
-      maxRecords: 100
-    });
+    try {
+      allRows = await airtableListRecords({
+        table: getEnvConfig().executionTable,
+        filterByFormula: `{${fieldName("groupFormIdField")}} = "${escapeFormulaValue(groupFormId)}"`,
+        maxRecords: 100
+      });
+    } catch (error) {
+      throw new Error(`group_execution_lookup | ${error.message}`);
+    }
   } else if (formId) {
-    allRows = await airtableListRecords({
-      table: getEnvConfig().executionTable,
-      filterByFormula: `{${fieldName("formIdField")}} = "${escapeFormulaValue(formId)}"`,
-      maxRecords: 100
-    });
+    try {
+      allRows = await airtableListRecords({
+        table: getEnvConfig().executionTable,
+        filterByFormula: `{${fieldName("formIdField")}} = "${escapeFormulaValue(formId)}"`,
+        maxRecords: 100
+      });
+    } catch (error) {
+      throw new Error(`form_execution_lookup | ${error.message}`);
+    }
   }
 
   if (tokenStatus !== "opened") {
-    await airtableUpdateRecord({
-      table: getEnvConfig().executionTable,
-      recordId: firstRecord.id,
-      fields: { [fieldName("tokenStatusField")]: "opened" }
-    });
+    try {
+      await airtableUpdateRecord({
+        table: getEnvConfig().executionTable,
+        recordId: firstRecord.id,
+        fields: { [fieldName("tokenStatusField")]: "opened" }
+      });
+    } catch (error) {
+      throw new Error(`mark_token_opened | ${error.message}`);
+    }
   }
 
-  return buildPayloadFromRecords(allRows);
+  try {
+    return await buildPayloadFromRecords(allRows);
+  } catch (error) {
+    throw new Error(`build_payload_from_records | ${error.message}`);
+  }
 }
 
 function buildDebugError(stage, error, extra = {}) {
