@@ -422,7 +422,7 @@ function buildSubmitPayload() {
 async function loadCurrentToken() {
   submitOutput.textContent = "Нет отправки.";
   payloadSummary.textContent = "Загружаем данные формы...";
-  const data = await callJson("/.netlify/functions/load-form", { token: tokenInput.value.trim() });
+  const data = await callJson("/.netlify/functions/load-form-v2", { token: tokenInput.value.trim() });
   fillForm(data);
 }
 
