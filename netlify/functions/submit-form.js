@@ -137,6 +137,10 @@ function assignIfNonEmpty(fields, key, value) {
   if (typeof value === "string" && !value.trim()) return;
   fields[key] = value;
 }
+
+function assignAllOptional(fields, pairs) {
+  pairs.forEach(([key, value]) => assignIfNonEmpty(fields, key, value));
+}
 function normalizeWhatsappValue(value) {
   if (value === "yes" || value === true) return "yes";
   if (value === "no" || value === false) return "no";
@@ -233,36 +237,17 @@ function buildPersonUpdate(person, fullPayload) {
       ? fullPayload.address.new_address || fullPayload.address.full || ""
       : fullPayload.address?.full || "";
 
-    const fields = {
-      [fieldName("lastNameField")]: person.last_name || "",
-      [fieldName("firstNameField")]: person.first_name || "",
-      [fieldName("middleNameField")]: person.middle_name || "",
-      [fieldName("genderField")]: person.gender || "",
+  const fields = {
+    [fieldName("lastNameField")]: person.last_name || "",
+    [fieldName("firstNameField")]: person.first_name || "",
+    [fieldName("middleNameField")]: person.middle_name || "",
+    [fieldName("genderField")]: person.gender || "",
     [fieldName("inCityField")]: person.will_be_in_city || "",
     [fieldName("roleField")]: person.role || "",
-    [fieldName("relationshipField")]: person.relationship || "",
-    [fieldName("motherNationalityField")]: person.parent_mother_nationality || "",
-    [fieldName("fatherNationalityField")]: person.parent_father_nationality || "",
-    [fieldName("maidenNameField")]: person.maiden_name || "",
-      [fieldName("hebrewNameField")]: person.hebrew_name || "",
-      [fieldName("birthPlaceField")]: person.birth_place || "",
-      [fieldName("educationField")]: person.education || "",
-      [fieldName("specialtyField")]: person.specialty || "",
     [fieldName("mobilePhoneField")]: getPrimaryMobilePhone(person),
-    [fieldName("motherLastNameField")]: person.mother_last_name || "",
-    [fieldName("motherFirstNameField")]: person.mother_first_name || "",
-    [fieldName("motherHebrewNameField")]: person.mother_hebrew_name || "",
-    [fieldName("motherMiddleNameField")]: person.mother_middle_name || "",
-    [fieldName("motherBirthPlaceField")]: person.mother_birth_place || "",
-    [fieldName("fatherLastNameField")]: person.father_last_name || "",
-    [fieldName("fatherFirstNameField")]: person.father_first_name || "",
-    [fieldName("fatherHebrewNameField")]: person.father_hebrew_name || "",
-    [fieldName("fatherMiddleNameField")]: person.father_middle_name || "",
-    [fieldName("fatherBirthPlaceField")]: person.father_birth_place || "",
     [fieldName("contactsJsonField")]: JSON.stringify(person.contacts || []),
     [fieldName("detailsConfirmedField")]: Boolean(fullPayload.details_confirmed),
     [fieldName("chametzConfirmedField")]: Boolean(fullPayload.chametz_sale_confirmation),
-    [fieldName("submittedAtField")]: new Date().toISOString(),
     [fieldName("tokenStatusField")]: "submitted",
     [fieldName("onlineStatusField")]: "РћС‚РІРµС‚ РїРѕР»СѓС‡РµРЅ РІ РѕРЅР»Р°Р№РЅ-С„РѕСЂРјРµ.",
     [fieldName("addressField")]:
@@ -273,9 +258,31 @@ function buildPersonUpdate(person, fullPayload) {
         : person.address || resolvedMainAddress
   };
 
+  assignAllOptional(fields, [
+    [fieldName("relationshipField"), person.relationship],
+    [fieldName("motherNationalityField"), person.parent_mother_nationality],
+    [fieldName("fatherNationalityField"), person.parent_father_nationality],
+    [fieldName("maidenNameField"), person.maiden_name],
+    [fieldName("hebrewNameField"), person.hebrew_name],
+    [fieldName("birthPlaceField"), person.birth_place],
+    [fieldName("educationField"), person.education],
+    [fieldName("specialtyField"), person.specialty],
+    [fieldName("motherLastNameField"), person.mother_last_name],
+    [fieldName("motherFirstNameField"), person.mother_first_name],
+    [fieldName("motherHebrewNameField"), person.mother_hebrew_name],
+    [fieldName("motherMiddleNameField"), person.mother_middle_name],
+    [fieldName("motherBirthPlaceField"), person.mother_birth_place],
+    [fieldName("fatherLastNameField"), person.father_last_name],
+    [fieldName("fatherFirstNameField"), person.father_first_name],
+    [fieldName("fatherHebrewNameField"), person.father_hebrew_name],
+    [fieldName("fatherMiddleNameField"), person.father_middle_name],
+    [fieldName("fatherBirthPlaceField"), person.father_birth_place]
+  ]);
+
   assignIfNonEmpty(fields, fieldName("birthDateField"), toAirtableDate(person.birth_date));
   assignIfNonEmpty(fields, fieldName("motherBirthDateField"), toAirtableDate(person.mother_birth_date));
   assignIfNonEmpty(fields, fieldName("fatherBirthDateField"), toAirtableDate(person.father_birth_date));
+  assignIfNonEmpty(fields, fieldName("submittedAtField"), new Date().toISOString());
 
   if (fieldName("payloadJsonField")) {
     fields[fieldName("payloadJsonField")] = JSON.stringify(fullPayload);
