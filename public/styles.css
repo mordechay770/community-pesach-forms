@@ -291,16 +291,41 @@ button.secondary{
   letter-spacing:.04em;
   text-transform:uppercase;
 }
-.presence-block{
+.subsection-block{
   margin-top:16px;
-  padding:14px;
+  padding-top:16px;
+  border-top:1px solid rgba(220,207,188,.75);
+}
+.presence-block{
+  margin-top:18px;
+  padding:18px;
   border:1.5px solid #d9ccb7;
-  border-radius:16px;
-  background:#f8f3eb;
+  border-radius:18px;
+  background:linear-gradient(180deg,#fbf7ef 0%,#f5eee2 100%);
 }
 .presence-block-invalid{
   border-color:#c85647;
   background:#fff1ee;
+}
+.presence-title{
+  margin:0 0 6px;
+  color:var(--navy);
+  font-size:18px;
+  font-weight:900;
+}
+.presence-subtitle{
+  margin:0 0 14px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5;
+}
+.presence-label span{
+  font-size:14px;
+}
+.presence-label select{
+  min-height:54px;
+  font-size:16px;
+  font-weight:700;
 }
 .field-required-missing span{
   color:#a33f33;
@@ -348,6 +373,9 @@ button.secondary{
   flex-wrap:wrap;
   justify-content:flex-start;
   gap:10px;
+}
+.continue-person-btn{
+  min-width:190px;
 }
 .contact-lock-note{
   color:var(--muted);
