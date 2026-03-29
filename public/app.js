@@ -108,30 +108,30 @@ function isAdultFemale(person) {
   return age !== null && age >= 18 && gender === "Ж";
 }
 
-function shouldUseSchoolField(person) {
-  if (!person) return false;
-  if (person.role === "child") return true;
-  if (person.role === "new_member") return isMinor(person);
-  return false;
-}
-
 function isFilled(value) {
   return String(value ?? "").trim() !== "";
 }
 
 function isContactComplete(contact) {
-  if (!contact || !isFilled(contact.number) || !isFilled(contact.owner_type)) return false;
+  if (!contact || !isFilled(contact.number)) return false;
+  if (contact.is_existing_source) {
+    if (!["yes", "no"].includes(contact.active)) return false;
+    if (contact.active === "no") return true;
+  }
+  if (!isFilled(contact.owner_type)) return false;
   if ((contact.kind || "phone") !== "email" && !["yes", "no"].includes(contact.whatsapp)) return false;
-  if (contact.is_existing_source && !["yes", "no"].includes(contact.active)) return false;
   return true;
 }
 
 function getContactMissingFields(contact) {
   const missing = [];
   if (!contact || !isFilled(contact.number)) missing.push("контакт");
+  if (contact?.is_existing_source) {
+    if (!["yes", "no"].includes(contact?.active)) missing.push("активность контакта");
+    if (contact?.active === "no") return missing;
+  }
   if (!contact || !isFilled(contact.owner_type)) missing.push("кому принадлежит контакт");
   if ((contact?.kind || "phone") !== "email" && !["yes", "no"].includes(contact?.whatsapp)) missing.push("WhatsApp");
-  if (contact?.is_existing_source && !["yes", "no"].includes(contact?.active)) missing.push("активность контакта");
   return missing;
 }
 
@@ -256,26 +256,36 @@ function safeFullName(person) { return person.full_name || `${person.last_name |
 function invalidLabelClass(isInvalid) { return isInvalid ? " field-required-missing" : ""; }
 function invalidInputClass(isInvalid) { return isInvalid ? " field-invalid" : ""; }
 
+function clearInlineValidation(target) {
+  if (!target?.classList) return;
+  target.classList.remove("field-invalid");
+  const label = target.closest("label");
+  label?.classList.remove("field-required-missing");
+}
+
 function renderContactItem(contact, person, personIndex, contactIndex) {
   const kind = contact.kind || "phone";
   const canDelete = !contact.is_existing_source;
   const missing = getContactMissingFields(contact);
   const showValidation = Boolean(person.show_validation);
   const numberMissing = !isFilled(contact.number);
-  const ownerMissing = !isFilled(contact.owner_type);
-  const whatsappMissing = kind !== "email" && !["yes", "no"].includes(contact.whatsapp);
   const activeMissing = contact.is_existing_source && !["yes", "no"].includes(contact.active);
-  const whatsappBlock = kind === "email" ? "" : `<label class="${invalidLabelClass(showValidation && whatsappMissing)}"><span>WhatsApp *</span><select class="${invalidInputClass(showValidation && whatsappMissing)}" data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="whatsapp" required><option value="">Выберите</option><option value="yes"${contact.whatsapp === "yes" ? " selected" : ""}>Да</option><option value="no"${contact.whatsapp === "no" ? " selected" : ""}>Нет</option></select></label>`;
+  const isInactiveExisting = contact.is_existing_source && contact.active === "no";
+  const ownerMissing = !isFilled(contact.owner_type);
+  const whatsappMissing = !isInactiveExisting && kind !== "email" && !["yes", "no"].includes(contact.whatsapp);
   const activeBlock = contact.is_existing_source ? `<label class="${invalidLabelClass(showValidation && activeMissing)}"><span>Активен ли этот контакт *</span><select class="${invalidInputClass(showValidation && activeMissing)}" data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="active" required>${contactActivityOptions(contact.active || "")}</select></label>` : "";
+  const ownerBlock = isInactiveExisting ? "" : `<label class="${invalidLabelClass(showValidation && ownerMissing)}"><span>Кому принадлежит контакт *</span><select class="${invalidInputClass(showValidation && ownerMissing)}" data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="owner_type" required><option value="">Выберите</option><option value="self"${contact.owner_type === "self" ? " selected" : ""}>Ему самому / ей самой</option><option value="parent"${contact.owner_type === "parent" ? " selected" : ""}>Родителям</option><option value="family"${contact.owner_type === "family" ? " selected" : ""}>Члену семьи</option></select></label>`;
+  const whatsappBlock = isInactiveExisting || kind === "email" ? "" : `<label class="${invalidLabelClass(showValidation && whatsappMissing)}"><span>WhatsApp *</span><select class="${invalidInputClass(showValidation && whatsappMissing)}" data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="whatsapp" required><option value="">Выберите</option><option value="yes"${contact.whatsapp === "yes" ? " selected" : ""}>Да</option><option value="no"${contact.whatsapp === "no" ? " selected" : ""}>Нет</option></select></label>`;
   return `
     <div class="contact-item">
       <div class="contact-grid">
         <label><span>Тип контакта</span><select data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="kind" required>${contactTypeOptions(kind)}</select></label>
         <label class="${invalidLabelClass(showValidation && numberMissing)}"><span>${kind === "email" ? "Email *" : `Номер ${contactIndex + 1} *`}</span><input class="${invalidInputClass(showValidation && numberMissing)}" type="${contactInputType(kind)}" value="${escapeHtml(contact.number || "")}" placeholder="${contactPlaceholder(kind)}" ${kind === "email" ? "" : 'inputmode="numeric" minlength="11" pattern="[0-9]{11,}"'} data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="number" required></label>
-        <label class="${invalidLabelClass(showValidation && ownerMissing)}"><span>Кому принадлежит контакт *</span><select class="${invalidInputClass(showValidation && ownerMissing)}" data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="owner_type" required><option value="">Выберите</option><option value="self"${contact.owner_type === "self" ? " selected" : ""}>Ему самому / ей самой</option><option value="parent"${contact.owner_type === "parent" ? " selected" : ""}>Родителям</option><option value="family"${contact.owner_type === "family" ? " selected" : ""}>Члену семьи</option></select></label>
-        ${whatsappBlock}
         ${activeBlock}
+        ${ownerBlock}
+        ${whatsappBlock}
       </div>
+      ${isInactiveExisting ? `<div class="field-inline-warning">Контакт отмечен как неактивный. Дополнительные поля для него не требуются.</div>` : ""}
       ${showValidation && missing.length ? `<div class="field-inline-warning">Заполните обязательные поля контакта: ${escapeHtml(missing.join(", "))}.</div>` : ""}
       <div class="inline-actions">${canDelete ? `<button type="button" class="secondary remove-contact-btn" data-person-index="${personIndex}" data-contact-index="${contactIndex}">Удалить контакт</button>` : '<span class="contact-lock-note">Контакт из системы нельзя удалить из формы. Его можно только отметить как неактивный.</span>'}</div>
     </div>
@@ -293,7 +303,6 @@ function renderPersonCard(person, index) {
   const iinBlock = isPrimaryApplicant ? "" : `<label><span>ИИН</span><input type="text" value="${escapeHtml(person.iin || "")}" data-person-index="${index}" data-field="iin"></label>`;
   const relationshipMissing = !isPrimaryApplicant && !isFilled(person.relationship);
   const relationshipBlock = isPrimaryApplicant ? "" : `<label class="${invalidLabelClass(showValidation && relationshipMissing)}"><span>Кем этот человек приходится основному заявителю *</span><select class="${invalidInputClass(showValidation && relationshipMissing)}" data-person-index="${index}" data-field="relationship"><option value="">Выберите</option>${relationshipOptions(person.relationship)}</select></label>`;
-  const useSchoolField = shouldUseSchoolField(person);
   const sameAddressMissing = (person.role === "child" || person.role === "new_member") && !["yes", "no"].includes(person.same_as_primary_address);
   const childAddressMissing = (person.role === "child" || person.role === "new_member") && person.same_as_primary_address === "no" && !isFilled(person.child_address);
   const childAddressBlock = (person.role === "child" || person.role === "new_member") ? `
@@ -312,8 +321,6 @@ function renderPersonCard(person, index) {
       ${isAdultFemale(person) ? `<label><span>Девичья фамилия</span><input type="text" value="${escapeHtml(person.maiden_name || "")}" data-person-index="${index}" data-field="maiden_name"></label>` : ""}
       <label><span>Еврейское имя</span><input type="text" value="${escapeHtml(person.hebrew_name || "")}" data-person-index="${index}" data-field="hebrew_name"></label>
       <label><span>Место рождения</span><input type="text" value="${escapeHtml(person.birth_place || "")}" data-person-index="${index}" data-field="birth_place"></label>
-      ${useSchoolField ? `<label><span>Номер школы</span><input type="text" value="${escapeHtml(person.school_number || "")}" data-person-index="${index}" data-field="school_number"></label>` : `<label><span>Образование</span><input type="text" value="${escapeHtml(person.education || "")}" data-person-index="${index}" data-field="education"></label>`}
-      ${useSchoolField ? "" : `<label class="full-span"><span>Род занятий / специальность</span><input type="text" value="${escapeHtml(person.specialty || "")}" data-person-index="${index}" data-field="specialty"></label>`}
     </div>
     </div>
   ` : "";
@@ -323,18 +330,6 @@ function renderPersonCard(person, index) {
     <div class="person-grid">
       <label><span>Национальность матери</span><input type="text" value="${escapeHtml(person.parent_mother_nationality || "")}" data-person-index="${index}" data-field="parent_mother_nationality"></label>
       <label><span>Национальность отца</span><input type="text" value="${escapeHtml(person.parent_father_nationality || "")}" data-person-index="${index}" data-field="parent_father_nationality"></label>
-      <label><span>Фамилия матери</span><input type="text" value="${escapeHtml(person.mother_last_name || "")}" data-person-index="${index}" data-field="mother_last_name"></label>
-      <label><span>Имя матери</span><input type="text" value="${escapeHtml(person.mother_first_name || "")}" data-person-index="${index}" data-field="mother_first_name"></label>
-      <label><span>Еврейское имя матери</span><input type="text" value="${escapeHtml(person.mother_hebrew_name || "")}" data-person-index="${index}" data-field="mother_hebrew_name"></label>
-      <label><span>Отчество матери</span><input type="text" value="${escapeHtml(person.mother_middle_name || "")}" data-person-index="${index}" data-field="mother_middle_name"></label>
-      <label><span>Дата рождения матери</span><input type="text" value="${escapeHtml(formatDisplayDate(person.mother_birth_date) || "")}" placeholder="ДД.ММ.ГГГГ" data-person-index="${index}" data-field="mother_birth_date"></label>
-      <label><span>Место рождения матери</span><input type="text" value="${escapeHtml(person.mother_birth_place || "")}" data-person-index="${index}" data-field="mother_birth_place"></label>
-      <label><span>Фамилия отца</span><input type="text" value="${escapeHtml(person.father_last_name || "")}" data-person-index="${index}" data-field="father_last_name"></label>
-      <label><span>Имя отца</span><input type="text" value="${escapeHtml(person.father_first_name || "")}" data-person-index="${index}" data-field="father_first_name"></label>
-      <label><span>Еврейское имя отца</span><input type="text" value="${escapeHtml(person.father_hebrew_name || "")}" data-person-index="${index}" data-field="father_hebrew_name"></label>
-      <label><span>Отчество отца</span><input type="text" value="${escapeHtml(person.father_middle_name || "")}" data-person-index="${index}" data-field="father_middle_name"></label>
-      <label><span>Дата рождения отца</span><input type="text" value="${escapeHtml(formatDisplayDate(person.father_birth_date) || "")}" placeholder="ДД.ММ.ГГГГ" data-person-index="${index}" data-field="father_birth_date"></label>
-      <label><span>Место рождения отца</span><input type="text" value="${escapeHtml(person.father_birth_place || "")}" data-person-index="${index}" data-field="father_birth_place"></label>
     </div>
     </div>
   ` : "";
@@ -455,6 +450,7 @@ function syncFieldFromEvent(target) {
   const contactIndex = target.dataset.contactIndex;
   const field = target.dataset.field;
   if (personIndex === undefined || !currentPayload) return;
+  clearInlineValidation(target);
 
   const person = currentPayload.persons[Number(personIndex)];
 
@@ -467,10 +463,6 @@ function syncFieldFromEvent(target) {
       manualExpandedPersonIndex = Number(personIndex);
       renderPersons(currentPayload.persons, currentPayload.mode);
       return;
-    }
-    if (person.show_validation) {
-      manualExpandedPersonIndex = Number(personIndex);
-      renderPersons(currentPayload.persons, currentPayload.mode);
     }
     return;
   }
@@ -495,10 +487,6 @@ function syncFieldFromEvent(target) {
     manualExpandedPersonIndex = Number(personIndex);
     renderPersons(currentPayload.persons, currentPayload.mode);
     return;
-  }
-  if (person.show_validation) {
-    manualExpandedPersonIndex = Number(personIndex);
-    renderPersons(currentPayload.persons, currentPayload.mode);
   }
 }
 
@@ -544,7 +532,6 @@ function buildSubmitPayload() {
     birth_date: formatDisplayDate(person.birth_date),
     mother_birth_date: formatDisplayDate(person.mother_birth_date),
     father_birth_date: formatDisplayDate(person.father_birth_date),
-    school_number: person.school_number || "",
     address: (person.role === "child" || person.role === "new_member") ? (person.same_as_primary_address === "no" ? person.child_address || "" : resolvedMainAddress) : (person.address || resolvedMainAddress),
     contacts: (person.contacts || []).map((contact) => ({ ...contact, number: normalizeContactValue(contact) }))
   }));

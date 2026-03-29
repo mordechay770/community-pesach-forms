@@ -280,8 +280,6 @@ function buildPersonUpdate(person, fullPayload) {
     [fieldName("maidenNameField"), person.maiden_name],
     [fieldName("hebrewNameField"), person.hebrew_name],
     [fieldName("birthPlaceField"), person.birth_place],
-    [fieldName("educationField"), person.education],
-    [fieldName("specialtyField"), person.specialty],
     [fieldName("motherLastNameField"), person.mother_last_name],
     [fieldName("motherFirstNameField"), person.mother_first_name],
     [fieldName("motherHebrewNameField"), person.mother_hebrew_name],
@@ -311,6 +309,8 @@ function stripOptionalSubmitFields(fields) {
   delete reduced[fieldName("payloadJsonField")];
   delete reduced[fieldName("submittedAtField")];
   delete reduced[fieldName("schoolField")];
+  delete reduced[fieldName("educationField")];
+  delete reduced[fieldName("specialtyField")];
   return reduced;
 }
 
