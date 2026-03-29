@@ -282,8 +282,6 @@ function buildPersonUpdate(person, fullPayload) {
   assignIfNonEmpty(fields, fieldName("birthDateField"), toAirtableDate(person.birth_date));
   assignIfNonEmpty(fields, fieldName("motherBirthDateField"), toAirtableDate(person.mother_birth_date));
   assignIfNonEmpty(fields, fieldName("fatherBirthDateField"), toAirtableDate(person.father_birth_date));
-  assignIfNonEmpty(fields, fieldName("submittedAtField"), new Date().toISOString());
-
   if (fieldName("payloadJsonField")) {
     fields[fieldName("payloadJsonField")] = JSON.stringify(fullPayload);
   }
