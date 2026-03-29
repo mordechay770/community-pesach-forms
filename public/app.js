@@ -458,7 +458,6 @@ function syncFieldFromEvent(target) {
     const contact = person.contacts[Number(contactIndex)];
     contact[field] = target.value;
     if (field === "kind" || field === "active") {
-      contact.number = "";
       if (field === "kind" && contact.kind === "email") contact.whatsapp = "no";
       if (field === "active" && contact.active === "no") {
         contact.whatsapp = "";
