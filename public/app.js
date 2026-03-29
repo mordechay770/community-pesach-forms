@@ -113,11 +113,11 @@ function isFilled(value) {
 }
 
 function isContactComplete(contact) {
-  if (!contact || !isFilled(contact.number)) return false;
   if (contact.is_existing_source) {
     if (!["yes", "no"].includes(contact.active)) return false;
     if (contact.active === "no") return true;
   }
+  if (!contact || !isFilled(contact.number)) return false;
   if (!isFilled(contact.owner_type)) return false;
   if ((contact.kind || "phone") !== "email" && !["yes", "no"].includes(contact.whatsapp)) return false;
   return true;
@@ -125,11 +125,11 @@ function isContactComplete(contact) {
 
 function getContactMissingFields(contact) {
   const missing = [];
-  if (!contact || !isFilled(contact.number)) missing.push("контакт");
   if (contact?.is_existing_source) {
     if (!["yes", "no"].includes(contact?.active)) missing.push("активность контакта");
     if (contact?.active === "no") return missing;
   }
+  if (!contact || !isFilled(contact.number)) missing.push("контакт");
   if (!contact || !isFilled(contact.owner_type)) missing.push("кому принадлежит контакт");
   if ((contact?.kind || "phone") !== "email" && !["yes", "no"].includes(contact?.whatsapp)) missing.push("WhatsApp");
   return missing;
@@ -268,9 +268,9 @@ function renderContactItem(contact, person, personIndex, contactIndex) {
   const canDelete = !contact.is_existing_source;
   const missing = getContactMissingFields(contact);
   const showValidation = Boolean(person.show_validation);
-  const numberMissing = !isFilled(contact.number);
   const activeMissing = contact.is_existing_source && !["yes", "no"].includes(contact.active);
   const isInactiveExisting = contact.is_existing_source && contact.active === "no";
+  const numberMissing = !isInactiveExisting && !isFilled(contact.number);
   const ownerMissing = !isFilled(contact.owner_type);
   const whatsappMissing = !isInactiveExisting && kind !== "email" && !["yes", "no"].includes(contact.whatsapp);
   const activeBlock = contact.is_existing_source ? `<label class="${invalidLabelClass(showValidation && activeMissing)}"><span>Активен ли этот контакт *</span><select class="${invalidInputClass(showValidation && activeMissing)}" data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="active" required>${contactActivityOptions(contact.active || "")}</select></label>` : "";
@@ -280,7 +280,7 @@ function renderContactItem(contact, person, personIndex, contactIndex) {
     <div class="contact-item">
       <div class="contact-grid">
         <label><span>Тип контакта</span><select data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="kind" required>${contactTypeOptions(kind)}</select></label>
-        <label class="${invalidLabelClass(showValidation && numberMissing)}"><span>${kind === "email" ? "Email *" : `Номер ${contactIndex + 1} *`}</span><input class="${invalidInputClass(showValidation && numberMissing)}" type="${contactInputType(kind)}" value="${escapeHtml(contact.number || "")}" placeholder="${contactPlaceholder(kind)}" ${kind === "email" ? "" : 'inputmode="numeric" minlength="11" pattern="[0-9]{11,}"'} data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="number" required></label>
+        <label class="${invalidLabelClass(showValidation && numberMissing)}"><span>${kind === "email" ? (isInactiveExisting ? "Email" : "Email *") : `${`Номер ${contactIndex + 1}`}${isInactiveExisting ? "" : " *"}`}</span><input class="${invalidInputClass(showValidation && numberMissing)}" type="${contactInputType(kind)}" value="${escapeHtml(contact.number || "")}" placeholder="${contactPlaceholder(kind)}" ${kind === "email" ? "" : 'inputmode="numeric" minlength="11" pattern="[0-9]{11,}"'} data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="number"${isInactiveExisting ? "" : " required"}></label>
         ${activeBlock}
         ${ownerBlock}
         ${whatsappBlock}
