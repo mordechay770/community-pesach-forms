@@ -242,7 +242,6 @@ function buildPersonUpdate(person, fullPayload) {
       [fieldName("birthPlaceField")]: person.birth_place || "",
       [fieldName("educationField")]: person.education || "",
       [fieldName("specialtyField")]: person.specialty || "",
-      [fieldName("schoolField")]: person.school_number || "",
     [fieldName("mobilePhoneField")]: getPrimaryMobilePhone(person),
     [fieldName("motherLastNameField")]: person.mother_last_name || "",
     [fieldName("motherFirstNameField")]: person.mother_first_name || "",
