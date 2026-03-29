@@ -679,6 +679,7 @@ form.addEventListener("submit", async (event) => {
     return;
   }
   const invalidPhone = (currentPayload?.persons || []).some((person) => (person.contacts || []).some((contact) => {
+    if (contact.is_existing_source && contact.active === "no") return false;
     if ((contact.kind || "phone") === "email") return false;
     const normalized = normalizePhone(contact.number);
     return normalized && normalized.length < 11;

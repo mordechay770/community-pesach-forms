@@ -235,9 +235,12 @@ function validatePayload(body) {
   if (
     body.persons.some((person) =>
       (person.contacts || []).some((contact) => {
+        if (contact.is_existing_source) {
+          if (!["yes", "no"].includes(contact.active)) return true;
+          if (contact.active === "no") return false;
+        }
         if (!contact.number || !contact.owner_type) return true;
         if ((contact.kind || "phone") !== "email" && !["yes", "no"].includes(contact.whatsapp)) return true;
-        if (contact.is_existing_source && !["yes", "no"].includes(contact.active)) return true;
         return false;
       })
     )
