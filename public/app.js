@@ -30,6 +30,7 @@ let currentPayload = null;
 let currentExpandedPersonIndex = 0;
 let manualExpandedPersonIndex = null;
 let pendingScrollPersonIndex = null;
+let pendingScrollToSubmit = false;
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -91,6 +92,14 @@ function calculateAge(value) {
 function isMinor(person) {
   const age = calculateAge(person?.birth_date);
   return age !== null && age < 18;
+}
+
+function normalizeUiGender(value) {
+  const text = String(value || "").trim().toLowerCase();
+  if (!text) return "";
+  if (["m", "м", "male"].includes(text)) return "М";
+  if (["f", "ж", "female"].includes(text)) return "Ж";
+  return String(value || "").trim();
 }
 
 function isAdultFemale(person) {
@@ -160,6 +169,13 @@ function getPreferredExpandedPersonIndex(persons) {
 }
 
 function scrollExpandedPersonIntoView() {
+  if (pendingScrollToSubmit) {
+    pendingScrollToSubmit = false;
+    requestAnimationFrame(() => {
+      fields.detailsConfirmed.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+    });
+    return;
+  }
   if (pendingScrollPersonIndex === null) return;
   const card = personsContainer.querySelector(`[data-person-index="${pendingScrollPersonIndex}"]`);
   pendingScrollPersonIndex = null;
@@ -335,7 +351,7 @@ function renderPersonCard(person, index) {
         <label class="${invalidLabelClass(showValidation && !isFilled(person.first_name))}"><span>Имя *</span><input class="${invalidInputClass(showValidation && !isFilled(person.first_name))}" type="text" value="${escapeHtml(person.first_name || "")}" data-person-index="${index}" data-field="first_name"></label>
         <label><span>Отчество</span><input type="text" value="${escapeHtml(person.middle_name || "")}" data-person-index="${index}" data-field="middle_name"></label>
         ${iinBlock}
-        <label class="${invalidLabelClass(showValidation && !isFilled(person.gender))}"><span>Пол *</span><select class="${invalidInputClass(showValidation && !isFilled(person.gender))}" data-person-index="${index}" data-field="gender"><option value="">Выберите</option><option value="М"${person.gender === "М" || person.gender === "M" ? " selected" : ""}>М</option><option value="Ж"${person.gender === "Ж" || person.gender === "F" ? " selected" : ""}>Ж</option></select></label>
+        <label class="${invalidLabelClass(showValidation && !isFilled(person.gender))}"><span>Пол *</span><select class="${invalidInputClass(showValidation && !isFilled(person.gender))}" data-person-index="${index}" data-field="gender"><option value="">Выберите</option><option value="М"${["М", "M", "м", "m"].includes(String(person.gender || "")) ? " selected" : ""}>М</option><option value="Ж"${["Ж", "F", "ж", "f"].includes(String(person.gender || "")) ? " selected" : ""}>Ж</option></select></label>
         <label class="${invalidLabelClass(showValidation && !isFilled(person.birth_date))}"><span>Дата рождения *</span><input class="${invalidInputClass(showValidation && !isFilled(person.birth_date))}" type="text" value="${escapeHtml(formatDisplayDate(person.birth_date) || "")}" placeholder="ДД.ММ.ГГГГ" data-person-index="${index}" data-field="birth_date"></label>
         ${relationshipBlock}
       </div>
@@ -358,7 +374,7 @@ function renderPersonCard(person, index) {
       ${showValidation && missingFields.length ? `<div class="field-inline-warning">Нужно заполнить обязательные поля: ${escapeHtml(missingFields.join(", "))}.</div>` : ''}
       <div class="requirement">Без отдельного ответа о нахождении в городе Алматы в период 1-9.4.2026 нельзя завершить форму.</div>
       <div class="contact-list">${contacts.map((contact, contactIndex) => renderContactItem(contact, person, index, contactIndex)).join("")}</div>
-        <div class="inline-actions"><button type="button" class="secondary add-contact-btn" data-person-index="${index}">Добавить личный контакт</button><button type="button" class="continue-person-btn" data-person-continue="${index}">${index === (currentPayload?.persons?.length || 0) - 1 ? "Проверить и завершить" : "Продолжить"}</button>${person.is_newly_added ? `<button type="button" class="secondary remove-member-btn" data-person-index="${index}">Удалить этого человека</button>` : ""}</div>
+        <div class="inline-actions"><button type="button" class="secondary add-contact-btn" data-person-index="${index}">Добавить личный контакт</button><button type="button" class="continue-person-btn" data-person-continue="${index}">${index === (currentPayload?.persons?.length || 0) - 1 ? "К подтверждению и отправке" : "Продолжить"}</button>${person.is_newly_added ? `<button type="button" class="secondary remove-member-btn" data-person-index="${index}">Удалить этого человека</button>` : ""}</div>
       </div>
     </article>
     `;
@@ -383,7 +399,15 @@ function validateAndAdvancePerson(personIndex) {
     return;
   }
 
-  const nextIndex = Math.min(personIndex + 1, currentPayload.persons.length - 1);
+  if (personIndex >= currentPayload.persons.length - 1) {
+    manualExpandedPersonIndex = personIndex;
+    pendingScrollToSubmit = true;
+    renderPersons(currentPayload.persons, currentPayload.mode);
+    submitOutput.textContent = "Все карточки заполнены. Проверьте подтверждения ниже и отправьте форму.";
+    return;
+  }
+
+  const nextIndex = personIndex + 1;
   manualExpandedPersonIndex = nextIndex;
   pendingScrollPersonIndex = nextIndex;
   renderPersons(currentPayload.persons, currentPayload.mode);
@@ -398,6 +422,7 @@ function fillForm(data) {
     const sameAsPrimary = isPrimaryApplicant || !person.address || person.address === primaryAddress ? "yes" : "no";
     return {
       ...person,
+      gender: normalizeUiGender(person.gender),
       show_validation: Boolean(person.show_validation),
       birth_date: formatDisplayDate(person.birth_date),
       mother_birth_date: formatDisplayDate(person.mother_birth_date),

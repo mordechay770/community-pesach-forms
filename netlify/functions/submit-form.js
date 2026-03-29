@@ -291,7 +291,9 @@ function stripUnknownField(fields, errorMessage) {
   const match = String(errorMessage || "").match(/Unknown field name:\s*"([^"]+)"/);
   if (!match) return null;
   const reduced = { ...fields };
-  delete reduced[match[1]];
+  const rawFieldName = match[1];
+  delete reduced[rawFieldName];
+  delete reduced[rawFieldName.replace(/\\\\/g, "\\")];
   return Object.keys(reduced).length ? reduced : null;
 }
 function buildExistingContactUpdate(contact) {
