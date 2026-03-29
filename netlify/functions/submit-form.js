@@ -130,6 +130,13 @@ function toAirtableDate(value) {
   if (slashDayFirstMatch) return `${slashDayFirstMatch[3]}-${slashDayFirstMatch[2]}-${slashDayFirstMatch[1]}`;
   return text;
 }
+
+function assignIfNonEmpty(fields, key, value) {
+  if (!key) return;
+  if (value === undefined || value === null) return;
+  if (typeof value === "string" && !value.trim()) return;
+  fields[key] = value;
+}
 function normalizeWhatsappValue(value) {
   if (value === "yes" || value === true) return "yes";
   if (value === "no" || value === false) return "no";
@@ -231,7 +238,6 @@ function buildPersonUpdate(person, fullPayload) {
       [fieldName("firstNameField")]: person.first_name || "",
       [fieldName("middleNameField")]: person.middle_name || "",
       [fieldName("genderField")]: person.gender || "",
-      [fieldName("birthDateField")]: toAirtableDate(person.birth_date),
     [fieldName("inCityField")]: person.will_be_in_city || "",
     [fieldName("roleField")]: person.role || "",
     [fieldName("relationshipField")]: person.relationship || "",
@@ -247,13 +253,11 @@ function buildPersonUpdate(person, fullPayload) {
     [fieldName("motherFirstNameField")]: person.mother_first_name || "",
     [fieldName("motherHebrewNameField")]: person.mother_hebrew_name || "",
     [fieldName("motherMiddleNameField")]: person.mother_middle_name || "",
-    [fieldName("motherBirthDateField")]: toAirtableDate(person.mother_birth_date),
     [fieldName("motherBirthPlaceField")]: person.mother_birth_place || "",
     [fieldName("fatherLastNameField")]: person.father_last_name || "",
     [fieldName("fatherFirstNameField")]: person.father_first_name || "",
     [fieldName("fatherHebrewNameField")]: person.father_hebrew_name || "",
     [fieldName("fatherMiddleNameField")]: person.father_middle_name || "",
-    [fieldName("fatherBirthDateField")]: toAirtableDate(person.father_birth_date),
     [fieldName("fatherBirthPlaceField")]: person.father_birth_place || "",
     [fieldName("contactsJsonField")]: JSON.stringify(person.contacts || []),
     [fieldName("detailsConfirmedField")]: Boolean(fullPayload.details_confirmed),
@@ -268,6 +272,10 @@ function buildPersonUpdate(person, fullPayload) {
           : resolvedMainAddress
         : person.address || resolvedMainAddress
   };
+
+  assignIfNonEmpty(fields, fieldName("birthDateField"), toAirtableDate(person.birth_date));
+  assignIfNonEmpty(fields, fieldName("motherBirthDateField"), toAirtableDate(person.mother_birth_date));
+  assignIfNonEmpty(fields, fieldName("fatherBirthDateField"), toAirtableDate(person.father_birth_date));
 
   if (fieldName("payloadJsonField")) {
     fields[fieldName("payloadJsonField")] = JSON.stringify(fullPayload);
