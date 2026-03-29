@@ -95,6 +95,8 @@ Object.assign(defaults, {
   contactOwnerField: "Кому принадлежит номер"
 });
 
+const ONLINE_FORM_STATUS_VALUE = "Ответ получен в онлайн-форме.";
+
 function fieldName(key) {
   return process.env[`AIRTABLE_${key}`] || defaults[key];
 }
@@ -249,7 +251,7 @@ function buildPersonUpdate(person, fullPayload) {
     [fieldName("detailsConfirmedField")]: Boolean(fullPayload.details_confirmed),
     [fieldName("chametzConfirmedField")]: Boolean(fullPayload.chametz_sale_confirmation),
     [fieldName("tokenStatusField")]: "submitted",
-    [fieldName("onlineStatusField")]: "РћС‚РІРµС‚ РїРѕР»СѓС‡РµРЅ РІ РѕРЅР»Р°Р№РЅ-С„РѕСЂРјРµ.",
+    [fieldName("onlineStatusField")]: ONLINE_FORM_STATUS_VALUE,
     [fieldName("addressField")]:
       person.role === "child" || person.role === "new_member"
         ? person.same_as_primary_address === "no"
