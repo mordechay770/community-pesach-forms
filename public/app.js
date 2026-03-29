@@ -457,9 +457,13 @@ function syncFieldFromEvent(target) {
   if (contactIndex !== undefined) {
     const contact = person.contacts[Number(contactIndex)];
     contact[field] = target.value;
-    if (field === "kind") {
+    if (field === "kind" || field === "active") {
       contact.number = "";
-      if (contact.kind === "email") contact.whatsapp = "no";
+      if (field === "kind" && contact.kind === "email") contact.whatsapp = "no";
+      if (field === "active" && contact.active === "no") {
+        contact.whatsapp = "";
+        contact.owner_type = "";
+      }
       manualExpandedPersonIndex = Number(personIndex);
       renderPersons(currentPayload.persons, currentPayload.mode);
       return;
