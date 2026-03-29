@@ -48,6 +48,9 @@
 
 defaults.contactTable = "РљРѕРЅС‚Р°РєС‚РЅС‹РµР”Р°РЅРЅС‹Рµ";
 defaults.contactNumberField = "РџРѕР»РЅС‹Р№ РЅРѕРјРµСЂ";
+defaults.contactCountryCodeField = "Код страны";
+defaults.contactAreaCodeField = "Код города / опаратора";
+defaults.contactLocalNumberField = "Номер";
 defaults.contactWhatsappField = "Whatsapp";
 defaults.contactActivityField = "РђРєС‚РёРІРЅРѕСЃС‚СЊ РЅРѕРјРµСЂР°";
 defaults.contactOwnerField = "РљРѕРјСѓ РїСЂРёРЅР°РґР»РµР¶РёС‚ РЅРѕРјРµСЂ";
@@ -91,6 +94,9 @@ Object.assign(defaults, {
   chametzConfirmedField: "Я прошу раввина продать мой хамец в канун праздника в этом году.",
   contactTable: "КонтактныеДанные",
   contactNumberField: "Полный номер",
+  contactCountryCodeField: "Код страны",
+  contactAreaCodeField: "Код города / опаратора",
+  contactLocalNumberField: "Номер",
   contactActivityField: "Активность номера",
   contactOwnerField: "Кому принадлежит номер"
 });
@@ -158,6 +164,29 @@ function getPrimaryMobilePhone(person) {
   const contacts = Array.isArray(person?.contacts) ? person.contacts : [];
   const phoneContact = contacts.find((contact) => (contact.kind || "phone") !== "email" && String(contact.number || "").trim());
   return phoneContact ? phoneContact.number || "" : "";
+}
+
+function splitContactNumberParts(contact) {
+  const raw = String(contact?.number || "").trim();
+  if (!raw) {
+    return { countryCode: "", areaCode: "", localNumber: "" };
+  }
+
+  if ((contact?.kind || "phone") === "email" || raw.includes("@")) {
+    return { countryCode: "", areaCode: "", localNumber: raw };
+  }
+
+  const digits = raw.replace(/\D+/g, "");
+  if (!digits) {
+    return { countryCode: "", areaCode: "", localNumber: raw };
+  }
+
+  const localNumber = digits.slice(-7);
+  const beforeLocal = digits.slice(0, -7);
+  const areaCode = beforeLocal.slice(-3);
+  const countryCode = beforeLocal.slice(0, -3);
+
+  return { countryCode, areaCode, localNumber };
 }
 
 async function airtableListRecords({ table, filterByFormula, maxRecords = 100 }) {
@@ -311,20 +340,30 @@ function stripUnknownField(fields, errorMessage) {
   return Object.keys(reduced).length ? reduced : null;
 }
 function buildExistingContactUpdate(contact) {
-  return {
-    [fieldName("contactNumberField")]: contact.number || "",
+  const parts = splitContactNumberParts(contact);
+  const fields = {
     [fieldName("contactWhatsappField")]: normalizeWhatsappValue(contact.whatsapp),
     [fieldName("contactActivityField")]: toContactActivityValue(contact.active),
     [fieldName("contactOwnerField")]: contact.owner_type || ""
   };
+
+  assignIfNonEmpty(fields, fieldName("contactCountryCodeField"), parts.countryCode);
+  assignIfNonEmpty(fields, fieldName("contactAreaCodeField"), parts.areaCode);
+  assignIfNonEmpty(fields, fieldName("contactLocalNumberField"), parts.localNumber);
+
+  return fields;
 }
 
 function buildNewContactFields(contact, person) {
+  const parts = splitContactNumberParts(contact);
   const fields = {
-    [fieldName("contactNumberField")]: contact.number || "",
     [fieldName("contactOwnerField")]: contact.owner_type || "",
     [fieldName("contactActivityField")]: "Активный"
   };
+
+  assignIfNonEmpty(fields, fieldName("contactCountryCodeField"), parts.countryCode);
+  assignIfNonEmpty(fields, fieldName("contactAreaCodeField"), parts.areaCode);
+  assignIfNonEmpty(fields, fieldName("contactLocalNumberField"), parts.localNumber);
 
   if ((contact.kind || "phone") !== "email") {
     fields[fieldName("contactWhatsappField")] = normalizeWhatsappValue(contact.whatsapp);
