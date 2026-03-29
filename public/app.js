@@ -93,6 +93,12 @@ function isMinor(person) {
   return age !== null && age < 18;
 }
 
+function isAdultFemale(person) {
+  const age = calculateAge(person?.birth_date);
+  const gender = String(person?.gender || "").trim().toUpperCase();
+  return age !== null && age >= 18 && gender === "Ж";
+}
+
 function shouldUseSchoolField(person) {
   if (!person) return false;
   if (person.role === "child") return true;
@@ -287,7 +293,7 @@ function renderPersonCard(person, index) {
     <div class="subsection-block">
     <div class="subsection-title">Дополнительные личные данные</div>
     <div class="person-grid">
-      <label><span>Девичья фамилия</span><input type="text" value="${escapeHtml(person.maiden_name || "")}" data-person-index="${index}" data-field="maiden_name"></label>
+      ${isAdultFemale(person) ? `<label><span>Девичья фамилия</span><input type="text" value="${escapeHtml(person.maiden_name || "")}" data-person-index="${index}" data-field="maiden_name"></label>` : ""}
       <label><span>Еврейское имя</span><input type="text" value="${escapeHtml(person.hebrew_name || "")}" data-person-index="${index}" data-field="hebrew_name"></label>
       <label><span>Место рождения</span><input type="text" value="${escapeHtml(person.birth_place || "")}" data-person-index="${index}" data-field="birth_place"></label>
       ${useSchoolField ? `<label><span>Номер школы</span><input type="text" value="${escapeHtml(person.school_number || "")}" data-person-index="${index}" data-field="school_number"></label>` : `<label><span>Образование</span><input type="text" value="${escapeHtml(person.education || "")}" data-person-index="${index}" data-field="education"></label>`}
