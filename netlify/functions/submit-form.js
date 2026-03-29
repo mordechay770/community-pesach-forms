@@ -26,6 +26,7 @@
   educationField: "РћР±СЂР°Р·РѕРІР°РЅРёРµ",
   specialtyField: "РЎРїРµС†РёР°Р»СЊРЅРѕСЃС‚СЊ",
   schoolField: "Номер школы",
+  mobilePhoneField: "Мобильный телефон",
   motherLastNameField: "Р¤Р°РјРёР»РёСЏ РњР°С‚РµСЂРё",
   motherFirstNameField: "РРјСЏ РјР°С‚РµСЂРё",
   motherHebrewNameField: "Р•РІСЂ РРјСЏ РњР°С‚РµСЂРё",
@@ -72,6 +73,7 @@ Object.assign(defaults, {
   educationField: "Образование",
   specialtyField: "Специальность",
   schoolField: "Номер школы",
+  mobilePhoneField: "Мобильный телефон",
   motherLastNameField: "Фамилия Матери",
   motherFirstNameField: "Имя матери",
   motherHebrewNameField: "Евр Имя Матери",
@@ -137,6 +139,12 @@ function toContactActivityValue(value) {
   if (value === "yes") return "Активный";
   if (value === "no") return "Не активный";
   return "";
+}
+
+function getPrimaryMobilePhone(person) {
+  const contacts = Array.isArray(person?.contacts) ? person.contacts : [];
+  const phoneContact = contacts.find((contact) => (contact.kind || "phone") !== "email" && String(contact.number || "").trim());
+  return phoneContact ? phoneContact.number || "" : "";
 }
 
 async function airtableListRecords({ table, filterByFormula, maxRecords = 100 }) {
@@ -235,6 +243,7 @@ function buildPersonUpdate(person, fullPayload) {
       [fieldName("educationField")]: person.education || "",
       [fieldName("specialtyField")]: person.specialty || "",
       [fieldName("schoolField")]: person.school_number || "",
+    [fieldName("mobilePhoneField")]: getPrimaryMobilePhone(person),
     [fieldName("motherLastNameField")]: person.mother_last_name || "",
     [fieldName("motherFirstNameField")]: person.mother_first_name || "",
     [fieldName("motherHebrewNameField")]: person.mother_hebrew_name || "",
@@ -275,6 +284,14 @@ function stripOptionalSubmitFields(fields) {
   delete reduced[fieldName("payloadJsonField")];
   delete reduced[fieldName("submittedAtField")];
   return reduced;
+}
+
+function stripUnknownField(fields, errorMessage) {
+  const match = String(errorMessage || "").match(/Unknown field name:\s*"([^"]+)"/);
+  if (!match) return null;
+  const reduced = { ...fields };
+  delete reduced[match[1]];
+  return Object.keys(reduced).length ? reduced : null;
 }
 function buildExistingContactUpdate(contact) {
   return {
@@ -348,6 +365,20 @@ async function updateRecordWithFallback(recordId, fields) {
     return { result, appliedFields: fields, fallbackApplied: false };
   } catch (error) {
     const message = String(error.message || "");
+    const unknownFieldReduced = stripUnknownField(fields, message);
+    if (unknownFieldReduced) {
+      try {
+        const result = await airtableUpdateRecord({
+          table: getEnvConfig().executionTable,
+          recordId,
+          fields: unknownFieldReduced
+        });
+        return { result, appliedFields: unknownFieldReduced, fallbackApplied: true };
+      } catch (unknownFieldRetryError) {
+        throw unknownFieldRetryError;
+      }
+    }
+
     const optionalFieldNames = [
       fieldName("detailsConfirmedField"),
       fieldName("chametzConfirmedField"),
