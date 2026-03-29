@@ -48,8 +48,6 @@
 
 defaults.contactTable = "РљРѕРЅС‚Р°РєС‚РЅС‹РµР”Р°РЅРЅС‹Рµ";
 defaults.contactNumberField = "РџРѕР»РЅС‹Р№ РЅРѕРјРµСЂ";
-defaults.contactCountryCodeField = "Код страны";
-defaults.contactAreaCodeField = "Код города / опаратора";
 defaults.contactLocalNumberField = "Номер";
 defaults.contactWhatsappField = "Whatsapp";
 defaults.contactActivityField = "РђРєС‚РёРІРЅРѕСЃС‚СЊ РЅРѕРјРµСЂР°";
@@ -94,8 +92,6 @@ Object.assign(defaults, {
   chametzConfirmedField: "Я прошу раввина продать мой хамец в канун праздника в этом году.",
   contactTable: "КонтактныеДанные",
   contactNumberField: "Полный номер",
-  contactCountryCodeField: "Код страны",
-  contactAreaCodeField: "Код города / опаратора",
   contactLocalNumberField: "Номер",
   contactActivityField: "Активность номера",
   contactOwnerField: "Кому принадлежит номер"
@@ -149,6 +145,17 @@ function assignIfNonEmpty(fields, key, value) {
 function assignAllOptional(fields, pairs) {
   pairs.forEach(([key, value]) => assignIfNonEmpty(fields, key, value));
 }
+
+function normalizeTextValue(value) {
+  if (Array.isArray(value)) {
+    return value
+      .flat(Infinity)
+      .map((item) => String(item ?? "").trim())
+      .filter(Boolean)
+      .join(", ");
+  }
+  return String(value ?? "").trim();
+}
 function normalizeWhatsappValue(value) {
   if (value === "yes" || value === true) return "yes";
   if (value === "no" || value === false) return "no";
@@ -164,29 +171,6 @@ function getPrimaryMobilePhone(person) {
   const contacts = Array.isArray(person?.contacts) ? person.contacts : [];
   const phoneContact = contacts.find((contact) => (contact.kind || "phone") !== "email" && String(contact.number || "").trim());
   return phoneContact ? phoneContact.number || "" : "";
-}
-
-function splitContactNumberParts(contact) {
-  const raw = String(contact?.number || "").trim();
-  if (!raw) {
-    return { countryCode: "", areaCode: "", localNumber: "" };
-  }
-
-  if ((contact?.kind || "phone") === "email" || raw.includes("@")) {
-    return { countryCode: "", areaCode: "", localNumber: raw };
-  }
-
-  const digits = raw.replace(/\D+/g, "");
-  if (!digits) {
-    return { countryCode: "", areaCode: "", localNumber: raw };
-  }
-
-  const localNumber = digits.slice(-7);
-  const beforeLocal = digits.slice(0, -7);
-  const areaCode = beforeLocal.slice(-3);
-  const countryCode = beforeLocal.slice(0, -3);
-
-  return { countryCode, areaCode, localNumber };
 }
 
 async function airtableListRecords({ table, filterByFormula, maxRecords = 100 }) {
@@ -265,8 +249,8 @@ function validatePayload(body) {
 function buildPersonUpdate(person, fullPayload) {
   const resolvedMainAddress =
     fullPayload.address?.confirmed === "no"
-      ? fullPayload.address.new_address || fullPayload.address.full || ""
-      : fullPayload.address?.full || "";
+      ? normalizeTextValue(fullPayload.address.new_address || fullPayload.address.full || "")
+      : normalizeTextValue(fullPayload.address?.full || "");
 
   const fields = {
     [fieldName("lastNameField")]: person.last_name || "",
@@ -284,9 +268,9 @@ function buildPersonUpdate(person, fullPayload) {
     [fieldName("addressField")]:
       person.role === "child" || person.role === "new_member"
         ? person.same_as_primary_address === "no"
-          ? person.child_address || person.address || ""
+          ? normalizeTextValue(person.child_address || person.address || "")
           : resolvedMainAddress
-        : person.address || resolvedMainAddress
+        : normalizeTextValue(person.address || resolvedMainAddress)
   };
 
   assignAllOptional(fields, [
@@ -340,30 +324,24 @@ function stripUnknownField(fields, errorMessage) {
   return Object.keys(reduced).length ? reduced : null;
 }
 function buildExistingContactUpdate(contact) {
-  const parts = splitContactNumberParts(contact);
   const fields = {
     [fieldName("contactWhatsappField")]: normalizeWhatsappValue(contact.whatsapp),
     [fieldName("contactActivityField")]: toContactActivityValue(contact.active),
     [fieldName("contactOwnerField")]: contact.owner_type || ""
   };
 
-  assignIfNonEmpty(fields, fieldName("contactCountryCodeField"), parts.countryCode);
-  assignIfNonEmpty(fields, fieldName("contactAreaCodeField"), parts.areaCode);
-  assignIfNonEmpty(fields, fieldName("contactLocalNumberField"), parts.localNumber);
+  assignIfNonEmpty(fields, fieldName("contactLocalNumberField"), String(contact.number || "").trim());
 
   return fields;
 }
 
 function buildNewContactFields(contact, person) {
-  const parts = splitContactNumberParts(contact);
   const fields = {
     [fieldName("contactOwnerField")]: contact.owner_type || "",
     [fieldName("contactActivityField")]: "Активный"
   };
 
-  assignIfNonEmpty(fields, fieldName("contactCountryCodeField"), parts.countryCode);
-  assignIfNonEmpty(fields, fieldName("contactAreaCodeField"), parts.areaCode);
-  assignIfNonEmpty(fields, fieldName("contactLocalNumberField"), parts.localNumber);
+  assignIfNonEmpty(fields, fieldName("contactLocalNumberField"), String(contact.number || "").trim());
 
   if ((contact.kind || "phone") !== "email") {
     fields[fieldName("contactWhatsappField")] = normalizeWhatsappValue(contact.whatsapp);
@@ -386,12 +364,18 @@ async function updateExistingContacts(persons) {
           table: fieldName("contactTable"),
           recordId: contact.contact_record_id,
           fields: buildExistingContactUpdate(contact)
+        }).then(() => true).catch((error) => {
+          console.error("updateExistingContacts failed", {
+            recordId: contact.contact_record_id,
+            message: error?.message || String(error)
+          });
+          return false;
         })
       );
     }
   }
-  await Promise.all(updates);
-  return updates.length;
+  const results = await Promise.all(updates);
+  return results.filter(Boolean).length;
 }
 
 async function createNewContacts(persons) {
@@ -403,12 +387,18 @@ async function createNewContacts(persons) {
         airtableCreateRecord({
           table: fieldName("contactTable"),
           fields: buildNewContactFields(contact, person)
+        }).then(() => true).catch((error) => {
+          console.error("createNewContacts failed", {
+            memberRecordId: person.member_record_id,
+            message: error?.message || String(error)
+          });
+          return false;
         })
       );
     }
   }
-  await Promise.all(creates);
-  return creates.length;
+  const results = await Promise.all(creates);
+  return results.filter(Boolean).length;
 }
 
 async function updateRecordWithFallback(recordId, fields) {

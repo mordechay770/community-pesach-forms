@@ -304,6 +304,17 @@ function firstNonEmpty(...values) {
   return values.find((value) => value !== undefined && value !== null && value !== "") || "";
 }
 
+function normalizeDisplayText(value) {
+  if (Array.isArray(value)) {
+    return value
+      .flat(Infinity)
+      .map((item) => String(item ?? "").trim())
+      .filter(Boolean)
+      .join(", ");
+  }
+  return String(value ?? "").trim();
+}
+
 function parseContacts(rawValue) {
   if (!rawValue) return [];
   if (Array.isArray(rawValue)) return rawValue;
@@ -544,7 +555,7 @@ async function buildPersonFromRecord(record) {
     father_middle_name: fatherMiddleName,
     father_birth_date: fatherBirthDate,
     father_birth_place: fatherBirthPlace,
-    address: firstNonEmpty(fields[fieldName("addressField")], memberFields[fieldName("sourceAddressField")]),
+    address: normalizeDisplayText(firstNonEmpty(fields[fieldName("addressField")], memberFields[fieldName("sourceAddressField")])),
     contacts: resolvedContacts,
     member_record_id: memberRecordId || ""
   };
@@ -570,7 +581,7 @@ async function buildPayloadFromRecords(records) {
       address_code: primaryPerson.address_code || ""
     },
     address: {
-      full: firstNonEmpty(primaryPerson.address, first[fieldName("addressField")])
+      full: normalizeDisplayText(firstNonEmpty(primaryPerson.address, first[fieldName("addressField")]))
     },
     persons
   };

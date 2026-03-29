@@ -300,7 +300,7 @@ function renderPersonCard(person, index) {
     <div class="subsection-block">
     <div class="subsection-title">Адрес этого человека</div>
     <div class="person-grid">
-      <label class="full-span${invalidLabelClass(showValidation && sameAddressMissing)}"><span>Этот человек проживает по тому же адресу, что и указанный выше? *</span><select class="${invalidInputClass(showValidation && sameAddressMissing)}" data-person-index="${index}" data-field="same_as_primary_address"><option value="">Выберите</option><option value="yes"${person.same_as_primary_address === "yes" ? " selected" : ""}>Да</option><option value="no"${person.same_as_primary_address === "no" ? " selected" : ""}>Нет</option></select></label>
+      <label class="full-span${invalidLabelClass(showValidation && sameAddressMissing)}"><span>Этот человек проживает по тому же адресу, что и указанный выше? *</span><select class="${invalidInputClass(showValidation && sameAddressMissing)}" data-person-index="${index}" data-field="same_as_primary_address"><option value="yes"${(!person.same_as_primary_address || person.same_as_primary_address === "yes") ? " selected" : ""}>Да</option><option value="no"${person.same_as_primary_address === "no" ? " selected" : ""}>Нет</option></select></label>
       ${person.same_as_primary_address === "no" ? `<label class="full-span${invalidLabelClass(showValidation && childAddressMissing)}"><span>Адрес проживания этого человека *</span><textarea class="${invalidInputClass(showValidation && childAddressMissing)}" rows="3" data-person-index="${index}" data-field="child_address">${escapeHtml(person.child_address || "")}</textarea></label>` : ""}
     </div>
     </div>
