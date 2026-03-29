@@ -273,6 +273,12 @@ function renderContactItem(contact, person, personIndex, contactIndex) {
   const numberMissing = !isInactiveExisting && !isFilled(contact.number);
   const ownerMissing = !isFilled(contact.owner_type);
   const whatsappMissing = !isInactiveExisting && kind !== "email" && !["yes", "no"].includes(contact.whatsapp);
+  const numberFieldAttrs =
+    kind === "email"
+      ? ""
+      : isInactiveExisting
+        ? 'inputmode="numeric"'
+        : 'inputmode="numeric" minlength="11" pattern="[0-9]{11,}"';
   const activeBlock = contact.is_existing_source ? `<label class="${invalidLabelClass(showValidation && activeMissing)}"><span>Активен ли этот контакт *</span><select class="${invalidInputClass(showValidation && activeMissing)}" data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="active" required>${contactActivityOptions(contact.active || "")}</select></label>` : "";
   const ownerBlock = isInactiveExisting ? "" : `<label class="${invalidLabelClass(showValidation && ownerMissing)}"><span>Кому принадлежит контакт *</span><select class="${invalidInputClass(showValidation && ownerMissing)}" data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="owner_type" required><option value="">Выберите</option><option value="self"${contact.owner_type === "self" ? " selected" : ""}>Ему самому / ей самой</option><option value="parent"${contact.owner_type === "parent" ? " selected" : ""}>Родителям</option><option value="family"${contact.owner_type === "family" ? " selected" : ""}>Члену семьи</option></select></label>`;
   const whatsappBlock = isInactiveExisting || kind === "email" ? "" : `<label class="${invalidLabelClass(showValidation && whatsappMissing)}"><span>WhatsApp *</span><select class="${invalidInputClass(showValidation && whatsappMissing)}" data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="whatsapp" required><option value="">Выберите</option><option value="yes"${contact.whatsapp === "yes" ? " selected" : ""}>Да</option><option value="no"${contact.whatsapp === "no" ? " selected" : ""}>Нет</option></select></label>`;
@@ -280,7 +286,7 @@ function renderContactItem(contact, person, personIndex, contactIndex) {
     <div class="contact-item">
       <div class="contact-grid">
         <label><span>Тип контакта</span><select data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="kind" required>${contactTypeOptions(kind)}</select></label>
-        <label class="${invalidLabelClass(showValidation && numberMissing)}"><span>${kind === "email" ? (isInactiveExisting ? "Email" : "Email *") : `${`Номер ${contactIndex + 1}`}${isInactiveExisting ? "" : " *"}`}</span><input class="${invalidInputClass(showValidation && numberMissing)}" type="${contactInputType(kind)}" value="${escapeHtml(contact.number || "")}" placeholder="${contactPlaceholder(kind)}" ${kind === "email" ? "" : 'inputmode="numeric" minlength="11" pattern="[0-9]{11,}"'} data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="number"${isInactiveExisting ? "" : " required"}></label>
+        <label class="${invalidLabelClass(showValidation && numberMissing)}"><span>${kind === "email" ? (isInactiveExisting ? "Email" : "Email *") : `${`Номер ${contactIndex + 1}`}${isInactiveExisting ? "" : " *"}`}</span><input class="${invalidInputClass(showValidation && numberMissing)}" type="${contactInputType(kind)}" value="${escapeHtml(contact.number || "")}" placeholder="${contactPlaceholder(kind)}" ${numberFieldAttrs} data-person-index="${personIndex}" data-contact-index="${contactIndex}" data-field="number"${isInactiveExisting ? "" : " required"}></label>
         ${activeBlock}
         ${ownerBlock}
         ${whatsappBlock}
