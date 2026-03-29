@@ -283,6 +283,7 @@ function stripOptionalSubmitFields(fields) {
   delete reduced[fieldName("chametzConfirmedField")];
   delete reduced[fieldName("payloadJsonField")];
   delete reduced[fieldName("submittedAtField")];
+  delete reduced[fieldName("schoolField")];
   return reduced;
 }
 
