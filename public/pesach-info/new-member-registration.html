@@ -172,7 +172,7 @@
     .contact-item:last-child{margin-bottom:0}
     .contact-grid{
       display:grid;
-      grid-template-columns:160px minmax(0,1fr) 180px 160px;
+      grid-template-columns:150px minmax(0,1fr) 160px 160px 150px;
       gap:10px;
       align-items:end;
     }
@@ -405,6 +405,7 @@
         <label>
           Тип контакта
           <select data-contact-field="kind">
+            <option value="">Выберите</option>
             <option value="phone">Телефон</option>
             <option value="email">Email</option>
           </select>
@@ -422,12 +423,20 @@
             <option value="family">Члену семьи</option>
           </select>
         </label>
-        <label>
+        <label data-whatsapp-wrap>
           WhatsApp
           <select data-contact-field="whatsapp">
             <option value="">Выберите</option>
             <option value="yes">Да</option>
             <option value="no">Нет</option>
+          </select>
+        </label>
+        <label>
+          Домашний / рабочий
+          <select data-contact-field="usage_type">
+            <option value="">Выберите</option>
+            <option value="home">Домашний</option>
+            <option value="work">Рабочий</option>
           </select>
         </label>
       </div>
@@ -645,6 +654,53 @@
       return documents;
     }
 
+    function syncContactItem(item) {
+      const kindInput = item.querySelector('[data-contact-field="kind"]');
+      const valueInput = item.querySelector('[data-contact-field="value"]');
+      const ownerInput = item.querySelector('[data-contact-field="owner_type"]');
+      const whatsappWrap = item.querySelector("[data-whatsapp-wrap]");
+      const whatsappInput = item.querySelector('[data-contact-field="whatsapp"]');
+      const usageInput = item.querySelector('[data-contact-field="usage_type"]');
+      const kind = kindInput?.value || "";
+      const isPhone = kind === "phone";
+
+      if (kindInput) kindInput.required = true;
+      if (kindInput?.closest("label")) ensureRequiredMarker(kindInput.closest("label"));
+      if (valueInput) {
+        valueInput.required = true;
+        valueInput.type = isPhone ? "tel" : "email";
+        valueInput.placeholder = isPhone ? "Например: 77015551234" : "name@example.com";
+        if (valueInput.closest("label")) ensureRequiredMarker(valueInput.closest("label"));
+      }
+      if (ownerInput) {
+        ownerInput.required = true;
+        if (ownerInput.closest("label")) ensureRequiredMarker(ownerInput.closest("label"));
+      }
+      if (usageInput) {
+        usageInput.required = true;
+        if (usageInput.closest("label")) ensureRequiredMarker(usageInput.closest("label"));
+      }
+      if (whatsappWrap) whatsappWrap.classList.toggle("hidden", !isPhone);
+      if (whatsappInput) {
+        whatsappInput.required = isPhone;
+        if (!isPhone) whatsappInput.value = "";
+        if (isPhone && whatsappInput.closest("label")) ensureRequiredMarker(whatsappInput.closest("label"));
+      }
+    }
+
+    function syncContactSection(card) {
+      const items = Array.from(card.querySelectorAll("[data-contact-list] .contact-item"));
+      items.forEach((item, index) => {
+        syncContactItem(item);
+        const removeBtn = item.querySelector("[data-remove-contact]");
+        const isProtected = card.dataset.personId && card === people.querySelector(".card") && index === 0;
+        if (removeBtn) {
+          removeBtn.disabled = isProtected;
+          removeBtn.classList.toggle("hidden", isProtected);
+        }
+      });
+    }
+
     async function buildPayload() {
       const submittedAt = new Date().toISOString();
       const groupFormId = "NMR-" + submittedAt.replace(/[-:TZ.]/g, "").slice(0, 14);
@@ -750,6 +806,7 @@
       const contactList = card.querySelector("[data-contact-list]");
       const fragment = contactTemplate.content.cloneNode(true);
       contactList.appendChild(fragment);
+      syncContactSection(card);
     }
 
     function addDocument(card) {
@@ -765,6 +822,7 @@
       cards.forEach((card, index) => {
         const values = valuesFrom(card);
         const personNumber = index + 1;
+        const contacts = contactsFrom(card);
 
         [
           "last_name",
@@ -810,6 +868,19 @@
             });
           }
         }
+
+        if (contacts.length === 0) {
+          errors.push(`Добавьте хотя бы один контакт для человека ${personNumber}.`);
+        }
+
+        contacts.forEach((contact) => {
+          if (!contact.kind || !contact.value || !contact.owner_type || !contact.usage_type) {
+            errors.push(`Заполните все обязательные поля в контактах для человека ${personNumber}.`);
+          }
+          if (contact.kind === "phone" && !contact.whatsapp) {
+            errors.push(`Укажите наличие WhatsApp для телефона человека ${personNumber}.`);
+          }
+        });
       });
 
       return [...new Set(errors)];
@@ -874,6 +945,7 @@
       Array.from(people.querySelectorAll(".card")).forEach((card, index) => {
         syncPersonCard(card, index);
         applyRequiredMarkers(card);
+        syncContactSection(card);
       });
     }
 
@@ -893,7 +965,9 @@
       const removeContactBtn = event.target.closest("[data-remove-contact]");
       if (removeContactBtn) {
         const item = removeContactBtn.closest(".contact-item");
+        const card = removeContactBtn.closest(".card");
         if (item) item.remove();
+        if (card) syncContactSection(card);
       }
 
       const removeDocumentBtn = event.target.closest("[data-remove-document]");
@@ -917,6 +991,12 @@
       if (sameAddressInput) {
         const card = sameAddressInput.closest(".card");
         if (card) refreshPeople();
+      }
+
+      const contactKind = event.target.closest('[data-contact-field="kind"]');
+      if (contactKind) {
+        const item = contactKind.closest(".contact-item");
+        if (item) syncContactItem(item);
       }
 
       const documentKind = event.target.closest('[data-document-field="kind"]');
