@@ -125,6 +125,12 @@
       color:var(--text);
     }
     textarea{min-height:88px;resize:vertical}
+    .req{
+      color:#c13f3f;
+      font-weight:800;
+      margin-inline:4px 6px;
+      display:inline-block;
+    }
     .choices{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
@@ -348,8 +354,6 @@
             <label>Девичья фамилия<input type="text" data-field="maiden_name"></label>
             <label>Еврейское имя<input type="text" data-field="jewish_name"></label>
             <label>Место рождения<input type="text" data-field="birth_place"></label>
-            <label>Национальность матери<input type="text" data-field="mother_nationality"></label>
-            <label>Национальность отца<input type="text" data-field="father_nationality"></label>
           </div>
         </section>
 
@@ -358,6 +362,7 @@
           <div class="grid">
             <label>Фамилия матери<input type="text" data-field="mother_last_name"></label>
             <label>Имя матери<input type="text" data-field="mother_first_name"></label>
+            <label>?????????????? ??????<input type="text" data-field="mother_nationality"></label>
             <label>Отчество матери<input type="text" data-field="mother_middle_name"></label>
             <label>Еврейское имя матери<input type="text" data-field="mother_jewish_name"></label>
             <label>Дата рождения матери<input type="date" data-field="mother_birth_date"></label>
@@ -370,6 +375,7 @@
           <div class="grid">
             <label>Фамилия отца<input type="text" data-field="father_last_name"></label>
             <label>Имя отца<input type="text" data-field="father_first_name"></label>
+            <label>?????????????? ????<input type="text" data-field="father_nationality"></label>
             <label>Отчество отца<input type="text" data-field="father_middle_name"></label>
             <label>Еврейское имя отца<input type="text" data-field="father_jewish_name"></label>
             <label>Дата рождения отца<input type="date" data-field="father_birth_date"></label>
@@ -507,7 +513,19 @@
       const marker = document.createElement("span");
       marker.className = "req";
       marker.textContent = "*";
-      target.appendChild(marker);
+      const fieldControl = target.querySelector("input, select, textarea");
+      if (fieldControl) {
+        target.insertBefore(marker, fieldControl);
+      } else {
+        target.appendChild(marker);
+      }
+    }
+
+    function setLabelPrefix(input, text) {
+      const label = input?.closest("label");
+      if (!label) return;
+      const textNode = Array.from(label.childNodes).find((node) => node.nodeType === Node.TEXT_NODE);
+      if (textNode) textNode.textContent = text;
     }
 
     function applyRequiredMarkers(card) {
@@ -516,7 +534,20 @@
         '[data-field="first_name"]',
         '[data-field="iin"]',
         '[data-field="gender"]',
-        '[data-field="birth_date"]'
+        '[data-field="birth_date"]',
+        '[data-field="country"]',
+        '[data-field="city"]',
+        '[data-field="neighborhood"]',
+        '[data-field="street"]',
+        '[data-field="house"]',
+        '[data-field="apartment"]',
+        '[data-field="postal_code"]',
+        '[data-field="mother_last_name"]',
+        '[data-field="mother_first_name"]',
+        '[data-field="mother_nationality"]',
+        '[data-field="father_last_name"]',
+        '[data-field="father_first_name"]',
+        '[data-field="father_nationality"]'
       ].forEach((selector) => {
         const input = card.querySelector(selector);
         if (!input) return;
@@ -542,6 +573,23 @@
         const heading = sameAddressWrap.querySelector("h4");
         if (heading) ensureRequiredMarker(heading);
       }
+
+      const selectedSameAddress = card.querySelector('[data-field="same_address"]:checked')?.value || "";
+      [
+        '[data-field="country_secondary"]',
+        '[data-field="city_secondary"]',
+        '[data-field="neighborhood_secondary"]',
+        '[data-field="street_secondary"]',
+        '[data-field="house_secondary"]',
+        '[data-field="apartment_secondary"]',
+        '[data-field="postal_code_secondary"]'
+      ].forEach((selector) => {
+        const input = card.querySelector(selector);
+        if (!input) return;
+        input.required = selectedSameAddress === "no";
+        const label = input.closest("label");
+        if (label) ensureRequiredMarker(label);
+      });
     }
 
     function valuesFrom(scope) {
@@ -674,6 +722,11 @@
     }
 
     async function handleSubmit() {
+      const errors = validateForm();
+      if (errors.length) {
+        setStatus(errors[0], true);
+        return;
+      }
       const payload = await buildPayload();
       setStatus("Отправляем данные...");
       if (submitBtn) submitBtn.disabled = true;
@@ -703,6 +756,63 @@
       const documentList = card.querySelector("[data-document-list]");
       const fragment = documentTemplate.content.cloneNode(true);
       documentList.appendChild(fragment);
+    }
+
+    function validateForm() {
+      const errors = [];
+      const cards = Array.from(people.querySelectorAll(".card"));
+
+      cards.forEach((card, index) => {
+        const values = valuesFrom(card);
+        const personNumber = index + 1;
+
+        [
+          "last_name",
+          "first_name",
+          "iin",
+          "gender",
+          "birth_date",
+          "country",
+          "city",
+          "neighborhood",
+          "street",
+          "house",
+          "apartment",
+          "postal_code",
+          "mother_last_name",
+          "mother_first_name",
+          "mother_nationality",
+          "father_last_name",
+          "father_first_name",
+          "father_nationality"
+        ].forEach((key) => {
+          if (!values[key]) errors.push(`Заполните обязательные поля для человека ${personNumber}.`);
+        });
+
+        if (index > 0) {
+          if (!values.relationship) {
+            errors.push(`Укажите связь с первым человеком для человека ${personNumber}.`);
+          }
+          if (!values.same_address) {
+            errors.push(`Укажите, проживает ли человек ${personNumber} по тому же адресу.`);
+          }
+          if (values.same_address === "no") {
+            [
+              "country_secondary",
+              "city_secondary",
+              "neighborhood_secondary",
+              "street_secondary",
+              "house_secondary",
+              "apartment_secondary",
+              "postal_code_secondary"
+            ].forEach((key) => {
+              if (!values[key]) errors.push(`Заполните отдельный адрес для человека ${personNumber}.`);
+            });
+          }
+        }
+      });
+
+      return [...new Set(errors)];
     }
 
     function syncPersonCard(card, index) {
@@ -754,6 +864,8 @@
       people.appendChild(fragment);
       addContact(people.lastElementChild);
       addDocument(people.lastElementChild);
+      setLabelPrefix(people.lastElementChild.querySelector('[data-field="mother_nationality"]'), "Национальность матери");
+      setLabelPrefix(people.lastElementChild.querySelector('[data-field="father_nationality"]'), "Национальность отца");
       applyRequiredMarkers(people.lastElementChild);
       refreshPeople();
     }
@@ -821,3 +933,4 @@
   </script>
 </body>
 </html>
+
