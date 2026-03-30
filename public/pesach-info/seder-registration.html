@@ -129,7 +129,7 @@
     .footnote { margin-top:12px; color:var(--muted); font-size:12px; line-height:1.65; }
     .hidden { display:none !important; }
     .status-panel {
-      margin-top: 16px;
+      margin-top:16px;
     }
     @media (max-width:1040px) { .hero,.layout { grid-template-columns:1fr; } .sidebar { position:static; } }
     @media (max-width:760px) { .page { width:min(100vw - 16px,100%); margin:8px auto 26px; } .hero,.panel { padding:18px; } .panel-head,.card-head,.row,.language-bar { flex-direction:column; align-items:start; justify-content:flex-start; } .grid.two,.night-grid,.summary-grid { grid-template-columns:1fr; } .hero h1 { font-size:38px; } }
@@ -193,9 +193,8 @@
         </section>
       </aside>
     </section>
-    <div class="status-panel">
+    <div class="status-panel hidden" id="statusPanel">
       <div class="status" id="statusBox" data-i18n="status_ready">Форма готова. После заполнения она создаст JSON-пакет. Если webhook уже задан в коде, форма отправит его автоматически.</div>
-      <pre id="jsonPreview">{}</pre>
     </div>
   </main>
 
@@ -629,19 +628,19 @@
     const peopleContainer = document.getElementById("peopleContainer");
     const template = document.getElementById("personTemplate");
     const peopleBadge = document.getElementById("peopleBadge");
+    const statusPanel = document.getElementById("statusPanel");
     const statusBox = document.getElementById("statusBox");
-    const jsonPreview = document.getElementById("jsonPreview");
     const summaryPeople = document.getElementById("summaryPeople");
     const summaryFirst = document.getElementById("summaryFirst");
     const summarySecond = document.getElementById("summarySecond");
     const sederForm = document.getElementById("sederForm");
     const addPersonBtn = document.getElementById("addPersonBtn");
     const submitBtn = sederForm?.querySelector('button[type="submit"]');
-    const copyJsonBtn = document.getElementById("copyJsonBtn");
     const langButtons = document.querySelectorAll("[data-lang-btn]");
     let counter = 0;
 
     function setStatus(text, kind = "") {
+      if (statusPanel) statusPanel.classList.remove("hidden");
       statusBox.textContent = text;
       statusBox.className = "status" + (kind ? " " + kind : "");
     }
@@ -826,7 +825,6 @@
       });
       renumber();
       const payload = buildPayload();
-      jsonPreview.textContent = JSON.stringify(payload, null, 2);
       summaryPeople.textContent = payload.form_details.people_count;
       summaryFirst.textContent = payload.form_details.summary.first_night_count;
       summarySecond.textContent = payload.form_details.summary.second_night_count;
@@ -866,15 +864,6 @@
       refresh();
     }
 
-    async function copyJson() {
-      try {
-        await navigator.clipboard.writeText(JSON.stringify(buildPayload(), null, 2));
-        setStatus(tr("copied_json"), "success");
-      } catch (error) {
-        setStatus(tr("copy_failed"), "error");
-      }
-    }
-
     async function handleSubmit(event) {
       event.preventDefault();
       const errors = validate();
@@ -883,7 +872,6 @@
         return;
       }
       const payload = buildPayload();
-      jsonPreview.textContent = JSON.stringify(payload, null, 2);
       if (!CONFIG.webhookUrl) {
         setStatus(tr("webhook_missing"), "success");
         return;
@@ -938,7 +926,6 @@
       if (last) last.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
-    if (copyJsonBtn) copyJsonBtn.addEventListener("click", copyJson);
     sederForm.addEventListener("submit", handleSubmit);
     langButtons.forEach((btn) => {
       btn.addEventListener("click", () => setLanguage(btn.dataset.langBtn));
