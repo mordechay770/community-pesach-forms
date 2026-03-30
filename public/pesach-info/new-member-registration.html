@@ -170,6 +170,12 @@
       gap:10px;
       align-items:end;
     }
+    .document-grid{
+      display:grid;
+      grid-template-columns:180px minmax(0,1fr) 220px;
+      gap:10px;
+      align-items:end;
+    }
     .toolbar{
       display:flex;
       flex-wrap:wrap;
@@ -213,7 +219,7 @@
     }
     .note{font-size:13px;color:var(--muted)}
     @media (max-width:900px){
-      .grid,.grid.address,.contact-grid{grid-template-columns:1fr}
+      .grid,.grid.address,.contact-grid,.document-grid{grid-template-columns:1fr}
     }
     @media (max-width:760px){
       .toolbar,.card-head{flex-direction:column;align-items:start}
@@ -377,6 +383,12 @@
           <button class="btn ghost" type="button" data-add-contact>Добавить ещё контакт</button>
           <div class="note">Каждый контакт указывается в отдельной строке.</div>
         </section>
+        <section class="section">
+          <h4>Личные документы</h4>
+          <div data-document-list></div>
+          <button class="btn ghost" type="button" data-add-document>Добавить ещё документ</button>
+          <div class="note">Для каждого документа можно выбрать тип и прикрепить файл.</div>
+        </section>
       </div>
     </article>
   </template>
@@ -419,6 +431,35 @@
     </div>
   </template>
 
+  <template id="documentTemplate">
+    <div class="contact-item">
+      <div class="document-grid">
+        <label>
+          Тип документа
+          <select data-document-field="kind">
+            <option value="">Выберите</option>
+            <option value="identity_card">Удостоверение личности</option>
+            <option value="birth_certificate">Свидетельство о рождении</option>
+            <option value="marriage_certificate">Свидетельство о браке</option>
+            <option value="conversion_certificate">Свидетельство о гиюре</option>
+            <option value="other">Другой документ</option>
+          </select>
+        </label>
+        <label class="hidden" data-document-other-wrap>
+          Уточните, какой это документ
+          <input type="text" data-document-field="kind_other">
+        </label>
+        <label>
+          Файл
+          <input type="file" data-document-field="file" accept=".pdf,.jpg,.jpeg,.png,.heic,.webp">
+        </label>
+      </div>
+      <div style="margin-top:10px;">
+        <button class="btn danger" type="button" data-remove-document>Удалить документ</button>
+      </div>
+    </div>
+  </template>
+
   <script>
     const CONFIG = {
       webhookUrl: "https://hook.eu1.make.com/pv7jmjdpxrw9xv5tzrmk66a0e5hshkpd",
@@ -428,6 +469,7 @@
     const people = document.getElementById("people");
     const personTemplate = document.getElementById("personTemplate");
     const contactTemplate = document.getElementById("contactTemplate");
+    const documentTemplate = document.getElementById("documentTemplate");
     const addPersonBtn = document.getElementById("addPerson");
     const submitBtn = document.querySelector(".toolbar .btn.primary");
     const statusBox = document.querySelector(".summary");
@@ -464,7 +506,7 @@
     }
 
     function contactsFrom(card) {
-      return Array.from(card.querySelectorAll(".contact-item")).map((item) => {
+      return Array.from(card.querySelectorAll("[data-contact-list] .contact-item")).map((item) => {
         const contact = {};
         item.querySelectorAll("[data-contact-field]").forEach((input) => {
           contact[input.dataset.contactField] = input.value || "";
@@ -473,10 +515,44 @@
       });
     }
 
-    function buildPayload() {
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result || "");
+        reader.onerror = () => reject(new Error("Не удалось прочитать файл."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function documentsFrom(card) {
+      const items = Array.from(card.querySelectorAll("[data-document-list] .contact-item"));
+      const documents = [];
+
+      for (const item of items) {
+        const kind = item.querySelector('[data-document-field="kind"]')?.value || "";
+        const kindOther = item.querySelector('[data-document-field="kind_other"]')?.value || "";
+        const fileInput = item.querySelector('[data-document-field="file"]');
+        const file = fileInput?.files?.[0];
+
+        if (!kind && !kindOther && !file) continue;
+
+        documents.push({
+          kind,
+          kind_other: kind === "other" ? kindOther : "",
+          file_name: file?.name || "",
+          file_type: file?.type || "",
+          file_size: file?.size || 0,
+          file_data_url: file ? await readFileAsDataUrl(file) : ""
+        });
+      }
+
+      return documents;
+    }
+
+    async function buildPayload() {
       const submittedAt = new Date().toISOString();
       const groupFormId = "NMR-" + submittedAt.replace(/[-:TZ.]/g, "").slice(0, 14);
-      const attendees = Array.from(people.querySelectorAll(".card")).map((card, index) => {
+      const attendees = await Promise.all(Array.from(people.querySelectorAll(".card")).map(async (card, index) => {
         const values = valuesFrom(card);
         return {
           person_index: index + 1,
@@ -530,9 +606,10 @@
             birth_date: values.father_birth_date || "",
             birth_place: values.father_birth_place || ""
           },
-          contacts: contactsFrom(card)
+          contacts: contactsFrom(card),
+          documents: await documentsFrom(card)
         };
-      });
+      }));
 
       return {
         form_details: {
@@ -549,7 +626,7 @@
     }
 
     async function handleSubmit() {
-      const payload = buildPayload();
+      const payload = await buildPayload();
       setStatus("Отправляем данные...");
       if (submitBtn) submitBtn.disabled = true;
       try {
@@ -572,6 +649,12 @@
       const contactList = card.querySelector("[data-contact-list]");
       const fragment = contactTemplate.content.cloneNode(true);
       contactList.appendChild(fragment);
+    }
+
+    function addDocument(card) {
+      const documentList = card.querySelector("[data-document-list]");
+      const fragment = documentTemplate.content.cloneNode(true);
+      documentList.appendChild(fragment);
     }
 
     function syncPersonCard(card, index) {
@@ -603,9 +686,9 @@
 
     function addPerson() {
       const fragment = personTemplate.content.cloneNode(true);
-      const card = fragment.querySelector(".card");
       people.appendChild(fragment);
       addContact(people.lastElementChild);
+      addDocument(people.lastElementChild);
       refreshPeople();
     }
 
@@ -620,9 +703,21 @@
         if (card) addContact(card);
       }
 
+      const addDocumentBtn = event.target.closest("[data-add-document]");
+      if (addDocumentBtn) {
+        const card = addDocumentBtn.closest(".card");
+        if (card) addDocument(card);
+      }
+
       const removeContactBtn = event.target.closest("[data-remove-contact]");
       if (removeContactBtn) {
         const item = removeContactBtn.closest(".contact-item");
+        if (item) item.remove();
+      }
+
+      const removeDocumentBtn = event.target.closest("[data-remove-document]");
+      if (removeDocumentBtn) {
+        const item = removeDocumentBtn.closest(".contact-item");
         if (item) item.remove();
       }
 
@@ -637,11 +732,18 @@
     });
 
     people.addEventListener("change", (event) => {
-      const input = event.target.closest('[data-field="same_address"]');
-      if (!input) return;
-      const card = input.closest(".card");
-      if (!card) return;
-      refreshPeople();
+      const sameAddressInput = event.target.closest('[data-field="same_address"]');
+      if (sameAddressInput) {
+        const card = sameAddressInput.closest(".card");
+        if (card) refreshPeople();
+      }
+
+      const documentKind = event.target.closest('[data-document-field="kind"]');
+      if (documentKind) {
+        const item = documentKind.closest(".contact-item");
+        const otherWrap = item?.querySelector("[data-document-other-wrap]");
+        if (otherWrap) otherWrap.classList.toggle("hidden", documentKind.value !== "other");
+      }
     });
 
     addPersonBtn.addEventListener("click", addPerson);
