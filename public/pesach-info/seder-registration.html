@@ -1,0 +1,943 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Регистрация на Седер Песаха</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --navy:#18345f; --navy-soft:#eaf0f8; --gold:#c7a24d; --gold-soft:#f7eed6; --paper:#fffdf8; --line:#ddd4c2; --text:#1d2b3a; --muted:#64748b; --danger:#b85050; --shadow:0 24px 60px rgba(17,38,69,.12); }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Manrope",Arial,sans-serif; color:var(--text); background:radial-gradient(circle at top right, rgba(199,162,77,.16), transparent 26%), linear-gradient(180deg,#f8f3e9 0%,#f5f1e7 45%,#f8f7f2 100%); }
+    .page { width:min(1240px,calc(100vw - 30px)); margin:22px auto 56px; }
+    .brand-row { display:flex; align-items:center; justify-content:flex-start; margin:0 0 12px; }
+    .brand-mark { width:104px; height:auto; display:block; filter:drop-shadow(0 12px 24px rgba(17,38,69,.16)); }
+    .hero,.panel { background:rgba(255,253,248,.94); border:1px solid rgba(221,212,194,.9); border-radius:34px; box-shadow:var(--shadow); }
+    .language-bar {
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .lang-btn {
+      border:none;
+      padding:10px 16px;
+      border-radius:999px;
+      background:#f4efe3;
+      color:var(--navy);
+      border:1px solid #ddd3bd;
+      font:inherit;
+      font-size:13px;
+      font-weight:800;
+      cursor:pointer;
+      transition:transform .15s ease, background .15s ease;
+    }
+    .lang-btn:hover { transform:translateY(-1px); }
+    .lang-btn.active {
+      background:var(--gold-soft);
+      border-color:#d8ba72;
+      box-shadow:inset 0 0 0 1px rgba(199,162,77,.18);
+    }
+    .hero { display:grid; grid-template-columns:1.3fr .9fr; gap:28px; padding:34px; margin-bottom:20px; color:#fff; background:linear-gradient(135deg,rgba(17,38,69,.98),rgba(30,60,108,.92)), linear-gradient(180deg,rgba(199,162,77,.08),transparent 60%); overflow:hidden; position:relative; }
+    .hero::after { content:""; position:absolute; right:-80px; bottom:-80px; width:320px; height:320px; border-radius:50%; background:radial-gradient(circle, rgba(199,162,77,.24), transparent 72%); }
+    .eyebrow { display:inline-block; padding:8px 14px; border-radius:999px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); color:#f2dfb2; font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    .hero h1 { margin:18px 0 12px; font-family:"Playfair Display",serif; font-size:clamp(38px,6vw,64px); line-height:.98; }
+    .hero p { margin:0; max-width:680px; color:rgba(255,255,255,.84); line-height:1.75; font-size:15px; }
+    .hero-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:22px; }
+    .hero-link,.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:999px; font:inherit; font-size:14px; font-weight:800; text-decoration:none; cursor:pointer; transition:transform .15s ease; }
+    .hero-link:hover,.btn:hover { transform:translateY(-1px); }
+    .hero-link.primary { padding:13px 18px; background:var(--gold-soft); color:var(--navy); border:1px solid #e8d7aa; }
+    .hero-link.secondary { padding:13px 18px; background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.14); }
+    .hero-notes { display:grid; gap:14px; align-self:end; }
+    .hero-note { padding:18px; border-radius:22px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); backdrop-filter:blur(10px); }
+    .hero-note strong { display:block; color:#f4e3bb; margin-bottom:8px; font-size:13px; letter-spacing:.06em; text-transform:uppercase; }
+    .hero-note span { display:block; color:rgba(255,255,255,.84); line-height:1.7; font-size:14px; }
+    .layout { display:grid; grid-template-columns:minmax(0,1.16fr) 360px; gap:20px; align-items:start; }
+    .panel { padding:24px; }
+    .panel h2,.panel h3 { margin:0; color:var(--navy); }
+    .panel-head { display:flex; justify-content:space-between; gap:18px; align-items:end; margin-bottom:18px; padding-bottom:18px; border-bottom:1px solid rgba(221,212,194,.9); }
+    .panel-head p { margin:6px 0 0; color:var(--muted); line-height:1.7; font-size:14px; }
+    .badge { padding:10px 15px; border-radius:999px; background:var(--gold-soft); border:1px solid #e7d5a5; color:var(--navy); font-size:13px; font-weight:800; white-space:nowrap; }
+    .card { border:1px solid rgba(221,212,194,.94); border-radius:28px; overflow:hidden; background:#fffdfa; margin-bottom:18px; }
+    .card:last-child { margin-bottom:0; }
+    .card-head { display:flex; justify-content:space-between; gap:16px; align-items:center; padding:18px 20px; background:linear-gradient(90deg, rgba(234,240,248,.85), rgba(247,238,214,.7)); border-bottom:1px solid rgba(221,212,194,.9); }
+    .card-head h3 { font-size:20px; font-weight:800; }
+    .card-head p { margin:5px 0 0; font-size:13px; color:var(--muted); }
+    .card-body { padding:20px; display:grid; gap:18px; }
+    .subsection { padding:18px; border-radius:22px; background:#fff; border:1px solid rgba(221,212,194,.85); }
+    .subsection h4 { margin:0 0 14px; color:var(--navy); font-size:15px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; }
+    .grid { display:grid; gap:14px; }
+    .grid.two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    label.field { display:grid; gap:7px; }
+    .field-title { color:var(--navy); font-size:13px; font-weight:800; }
+    .req { color:#c13f3f; margin-inline-start:4px; }
+    input,select,textarea { width:100%; border:1px solid #d6dce7; border-radius:16px; padding:13px 14px; background:#fff; color:var(--text); font:inherit; }
+    textarea { min-height:92px; resize:vertical; }
+    input:focus,select:focus,textarea:focus { outline:none; border-color:#9bb3da; box-shadow:0 0 0 4px rgba(155,179,218,.16); }
+    .choices { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
+    .choice,.night { position:relative; }
+    .choice input,.night input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+    .choice span { display:flex; align-items:center; justify-content:center; min-height:52px; padding:10px 12px; border-radius:16px; border:1px solid #dce3ef; background:#fff; font-size:14px; font-weight:700; text-align:center; }
+    .choice input:checked + span { border-color:#d1b15f; background:var(--gold-soft); color:var(--navy); box-shadow:inset 0 0 0 1px rgba(199,162,77,.18); }
+    .toggle span { justify-content:flex-start; gap:10px; padding-left:16px; }
+    .toggle span::before { content:""; width:14px; height:14px; border-radius:50%; border:2px solid #b9c4d8; flex:0 0 auto; }
+    .toggle input:checked + span::before { border-color:var(--gold); background:radial-gradient(circle,var(--gold) 0 45%,transparent 46%); }
+    .checkbox span {
+      justify-content:flex-start;
+      gap:10px;
+      padding-left:16px;
+      text-align:left;
+    }
+    .checkbox span::before {
+      content:"";
+      width:16px;
+      height:16px;
+      border-radius:5px;
+      border:2px solid #b9c4d8;
+      flex:0 0 auto;
+    }
+    .checkbox input:checked + span::before {
+      border-color:var(--gold);
+      background:
+        linear-gradient(135deg, transparent 42%, var(--gold) 42% 58%, transparent 58%),
+        linear-gradient(45deg, transparent 52%, var(--gold) 52% 68%, transparent 68%);
+    }
+    .night-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .night-box { display:grid; gap:6px; padding:16px; min-height:92px; border-radius:20px; border:1px solid #dee6f2; background:#fcfdff; }
+    .night-box strong { color:var(--navy); font-size:15px; }
+    .night-box small { color:var(--muted); line-height:1.5; }
+    .night input:checked + .night-box { border-color:#d1b15f; background:linear-gradient(180deg,#fff9ec,#fffdf9); box-shadow:inset 0 0 0 1px rgba(199,162,77,.18); }
+    .conditional { display:none; }
+    .conditional.is-visible { display:grid; gap:14px; }
+    .row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; }
+    .btn { border:none; padding:12px 18px; }
+    .btn.primary { background:linear-gradient(135deg,var(--navy),#2d5698); color:#fff; }
+    .btn.ghost { background:#f2f5fa; color:var(--navy); border:1px solid #d5ddea; }
+    .btn.danger { background:#fbeeee; color:var(--danger); border:1px solid #efcaca; }
+    .helper { color:var(--muted); font-size:13px; line-height:1.65; }
+    .sidebar { position:sticky; top:18px; display:grid; gap:16px; }
+    .summary-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px; }
+    .summary { padding:14px; border-radius:18px; background:#fff; border:1px solid rgba(221,212,194,.85); }
+    .summary strong { display:block; margin-bottom:8px; color:var(--navy); font-size:24px; }
+    .summary span { display:block; color:var(--muted); font-size:13px; line-height:1.5; }
+    .status { margin-top:12px; padding:14px; border-radius:16px; border:1px solid #e6d8b1; background:rgba(255,255,255,.74); line-height:1.7; font-size:14px; min-height:80px; }
+    .status.success { background:#f1fbf4; border-color:#c7e2d1; color:#1f6d45; }
+    .status.error { background:#fff4f4; border-color:#efcaca; color:#9a4444; }
+    pre { margin:12px 0 0; padding:16px; border-radius:18px; background:#122038; color:#edf4ff; font-size:12px; line-height:1.7; white-space:pre-wrap; word-break:break-word; max-height:360px; overflow:auto; }
+    .footnote { margin-top:12px; color:var(--muted); font-size:12px; line-height:1.65; }
+    .hidden { display:none !important; }
+    @media (max-width:1040px) { .hero,.layout { grid-template-columns:1fr; } .sidebar { position:static; } }
+    @media (max-width:760px) { .page { width:min(100vw - 16px,100%); margin:8px auto 26px; } .hero,.panel { padding:18px; } .panel-head,.card-head,.row,.language-bar { flex-direction:column; align-items:start; justify-content:flex-start; } .grid.two,.night-grid,.summary-grid { grid-template-columns:1fr; } .hero h1 { font-size:38px; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="brand-row">
+      <img src="../assets/logo/logo2%20-.png" alt="Chabad Almaty logo" class="brand-mark">
+    </div>
+    <div class="language-bar">
+      <button class="lang-btn active" type="button" data-lang-btn="ru">Русский</button>
+      <button class="lang-btn" type="button" data-lang-btn="en">English</button>
+      <button class="lang-btn" type="button" data-lang-btn="he">עברית</button>
+    </div>
+    <section class="hero">
+      <div>
+        <span class="eyebrow" data-i18n="hero_eyebrow">Песах 5786 · регистрация на Седер</span>
+        <h1 data-i18n="hero_title">Регистрация на Пасхальный Седер, Алматы 5786</h1>
+        <p data-i18n="hero_text">Пожалуйста, заполните данные участника и, при необходимости, добавьте других людей, которые будут приходить вместе с Вами.</p>
+        <div class="hero-actions">
+          <a class="hero-link primary" href="#formStart" data-i18n="hero_fill">Заполнить форму</a>
+          <a class="hero-link secondary" href="community-info.html" data-i18n="hero_back">Вернуться к странице Песаха</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2 id="formStart" data-i18n="form_title">Форма записи на Седер</h2>
+            <p data-i18n="form_intro">Пожалуйста, заполните данные участника. Если вместе с Вами приходят другие люди, можно добавить их ниже в этой же форме.</p>
+          </div>
+          <div class="badge" id="peopleBadge">Участников: 1</div>
+        </div>
+
+        <form id="sederForm" novalidate>
+          <div id="peopleContainer"></div>
+
+          <div class="row" style="margin-top:20px;padding-top:18px;border-top:1px solid rgba(221,212,194,.9);">
+            <div class="row">
+              <button class="btn ghost" id="addPersonBtn" type="button" data-i18n="add_person">Добавить ещё человека</button>
+              <span class="helper" data-i18n="add_person_hint">Новый участник получает отдельный блок с теми же вопросами.</span>
+            </div>
+            <div class="row">
+              <button class="btn primary" type="submit" data-i18n="submit_form">Сформировать и отправить</button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <aside class="sidebar">
+        <section class="panel">
+          <h3 data-i18n="summary_title">Сводка</h3>
+          <div class="summary-grid">
+            <div class="summary"><strong id="summaryPeople">1</strong><span>Всего участников</span></div>
+            <div class="summary"><strong id="summaryFirst">0</strong><span>На первый вечер</span></div>
+            <div class="summary"><strong id="summarySecond">0</strong><span>На второй вечер</span></div>
+          </div>
+        </section>
+      </aside>
+    </section>
+    <div class="hidden">
+      <div class="status" id="statusBox" data-i18n="status_ready">Форма готова. После заполнения она создаст JSON-пакет. Если webhook уже задан в коде, форма отправит его автоматически.</div>
+      <pre id="jsonPreview">{}</pre>
+    </div>
+  </main>
+
+  <template id="personTemplate">
+    <article class="card" data-person-card>
+      <div class="card-head">
+        <div>
+          <h3 data-title>Участник 1</h3>
+          <p data-subtitle>Основной участник формы</p>
+        </div>
+        <button class="btn danger hidden" type="button" data-remove>Удалить</button>
+      </div>
+      <div class="card-body">
+        <section class="subsection hidden" data-relation-wrap>
+          <h4 data-i18n="relationship_section">Связь с первым участником</h4>
+          <div class="grid">
+            <label class="field"><span class="field-title" data-i18n="relationship_question">Какова связь с первым участником?<span class="req">*</span></span><select data-field="relationship_type"><option value="" data-i18n="choose_option">Выберите вариант</option><option value="friend" data-i18n="friend">Друг</option><option value="acquaintance" data-i18n="acquaintance">Знакомый</option><option value="relative" data-i18n="relative">Родственник</option></select></label>
+            <div class="conditional" data-show-when="relationship_type=relative"><label class="field"><span class="field-title" data-i18n="relative_detail">Какой именно родственник?<span class="req">*</span></span><input type="text" data-field="relationship_relative_detail" data-i18n-placeholder="relative_placeholder" placeholder="Например: брат, сестра, тётя"></label></div>
+          </div>
+        </section>
+
+        <section class="subsection">
+          <h4 data-i18n="basic_section">Основные данные</h4>
+          <div class="grid two">
+            <label class="field"><span class="field-title" data-i18n-html="first_name_label">Имя участника<span class="req">*</span></span><input type="text" data-field="first_name" required></label>
+            <label class="field"><span class="field-title" data-i18n-html="last_name_label">Фамилия участника<span class="req">*</span></span><input type="text" data-field="last_name" required></label>
+            <label class="field"><span class="field-title" data-i18n="middle_name">Отчество участника</span><input type="text" data-field="middle_name"></label>
+            <label class="field"><span class="field-title" data-i18n-html="gender_label">Пол участника<span class="req">*</span></span><select data-field="gender" required><option value="" data-i18n="gender_placeholder">Выберите пол</option><option value="male" data-i18n="male">Мужчина</option><option value="female" data-i18n="female">Женщина</option></select></label>
+            <label class="field"><span class="field-title" data-i18n-html="age_label">Возраст участника<span class="req">*</span></span><input type="number" min="0" max="120" data-field="age" required></label>
+            <label class="field"><span class="field-title" data-i18n="email">Электронная почта</span><input type="email" data-field="email"></label>
+            <label class="field hidden" data-age-phone-wrap hidden><span class="field-title" data-i18n-html="phone_label">Номер телефона участника<span class="req">*</span></span><input type="tel" data-field="phone" placeholder="+7 701 000 00 00"></label>
+            <div class="field" style="grid-column:1/-1;" data-languages-field>
+              <span class="field-title" data-i18n-html="spoken_languages_label">На каких языках говорит участник?<span class="req">*</span></span>
+              <div class="choices">
+                <label class="choice checkbox"><input type="checkbox" data-field="speaks_russian"><span data-i18n="lang_russian">Русский</span></label>
+                <label class="choice checkbox"><input type="checkbox" data-field="speaks_english"><span data-i18n="lang_english">Английский</span></label>
+                <label class="choice checkbox"><input type="checkbox" data-field="speaks_hebrew"><span data-i18n="lang_hebrew">Иврит</span></label>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="subsection">
+          <h4 data-i18n="nights_section">На какие вечера регистрируется участник?</h4>
+          <div class="night-grid">
+            <label class="night"><input type="checkbox" data-field="attends_first_night"><span class="night-box"><strong data-i18n="first_night">Первый вечер</strong><small data-i18n="first_night_date">Среда вечером, 1 апреля 2026</small></span></label>
+            <label class="night"><input type="checkbox" data-field="attends_second_night"><span class="night-box"><strong data-i18n="second_night">Второй вечер</strong><small data-i18n="second_night_date">Четверг вечером, 2 апреля 2026</small></span></label>
+          </div>
+        </section>
+
+        <section class="subsection">
+          <h4 data-i18n="community_section">Связь с общиной</h4>
+          <div class="grid">
+            <div>
+              <div class="field-title" style="margin-bottom:10px;" data-i18n-html="is_member_question_label">Является ли участник членом общины?<span class="req">*</span></div>
+              <div class="choices">
+                <label class="choice toggle"><input type="radio" data-field="is_community_member" value="yes"><span data-i18n="yes">Да</span></label>
+                <label class="choice toggle"><input type="radio" data-field="is_community_member" value="no"><span data-i18n="no">Нет</span></label>
+              </div>
+            </div>
+
+            <div class="conditional" data-show-when="is_community_member=no">
+              <div class="grid">
+                <div>
+                  <div class="field-title" style="margin-bottom:10px;" data-i18n-html="member_elsewhere_question_label">Состоит ли участник в общине в другом городе или другой стране?<span class="req">*</span></div>
+                  <div class="choices">
+                    <label class="choice toggle"><input type="radio" data-field="member_elsewhere" value="yes"><span data-i18n="yes">Да</span></label>
+                    <label class="choice toggle"><input type="radio" data-field="member_elsewhere" value="no"><span data-i18n="no">Нет</span></label>
+                  </div>
+                </div>
+
+                <div class="conditional" data-show-when="member_elsewhere=yes">
+                  <div class="grid two">
+                    <label class="field"><span class="field-title" data-i18n-html="country_city_label">Страна / город<span class="req">*</span></span><input type="text" data-field="other_country_city"></label>
+                    <label class="field"><span class="field-title" data-i18n-html="community_name_label">Название общины<span class="req">*</span></span><input type="text" data-field="other_community_name"></label>
+                    <label class="field" style="grid-column:1/-1;"><span class="field-title" data-i18n-html="rabbi_details_label">Данные раввина<span class="req">*</span></span><textarea data-field="rabbi_details"></textarea></label>
+                  </div>
+                </div>
+
+                <div class="conditional" data-show-when="member_elsewhere=no">
+                  <div class="grid">
+                    <label class="field"><span class="field-title" data-i18n-html="nationality_label">Национальность участника<span class="req">*</span></span><input type="text" data-field="nationality"></label>
+                    <div>
+                      <div class="field-title" style="margin-bottom:10px;" data-i18n-html="knows_question_label">Знает ли участник кого-то из нашей общины?<span class="req">*</span></div>
+                      <div class="choices">
+                        <label class="choice toggle"><input type="radio" data-field="knows_community_person" value="yes"><span data-i18n="yes">Да</span></label>
+                        <label class="choice toggle"><input type="radio" data-field="knows_community_person" value="no"><span data-i18n="no">Нет</span></label>
+                      </div>
+                    </div>
+                    <div class="conditional" data-show-when="knows_community_person=yes">
+                      <div class="grid two">
+                        <label class="field"><span class="field-title" data-i18n-html="known_person_name_label">Имя знакомого из общины<span class="req">*</span></span><input type="text" data-field="known_person_name"></label>
+                        <label class="field"><span class="field-title" data-i18n-html="known_person_phone_label">Телефон знакомого<span class="req">*</span></span><input type="tel" data-field="known_person_phone"></label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </article>
+  </template>
+
+  <script>
+    const CONFIG = { webhookUrl: "https://hook.eu1.make.com/pv7jmjdpxrw9xv5tzrmk66a0e5hshkpd", eventKey: "pesach_seder_5786_almaty" };
+    const LANG = {
+      ru: {
+        dir: "ltr",
+        title: "Регистрация на Седер Песаха",
+        hero_eyebrow: "Песах 5786 · регистрация на Седер",
+        hero_title: "Регистрация на Пасхальный Седер, Алматы 5786",
+        hero_text: "Пожалуйста, заполните форму для регистрации на Пасхальный Седер. Если вместе с Вами придут другие люди, их можно добавить ниже.",
+        hero_fill: "Заполнить форму",
+        hero_back: "Вернуться к странице Песаха",
+        hero_note_1_title: "Без токена",
+        hero_note_1_text: "Для этой формы не нужен токен. Она работает как прямая регистрация на Седер.",
+        hero_note_2_title: "Готово для Make",
+        hero_note_2_text: "Укажите адрес webhook в коде страницы, и форма сможет отправлять JSON сразу после заполнения.",
+        form_title: "Форма записи на Седер",
+        form_intro: "Пожалуйста, заполните данные участника. Если вместе с Вами приходят другие люди, можно добавить их ниже в этой же форме.",
+        add_person: "Добавить ещё человека",
+        add_person_hint: "Новый участник получает отдельный блок с теми же вопросами.",
+        copy_json: "Скопировать JSON",
+        submit_form: "Сформировать и отправить",
+        summary_title: "Сводка",
+        summary_note: "Сводка обновляется сразу по мере заполнения.",
+        status_title: "Статус",
+        status_ready: "Форма готова. После заполнения она создаст JSON-пакет. Если webhook уже задан в коде, форма отправит его автоматически.",
+        status_note: "Для интеграции укажите адрес в переменной <code>CONFIG.webhookUrl</code>.",
+        copied_json: "JSON скопирован. Его можно сразу использовать в Make или сохранить для Airtable.",
+        copy_failed: "Не удалось скопировать JSON автоматически. Можно взять его из блока справа.",
+        webhook_missing: "Webhook пока не задан. JSON уже готов для копирования и дальнейшей интеграции.",
+        sending: "Отправляем данные в Make webhook...",
+        sent_ok: "Регистрация успешно отправлена. JSON передан в webhook.",
+        sent_fail: "Не удалось отправить данные в webhook. JSON сохранён справа.",
+        err_phone_adult: "Укажите номер телефона для участника {n}",
+        err_languages: "Отметьте языки общения для участника {n}",
+        err_required: "Заполните обязательные поля участника {n}",
+        err_night: "Укажите хотя бы один вечер для участника {n}",
+        err_member: "Укажите, является ли участник {n} членом общины",
+        err_relation: "Укажите связь с первым участником для участника {n}",
+        err_relative: "Уточните родство для участника {n}",
+        err_elsewhere: "Уточните связь с другой общиной для участника {n}",
+        err_other_community: "Заполните данные другой общины для участника {n}",
+        err_nationality: "Укажите национальность для участника {n}",
+        err_knows: "Укажите, знает ли участник {n} кого-то из общины",
+        err_known_person: "Укажите имя и телефон знакомого из общины для участника {n}",
+        json_title: "JSON-предпросмотр",
+        relationship_section: "Связь с первым участником",
+        relationship_question: "Какова связь с первым участником?",
+        choose_option: "Выберите вариант",
+        friend: "Друг",
+        acquaintance: "Знакомый",
+        relative: "Родственник",
+        relative_detail: "Какой именно родственник?",
+        relative_placeholder: "Например: брат, сестра, тётя",
+        basic_section: "Основные данные",
+        first_name_label: "Имя участника<span class=\"req\">*</span>",
+        last_name_label: "Фамилия участника<span class=\"req\">*</span>",
+        first_name: "Имя участника",
+        last_name: "Фамилия участника",
+        middle_name: "Отчество участника",
+        email: "Электронная почта",
+        gender_label: "Пол участника<span class=\"req\">*</span>",
+        age_label: "Возраст участника<span class=\"req\">*</span>",
+        phone_label: "Номер телефона участника<span class=\"req\">*</span>",
+        phone: "Номер телефона участника",
+        gender: "Пол участника",
+        gender_placeholder: "Выберите пол",
+        male: "Мужчина",
+        female: "Женщина",
+        age: "Возраст",
+        spoken_languages_label: "На каких языках говорит участник?<span class=\"req\">*</span>",
+        spoken_languages: "На каких языках говорит участник?",
+        lang_russian: "Русский",
+        lang_english: "Английский",
+        lang_hebrew: "Иврит",
+        nights_section: "На какие вечера регистрируется участник?",
+        first_night: "Первый вечер",
+        first_night_date: "Среда вечером, 1 апреля 2026",
+        second_night: "Второй вечер",
+        second_night_date: "Четверг вечером, 2 апреля 2026",
+        community_section: "Связь с общиной",
+        is_member_question_label: "Является ли участник членом общины?<span class=\"req\">*</span>",
+        is_member_question: "Является ли участник членом общины?",
+        yes: "Да",
+        no: "Нет",
+        member_elsewhere_question_label: "Состоит ли участник в общине в другом городе или другой стране?<span class=\"req\">*</span>",
+        member_elsewhere_question: "Состоит ли участник в общине в другом городе или другой стране?",
+        country_city_label: "Страна / город<span class=\"req\">*</span>",
+        country_city: "Страна / город",
+        community_name_label: "Название общины<span class=\"req\">*</span>",
+        community_name: "Название общины",
+        rabbi_details_label: "Данные раввина<span class=\"req\">*</span>",
+        rabbi_details: "Данные раввина",
+        nationality_label: "Национальность участника<span class=\"req\">*</span>",
+        nationality: "Национальность участника",
+        knows_question_label: "Знает ли участник кого-то из нашей общины?<span class=\"req\">*</span>",
+        knows_question: "Знает ли участник кого-то из нашей общины?",
+        known_person_name_label: "Имя знакомого из общины<span class=\"req\">*</span>",
+        known_person_name: "Имя знакомого из общины",
+        known_person_phone_label: "Телефон знакомого<span class=\"req\">*</span>",
+        known_person_phone: "Телефон знакомого",
+        people_badge: "Участников: {count}",
+        summary_people: "Всего участников",
+        summary_first: "На первый вечер",
+        summary_second: "На второй вечер",
+        summary_non_members: "Не члены общины",
+        participant: "Участник",
+        primary_participant: "Основной участник формы",
+        extra_participant: "Дополнительный участник",
+        remove: "Удалить"
+      },
+      en: {
+        dir: "ltr",
+        title: "Pesach Seder Registration",
+        hero_eyebrow: "Pesach 5786 · Seder registration",
+        hero_title: "Pesach Seder Registration, Almaty 5786",
+        hero_text: "Please fill out the registration form for the Pesach Seder. If other people will come with you, you can add them below.",
+        hero_fill: "Fill out the form",
+        hero_back: "Back to the Pesach page",
+        hero_note_1_title: "No token needed",
+        hero_note_1_text: "This form does not need a token. It works as a direct Seder registration page.",
+        hero_note_2_title: "Ready for Make",
+        hero_note_2_text: "Set the webhook URL in the page code and the form can send JSON automatically after submission.",
+        form_title: "Seder registration form",
+        form_intro: "Please fill in the attendee details. If other people are coming with you, you can add them below in the same form.",
+        add_person: "Add another person",
+        add_person_hint: "Each new attendee gets a separate block with the same questions.",
+        copy_json: "Copy JSON",
+        submit_form: "Build and send",
+        summary_title: "Summary",
+        summary_note: "The summary updates immediately while the form is being filled out.",
+        status_title: "Status",
+        status_ready: "The form is ready. After completion it will create a JSON package. If a webhook is already configured, the form will send it automatically.",
+        status_note: "For integration, set the address in <code>CONFIG.webhookUrl</code>.",
+        copied_json: "The JSON was copied. You can use it directly in Make or save it for Airtable.",
+        copy_failed: "Automatic copying failed. You can take the JSON from the panel on the right.",
+        webhook_missing: "The webhook is not set yet. The JSON is ready for copying and further integration.",
+        sending: "Sending data to the Make webhook...",
+        sent_ok: "Registration was sent successfully. The JSON has been delivered to the webhook.",
+        sent_fail: "The webhook request failed. The JSON is still available on the right.",
+        err_phone_adult: "Enter a phone number for attendee {n}",
+        err_languages: "Mark the spoken languages for attendee {n}",
+        err_required: "Fill in the required fields for attendee {n}",
+        err_night: "Select at least one night for attendee {n}",
+        err_member: "Specify whether attendee {n} is a community member",
+        err_relation: "Specify the relation to the first attendee for attendee {n}",
+        err_relative: "Specify the exact relative for attendee {n}",
+        err_elsewhere: "Specify the other community connection for attendee {n}",
+        err_other_community: "Fill in the other community details for attendee {n}",
+        err_nationality: "Specify the nationality for attendee {n}",
+        err_knows: "Specify whether attendee {n} knows someone from the community",
+        err_known_person: "Specify the name and phone of the community contact for attendee {n}",
+        json_title: "JSON preview",
+        relationship_section: "Relation to the first attendee",
+        relationship_question: "What is the relation to the first attendee?",
+        choose_option: "Choose an option",
+        friend: "Friend",
+        acquaintance: "Acquaintance",
+        relative: "Relative",
+        relative_detail: "Which relative exactly?",
+        relative_placeholder: "For example: brother, sister, aunt",
+        basic_section: "Basic details",
+        first_name_label: "Attendee first name<span class=\"req\">*</span>",
+        last_name_label: "Attendee last name<span class=\"req\">*</span>",
+        first_name: "Attendee first name",
+        last_name: "Attendee last name",
+        middle_name: "Attendee patronymic",
+        email: "Email",
+        gender_label: "Attendee gender<span class=\"req\">*</span>",
+        age_label: "Age<span class=\"req\">*</span>",
+        phone_label: "Attendee phone number<span class=\"req\">*</span>",
+        phone: "Attendee phone number",
+        gender: "Attendee gender",
+        gender_placeholder: "Choose gender",
+        male: "Male",
+        female: "Female",
+        age: "Age",
+        spoken_languages_label: "Which languages does the attendee speak?<span class=\"req\">*</span>",
+        spoken_languages: "Which languages does the attendee speak?",
+        lang_russian: "Russian",
+        lang_english: "English",
+        lang_hebrew: "Hebrew",
+        nights_section: "Which nights is the attendee registering for?",
+        first_night: "First night",
+        first_night_date: "Wednesday evening, April 1, 2026",
+        second_night: "Second night",
+        second_night_date: "Thursday evening, April 2, 2026",
+        community_section: "Community connection",
+        is_member_question_label: "Is the attendee a community member?<span class=\"req\">*</span>",
+        is_member_question: "Is the attendee a community member?",
+        yes: "Yes",
+        no: "No",
+        member_elsewhere_question_label: "Is the attendee part of a community in another city or country?<span class=\"req\">*</span>",
+        member_elsewhere_question: "Is the attendee part of a community in another city or country?",
+        country_city_label: "Country / city<span class=\"req\">*</span>",
+        country_city: "Country / city",
+        community_name_label: "Community name<span class=\"req\">*</span>",
+        community_name: "Community name",
+        rabbi_details_label: "Rabbi details<span class=\"req\">*</span>",
+        rabbi_details: "Rabbi details",
+        nationality_label: "Attendee nationality<span class=\"req\">*</span>",
+        nationality: "Attendee nationality",
+        knows_question_label: "Does the attendee know someone from our community?<span class=\"req\">*</span>",
+        knows_question: "Does the attendee know someone from our community?",
+        known_person_name_label: "Name of the community contact<span class=\"req\">*</span>",
+        known_person_name: "Name of the community contact",
+        known_person_phone_label: "Phone of the community contact<span class=\"req\">*</span>",
+        known_person_phone: "Phone of the community contact",
+        people_badge: "Attendees: {count}",
+        summary_people: "Total attendees",
+        summary_first: "First night",
+        summary_second: "Second night",
+        summary_non_members: "Non-members",
+        participant: "Attendee",
+        primary_participant: "Main attendee in this form",
+        extra_participant: "Additional attendee",
+        remove: "Remove"
+      },
+      he: {
+        dir: "rtl",
+        title: "הרשמה לסדר פסח",
+        hero_eyebrow: "פסח תשפ\"ו · הרשמה לסדר",
+        hero_title: "רישום לסדר פסח, אלמאטי תשפ\"ו",
+        hero_text: "נשמח שתמלאו את טופס הרישום לסדר פסח. אם יש אנשים נוספים שמגיעים איתכם, אפשר להוסיף אותם בהמשך אותו טופס.",
+        hero_fill: "למילוי הטופס",
+        hero_back: "חזרה לעמוד פסח",
+        hero_note_1_title: "ללא טוקן",
+        hero_note_1_text: "לטופס הזה לא צריך טוקן. זו הרשמה ישירה לסדר.",
+        hero_note_2_title: "מוכן ל־Make",
+        hero_note_2_text: "מגדירים את כתובת ה־webhook בקוד, והטופס יכול לשלוח את ה־JSON אוטומטית אחרי השליחה.",
+        form_title: "טופס הרשמה לסדר",
+        form_intro: "נא למלא את פרטי המשתתף. אם מגיעים איתכם אנשים נוספים, אפשר להוסיף אותם בהמשך באותו טופס.",
+        add_person: "להוסיף אדם נוסף",
+        add_person_hint: "כל משתתף חדש מקבל בלוק נפרד עם אותן שאלות.",
+        copy_json: "העתקת JSON",
+        submit_form: "יצירה ושליחה",
+        summary_title: "סיכום",
+        summary_note: "הסיכום מתעדכן מיד תוך כדי המילוי.",
+        status_title: "סטטוס",
+        status_ready: "הטופס מוכן. בסיום הוא ייצור חבילת JSON. אם ה־webhook כבר מוגדר, הטופס ישלח אותה אוטומטית.",
+        status_note: "לחיבור, יש להגדיר את הכתובת בתוך <code>CONFIG.webhookUrl</code>.",
+        copied_json: "ה־JSON הועתק. אפשר להשתמש בו מיד ב־Make או לשמור אותו עבור Airtable.",
+        copy_failed: "לא הצלחנו להעתיק את ה־JSON אוטומטית. אפשר לקחת אותו מהחלונית שמימין.",
+        webhook_missing: "ה־Webhook עדיין לא הוגדר. ה־JSON כבר מוכן להעתקה ולהמשך חיבור.",
+        sending: "שולח את הנתונים ל־Make webhook...",
+        sent_ok: "ההרשמה נשלחה בהצלחה. ה־JSON הועבר ל־webhook.",
+        sent_fail: "שליחת ה־webhook נכשלה. ה־JSON עדיין שמור בצד.",
+        err_phone_adult: "יש למלא מספר טלפון עבור משתתף {n}",
+        err_languages: "יש לסמן את שפות הדיבור עבור משתתף {n}",
+        err_required: "יש למלא את שדות החובה עבור משתתף {n}",
+        err_night: "יש לבחור לפחות לילה אחד עבור משתתף {n}",
+        err_member: "יש לציין האם משתתף {n} הוא חבר קהילה",
+        err_relation: "יש לציין את הקשר לאדם הראשון עבור משתתף {n}",
+        err_relative: "יש לפרט איזה קרוב משפחה הוא משתתף {n}",
+        err_elsewhere: "יש לציין את הקשר לקהילה אחרת עבור משתתף {n}",
+        err_other_community: "יש למלא את פרטי הקהילה האחרת עבור משתתף {n}",
+        err_nationality: "יש לציין את הלאום עבור משתתף {n}",
+        err_knows: "יש לציין האם משתתף {n} מכיר מישהו מהקהילה",
+        err_known_person: "יש לציין שם וטלפון של האדם מהקהילה עבור משתתף {n}",
+        json_title: "תצוגת JSON",
+        relationship_section: "הקשר לאדם הראשון",
+        relationship_question: "מה הקשר לאדם הראשון?",
+        choose_option: "יש לבחור אפשרות",
+        friend: "חבר",
+        acquaintance: "מכר",
+        relative: "קרוב משפחה",
+        relative_detail: "איזה קרוב משפחה בדיוק?",
+        relative_placeholder: "למשל: אח, אחות, דודה",
+        basic_section: "פרטים בסיסיים",
+        first_name_label: "שם פרטי של המשתתף<span class=\"req\">*</span>",
+        last_name_label: "שם משפחה של המשתתף<span class=\"req\">*</span>",
+        first_name: "שם פרטי של המשתתף",
+        last_name: "שם משפחה של המשתתף",
+        middle_name: "אוצ'סטבה של המשתתף",
+        email: "אימייל",
+        gender_label: "מין המשתתף<span class=\"req\">*</span>",
+        age_label: "גיל<span class=\"req\">*</span>",
+        phone_label: "מספר טלפון של המשתתף<span class=\"req\">*</span>",
+        phone: "מספר טלפון של המשתתף",
+        gender: "מין המשתתף",
+        gender_placeholder: "יש לבחור מין",
+        male: "בן",
+        female: "בת",
+        age: "גיל",
+        spoken_languages_label: "אילו שפות המשתתף דובר?<span class=\"req\">*</span>",
+        spoken_languages: "אילו שפות המשתתף דובר?",
+        lang_russian: "רוסית",
+        lang_english: "אנגלית",
+        lang_hebrew: "עברית",
+        nights_section: "לאילו לילות המשתתף נרשם?",
+        first_night: "לילה ראשון",
+        first_night_date: "יום רביעי בערב, 1 באפריל 2026",
+        second_night: "לילה שני",
+        second_night_date: "יום חמישי בערב, 2 באפריל 2026",
+        community_section: "קשר לקהילה",
+        is_member_question_label: "האם המשתתף חבר קהילה?<span class=\"req\">*</span>",
+        is_member_question: "האם המשתתף חבר קהילה?",
+        yes: "כן",
+        no: "לא",
+        member_elsewhere_question_label: "האם המשתתף חבר קהילה בעיר או במדינה אחרת?<span class=\"req\">*</span>",
+        member_elsewhere_question: "האם המשתתף חבר קהילה בעיר או במדינה אחרת?",
+        country_city_label: "מדינה / עיר<span class=\"req\">*</span>",
+        country_city: "מדינה / עיר",
+        community_name_label: "שם הקהילה<span class=\"req\">*</span>",
+        community_name: "שם הקהילה",
+        rabbi_details_label: "פרטי הרב<span class=\"req\">*</span>",
+        rabbi_details: "פרטי הרב",
+        nationality_label: "הלאום של המשתתף<span class=\"req\">*</span>",
+        nationality: "הלאום של המשתתף",
+        knows_question_label: "האם המשתתף מכיר מישהו מהקהילה שלנו?<span class=\"req\">*</span>",
+        knows_question: "האם המשתתף מכיר מישהו מהקהילה שלנו?",
+        known_person_name_label: "שם האדם מהקהילה<span class=\"req\">*</span>",
+        known_person_name: "שם האדם מהקהילה",
+        known_person_phone_label: "טלפון של אותו אדם<span class=\"req\">*</span>",
+        known_person_phone: "טלפון של אותו אדם",
+        people_badge: "משתתפים: {count}",
+        summary_people: "סה\"כ משתתפים",
+        summary_first: "ללילה הראשון",
+        summary_second: "ללילה השני",
+        summary_non_members: "לא חברי קהילה",
+        participant: "משתתף",
+        primary_participant: "האדם הראשי בטופס",
+        extra_participant: "משתתף נוסף",
+        remove: "מחיקה"
+      }
+    };
+    let currentLang = "ru";
+    const peopleContainer = document.getElementById("peopleContainer");
+    const template = document.getElementById("personTemplate");
+    const peopleBadge = document.getElementById("peopleBadge");
+    const statusBox = document.getElementById("statusBox");
+    const jsonPreview = document.getElementById("jsonPreview");
+    const summaryPeople = document.getElementById("summaryPeople");
+    const summaryFirst = document.getElementById("summaryFirst");
+    const summarySecond = document.getElementById("summarySecond");
+    const sederForm = document.getElementById("sederForm");
+    const addPersonBtn = document.getElementById("addPersonBtn");
+    const copyJsonBtn = document.getElementById("copyJsonBtn");
+    const langButtons = document.querySelectorAll("[data-lang-btn]");
+    let counter = 0;
+
+    function setStatus(text, kind = "") {
+      statusBox.textContent = text;
+      statusBox.className = "status" + (kind ? " " + kind : "");
+    }
+    function tr(key, vars = {}) {
+      let value = LANG[currentLang][key] || key;
+      Object.keys(vars).forEach((name) => {
+        value = value.replace("{" + name + "}", vars[name]);
+      });
+      return value;
+    }
+
+    function makePersonId() { counter += 1; return "person_" + counter; }
+    function makeRadioName(personId, field) { return personId + "__" + field; }
+
+    function addPerson() {
+      const id = makePersonId();
+      const index = peopleContainer.querySelectorAll("[data-person-card]").length + 1;
+      const fragment = template.content.cloneNode(true);
+      const card = fragment.querySelector("[data-person-card]");
+      card.dataset.personId = id;
+      fragment.querySelectorAll("[data-field]").forEach((el) => {
+        if (el.type === "radio") el.name = makeRadioName(id, el.dataset.field);
+      });
+      fragment.querySelector("[data-title]").textContent = "Участник " + index;
+      if (index > 1) {
+        fragment.querySelector("[data-subtitle]").textContent = "Дополнительный участник";
+        fragment.querySelector("[data-remove]").classList.remove("hidden");
+        fragment.querySelector("[data-relation-wrap]").classList.remove("hidden");
+      }
+      peopleContainer.appendChild(fragment);
+      applyTranslations(card);
+      refresh();
+    }
+
+    function renumber() {
+      Array.from(peopleContainer.querySelectorAll("[data-person-card]")).forEach((card, index) => {
+        const t = LANG[currentLang];
+        card.querySelector("[data-title]").textContent = t.participant + " " + (index + 1);
+        card.querySelector("[data-subtitle]").textContent = index === 0 ? t.primary_participant : t.extra_participant;
+        const removeBtn = card.querySelector("[data-remove]");
+        if (removeBtn) removeBtn.textContent = t.remove;
+      });
+      peopleBadge.textContent = LANG[currentLang].people_badge.replace("{count}", peopleContainer.querySelectorAll("[data-person-card]").length);
+    }
+
+    function valuesFrom(card) {
+      const values = {};
+      card.querySelectorAll("[data-field]").forEach((el) => {
+        const key = el.dataset.field;
+        if (el.type === "checkbox") {
+          values[key] = el.checked;
+        } else if (el.type === "radio") {
+          if (!(key in values)) values[key] = "";
+          if (el.checked) values[key] = el.value;
+        } else {
+          values[key] = el.value.trim();
+        }
+      });
+      return values;
+    }
+
+    function syncConditional(card) {
+      const values = valuesFrom(card);
+      card.querySelectorAll("[data-show-when]").forEach((block) => {
+        const [field, expected] = block.dataset.showWhen.split("=");
+        block.classList.toggle("is-visible", String(values[field] || "") === expected);
+      });
+    }
+
+    function syncAgeDrivenFields(card) {
+      const values = valuesFrom(card);
+      const ageValue = Number(values.age || 0);
+      const phoneWrap = card.querySelector("[data-age-phone-wrap]");
+      const phoneInput = card.querySelector('[data-field="phone"]');
+      const showPhone = ageValue >= 16;
+
+      if (phoneWrap) {
+        phoneWrap.hidden = !showPhone;
+        phoneWrap.classList.toggle("hidden", !showPhone);
+      }
+
+      if (phoneInput) {
+        phoneInput.required = showPhone;
+        if (!showPhone) phoneInput.value = "";
+      }
+    }
+
+    function buildPayload() {
+      const attendees = Array.from(peopleContainer.querySelectorAll("[data-person-card]")).map((card, index) => {
+        const values = valuesFrom(card);
+        return {
+          person_index: index + 1,
+          is_primary_person: index === 0,
+          relationship_to_primary: index === 0 ? null : {
+            type: values.relationship_type || null,
+            relative_detail: values.relationship_relative_detail || null
+          },
+          first_name: values.first_name || "",
+          last_name: values.last_name || "",
+          middle_name: values.middle_name || "",
+          email: values.email || "",
+          phone: values.phone || "",
+          gender: values.gender || "",
+          age: values.age || "",
+          spoken_languages: [
+            values.speaks_russian ? "russian" : null,
+            values.speaks_english ? "english" : null,
+            values.speaks_hebrew ? "hebrew" : null
+          ].filter(Boolean),
+          seder_nights: {
+            first_night: !!values.attends_first_night,
+            second_night: !!values.attends_second_night
+          },
+          is_community_member: values.is_community_member || "",
+          community_context: values.is_community_member === "no" ? {
+            is_member_in_other_city_or_country: values.member_elsewhere || "",
+            other_country_city: values.other_country_city || "",
+            other_community_name: values.other_community_name || "",
+            rabbi_details: values.rabbi_details || "",
+            nationality: values.nationality || "",
+            knows_someone_from_community: values.knows_community_person || "",
+            known_person_name: values.known_person_name || "",
+            known_person_phone: values.known_person_phone || ""
+          } : null
+        };
+      });
+
+      return {
+        form_details: {
+          form_type: "seder_registration",
+          form_name: "seder_registration",
+          source: "seder_registration_form",
+          event_key: CONFIG.eventKey,
+          registration_id: "SEDER-" + new Date().toISOString().replace(/[-:TZ.]/g, "").slice(0, 14),
+          submitted_at: new Date().toISOString(),
+          people_count: attendees.length,
+          summary: {
+            first_night_count: attendees.filter((item) => item.seder_nights.first_night).length,
+            second_night_count: attendees.filter((item) => item.seder_nights.second_night).length,
+            non_members_count: attendees.filter((item) => item.is_community_member === "no").length
+          }
+        },
+        attendees
+      };
+    }
+    function validate() {
+      const errors = [];
+      Array.from(peopleContainer.querySelectorAll("[data-person-card]")).forEach((card, index) => {
+        const values = valuesFrom(card);
+        ["first_name", "last_name", "gender", "age"].forEach((key) => {
+          if (!values[key]) errors.push(tr("err_required", { n: index + 1 }));
+        });
+        if (Number(values.age || 0) >= 16 && !values.phone) errors.push(tr("err_phone_adult", { n: index + 1 }));
+        if ((currentLang === "en" || currentLang === "he") && !values.speaks_russian && !values.speaks_english && !values.speaks_hebrew) {
+          errors.push(tr("err_languages", { n: index + 1 }));
+        }
+        if (!values.attends_first_night && !values.attends_second_night) errors.push(tr("err_night", { n: index + 1 }));
+        if (!values.is_community_member) errors.push(tr("err_member", { n: index + 1 }));
+        if (index > 0 && !values.relationship_type) errors.push(tr("err_relation", { n: index + 1 }));
+        if (values.relationship_type === "relative" && !values.relationship_relative_detail) errors.push(tr("err_relative", { n: index + 1 }));
+        if (values.is_community_member === "no" && !values.member_elsewhere) errors.push(tr("err_elsewhere", { n: index + 1 }));
+        if (values.is_community_member === "no" && values.member_elsewhere === "yes") {
+          ["other_country_city", "other_community_name", "rabbi_details"].forEach((key) => {
+            if (!values[key]) errors.push(tr("err_other_community", { n: index + 1 }));
+          });
+        }
+        if (values.is_community_member === "no" && values.member_elsewhere === "no") {
+          if (!values.nationality) errors.push(tr("err_nationality", { n: index + 1 }));
+          if (!values.knows_community_person) errors.push(tr("err_knows", { n: index + 1 }));
+          if (values.knows_community_person === "yes" && (!values.known_person_name || !values.known_person_phone)) {
+            errors.push(tr("err_known_person", { n: index + 1 }));
+          }
+        }
+      });
+      return [...new Set(errors)];
+    }
+
+    function refresh() {
+      Array.from(peopleContainer.querySelectorAll("[data-person-card]")).forEach((card) => {
+        syncConditional(card);
+        syncAgeDrivenFields(card);
+      });
+      renumber();
+      const payload = buildPayload();
+      jsonPreview.textContent = JSON.stringify(payload, null, 2);
+      summaryPeople.textContent = payload.form_details.people_count;
+      summaryFirst.textContent = payload.form_details.summary.first_night_count;
+      summarySecond.textContent = payload.form_details.summary.second_night_count;
+    }
+
+    function applyTranslations(root = document) {
+      const t = LANG[currentLang];
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir = t.dir;
+      document.title = t.title;
+      root.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.dataset.i18n;
+        if (t[key]) el.textContent = t[key];
+      });
+      root.querySelectorAll("[data-i18n-html]").forEach((el) => {
+        const key = el.dataset.i18nHtml;
+        if (t[key]) el.innerHTML = t[key];
+      });
+      root.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+        const key = el.dataset.i18nPlaceholder;
+        if (t[key]) el.placeholder = t[key];
+      });
+      root.querySelectorAll("[data-languages-field]").forEach((el) => {
+        el.classList.toggle("hidden", currentLang === "ru");
+      });
+      langButtons.forEach((btn) => btn.classList.toggle("active", btn.dataset.langBtn === currentLang));
+      const summaryLabels = document.querySelectorAll(".summary span");
+      if (summaryLabels[0]) summaryLabels[0].textContent = t.summary_people;
+      if (summaryLabels[1]) summaryLabels[1].textContent = t.summary_first;
+      if (summaryLabels[2]) summaryLabels[2].textContent = t.summary_second;
+      renumber();
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      applyTranslations(document);
+      refresh();
+    }
+
+    async function copyJson() {
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(buildPayload(), null, 2));
+        setStatus(tr("copied_json"), "success");
+      } catch (error) {
+        setStatus(tr("copy_failed"), "error");
+      }
+    }
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+      const errors = validate();
+      if (errors.length) {
+        setStatus(errors[0], "error");
+        return;
+      }
+      const payload = buildPayload();
+      jsonPreview.textContent = JSON.stringify(payload, null, 2);
+      if (!CONFIG.webhookUrl) {
+        setStatus(tr("webhook_missing"), "success");
+        return;
+      }
+      setStatus(tr("sending"));
+      try {
+        const response = await fetch(CONFIG.webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        setStatus(tr("sent_ok"), "success");
+      } catch (error) {
+        setStatus(tr("sent_fail") + " " + error.message, "error");
+      }
+    }
+
+    peopleContainer.addEventListener("input", (event) => {
+      const card = event.target.closest("[data-person-card]");
+      if (!card) return;
+      syncConditional(card);
+      syncAgeDrivenFields(card);
+      refresh();
+    });
+
+    peopleContainer.addEventListener("change", (event) => {
+      const card = event.target.closest("[data-person-card]");
+      if (!card) return;
+      syncConditional(card);
+      syncAgeDrivenFields(card);
+      refresh();
+    });
+
+    peopleContainer.addEventListener("click", (event) => {
+      const remove = event.target.closest("[data-remove]");
+      if (!remove) return;
+      const card = event.target.closest("[data-person-card]");
+      if (!card) return;
+      card.remove();
+      refresh();
+    });
+
+    addPersonBtn.addEventListener("click", () => {
+      addPerson();
+      const cards = peopleContainer.querySelectorAll("[data-person-card]");
+      const last = cards[cards.length - 1];
+      if (last) last.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    if (copyJsonBtn) copyJsonBtn.addEventListener("click", copyJson);
+    sederForm.addEventListener("submit", handleSubmit);
+    langButtons.forEach((btn) => {
+      btn.addEventListener("click", () => setLanguage(btn.dataset.langBtn));
+    });
+
+    addPerson();
+    applyTranslations(document);
+  </script>
+</body>
+</html>

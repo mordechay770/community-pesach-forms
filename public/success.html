@@ -6,6 +6,19 @@
   <title>Pesach Form Submitted</title>
   <link rel="stylesheet" href="./styles.css">
   <style>
+    .success-logo{
+      width:96px;
+      height:auto;
+      display:block;
+      margin:0 0 14px;
+      filter:drop-shadow(0 10px 18px rgba(0,0,0,.18));
+    }
+    .success-topmark{
+      display:flex;
+      justify-content:flex-start;
+      align-items:center;
+      margin-bottom:-2px;
+    }
     .success-shell{
       width:min(980px,94vw);
       margin:24px auto 56px;
@@ -69,6 +82,9 @@
 </head>
 <body data-page-type="success">
   <main class="success-shell">
+    <div class="success-topmark">
+      <img src="./assets/logo/logo2%20-.png" alt="Chabad Almaty logo" class="success-logo">
+    </div>
     <section class="success-hero">
       <p class="eyebrow" data-content="success-eyebrow">Pesach 5786</p>
       <h1 data-content="success-title">Спасибо, форма успешно отправлена</h1>

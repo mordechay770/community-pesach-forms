@@ -1,0 +1,738 @@
+﻿<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Песах 5786 — Хабад Алматы</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:      #1B3A6B;
+      --navy-2:    #2A4F8E;
+      --navy-light:#E8EEF7;
+      --gold:      #C9A84C;
+      --gold-soft: #FBF3DF;
+      --gold-dark: #A07820;
+      --paper:     #FFFFFF;
+      --soft:      #F8F6F0;
+      --text:      #1A1A2E;
+      --muted:     #6B7280;
+      --line:      #E5E0D5;
+      --shadow:    0 4px 20px rgba(27,58,107,0.12);
+      --shadow-sm: 0 2px 8px rgba(27,58,107,0.08);
+      --radius:    20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background: var(--soft);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── SHELL ── */
+    .info-shell {
+      width: min(1020px, 94vw);
+      margin: 24px auto 56px;
+      display: grid;
+      gap: 18px;
+    }
+    .brand-row {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding-inline: 8px;
+    }
+    .brand-mark {
+      width: 104px;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 12px 20px rgba(27,58,107,0.18));
+    }
+
+    /* ── HERO ── */
+    .info-hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+      color: #fff;
+      padding: 36px 32px;
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .info-hero::after {
+      content: '🍷';
+      position: absolute;
+      right: 28px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 80px;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+    .info-hero .eyebrow {
+      display: inline-block;
+      background: rgba(201,168,76,0.25);
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      border-radius: 20px;
+      padding: 4px 14px;
+      margin-bottom: 14px;
+    }
+    .info-hero h1 {
+      font-size: clamp(26px, 5vw, 40px);
+      font-weight: 900;
+      margin: 0 0 12px;
+      line-height: 1.2;
+    }
+    .info-hero p {
+      margin: 0;
+      color: #edf3f8;
+      line-height: 1.7;
+      max-width: 600px;
+      font-size: 15px;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .hero-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      padding: 11px 18px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: transform .15s, background .15s, color .15s;
+    }
+    .hero-btn.primary {
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+    .hero-btn.secondary {
+      background: var(--gold-soft);
+      color: var(--navy);
+      border: 1px solid #dcc38b;
+    }
+    .hero-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    /* ── NAV ── */
+    .nav-panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow-sm);
+      padding: 18px 22px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      text-decoration: none;
+      padding: 9px 16px;
+      border-radius: 999px;
+      background: var(--gold-soft);
+      color: var(--navy);
+      border: 1px solid #dcc38b;
+      font-weight: 700;
+      font-size: 13px;
+      transition: background .15s, transform .1s;
+    }
+    .nav-links a:hover {
+      background: #f0e4c0;
+      transform: translateY(-1px);
+    }
+
+    /* ── SECTION PANEL ── */
+    .section-panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow-sm);
+      padding: 28px 28px;
+    }
+    .section-panel h2 {
+      margin: 0 0 6px;
+      color: var(--navy);
+      font-size: 26px;
+      font-weight: 800;
+    }
+    .section-panel .section-sub {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .section-panel p {
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 14px;
+    }
+    .section-panel p:last-child { margin-bottom: 0; }
+
+    /* ── BULLET LIST ── */
+    .bullet-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .bullet-list.cols-2 {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+    .bullet {
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+    .bullet strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--navy);
+      font-weight: 700;
+    }
+    .bullet span {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    .bullet.gold {
+      background: var(--gold-soft);
+      border-color: #dcc38b;
+    }
+    .bullet.gold strong { color: var(--gold-dark); }
+    .bullet.navy {
+      background: var(--navy-light);
+      border-color: #c0d0e8;
+    }
+    .bullet.navy strong { color: var(--navy); }
+
+    /* ── DATES TABLE ── */
+    .dates-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .date-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+    .date-row.highlight {
+      background: var(--gold-soft);
+      border-color: #dcc38b;
+    }
+    .date-badge {
+      flex-shrink: 0;
+      background: var(--navy);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 4px 12px;
+      text-align: center;
+      min-width: 90px;
+    }
+    .date-row.highlight .date-badge {
+      background: var(--gold-dark);
+    }
+    .date-info strong {
+      display: block;
+      color: var(--text);
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .date-info span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ── SEDER CARD ── */
+    .seder-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .seder-card {
+      border-radius: 20px;
+      padding: 22px 20px;
+      text-align: center;
+      border: 2px solid var(--gold);
+      background: var(--gold-soft);
+    }
+    .seder-card .sc-num {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--gold-dark);
+      line-height: 1;
+    }
+    .seder-card .sc-label {
+      font-size: 14px;
+      color: var(--muted);
+      margin: 4px 0 10px;
+    }
+    .seder-card .sc-date {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .seder-card .sc-time {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--gold-dark);
+      margin: 4px 0;
+    }
+    .seder-card .sc-addr {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    /* ── FAIR BLOCK ── */
+    .fair-block {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+      border-radius: 20px;
+      padding: 24px 24px;
+      color: #fff;
+      margin-top: 16px;
+    }
+    .fair-block h3 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .fair-block p {
+      color: #d0dcea;
+      font-size: 14px;
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+    .fair-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .fair-item {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* ── CONTACT BLOCK ── */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 16px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      text-decoration: none;
+      color: var(--text);
+      transition: box-shadow .15s, transform .1s;
+    }
+    .contact-item:hover {
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-1px);
+    }
+    .contact-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .contact-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .contact-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      width: 48px;
+      height: 4px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin: 12px 0 20px;
+    }
+
+    @media (max-width: 520px) {
+      .info-hero { padding: 24px 20px; }
+      .section-panel { padding: 22px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="info-shell">
+
+    <div class="brand-row">
+      <img src="../assets/logo/logo2%20-.png" alt="Chabad Almaty logo" class="brand-mark">
+    </div>
+
+    <!-- HERO -->
+    <section class="info-hero">
+      <p class="eyebrow">Хабад Алматы · 5786</p>
+      <h1>Песах 5786 — Пасха</h1>
+      <p>Всё о еврейском Песахе: даты, традиции, Пасхальный Седер и программы нашего центра в Алматы для всей семьи.</p>
+      <div class="hero-actions">
+        <a href="seder-registration.html" class="hero-btn secondary">📝 Регистрация на Седер</a>
+        <a href="new-member-registration.html" class="hero-btn secondary">👥 Новая семья / новый член общины</a>
+        <a href="guest-matzah-request.html" class="hero-btn secondary">🫓 Гость · заявка на мацу</a>
+        <a href="#programs" class="hero-btn primary">✨ Посмотреть программы</a>
+      </div>
+    </section>
+
+    <!-- NAV -->
+    <nav class="nav-panel">
+      <div class="nav-links">
+        <a href="seder-registration.html">📝 Регистрация на Седер</a>
+        <a href="new-member-registration.html">👥 Новая семья</a>
+        <a href="guest-matzah-request.html">🫓 Гость · маца</a>
+        <a href="#about">📖 О Песахе</a>
+        <a href="#dates">📅 Даты 5786</a>
+        <a href="#seder">🍷 Пасхальный Седер</a>
+        <a href="#matzah">🫓 Раздача мацы</a>
+        <a href="#prepare">🏠 Подготовка</a>
+        <a href="#programs">🎓 Постоянные программы</a>
+        <a href="#contacts">📞 Контакты</a>
+      </div>
+    </nav>
+
+    <!-- О ПЕСАХЕ -->
+    <section id="about" class="section-panel">
+      <h2>📖 О Песахе</h2>
+      <div class="section-divider"></div>
+      <p>
+        <strong>Песах</strong> — один из важнейших еврейских праздников, отмечающий исход евреев из египетского рабства более 3 300 лет назад. Название происходит от слова «пасах» (פֶּסַח) — «миновал», «прошёл мимо»: Всевышний миновал еврейские дома во время десятой казни египетской.
+      </p>
+      <p>
+        Песах длится <strong>8 дней</strong> в диаспоре (7 дней в Израиле). В это время запрещено иметь и употреблять <em>хамец</em> — квасное: всё, что приготовлено из пшеницы, ячменя, полбы, ржи или овса с добавлением воды и прошедшее процесс брожения. Вместо хлеба едят <strong>мацу</strong> — тонкий пресный хлеб, символ поспешного исхода.
+      </p>
+      <div class="bullet-list cols-2">
+        <div class="bullet">
+          <strong>🫓 Маца</strong>
+          <span>Пресный хлеб, испечённый за 18 минут. Символизирует поспешность исхода из Египта — тесто не успело взойти.</span>
+        </div>
+        <div class="bullet">
+          <strong>🚫 Хамец</strong>
+          <span>Всё квасное убирается из дома до наступления праздника. Дом тщательно проверяется и очищается.</span>
+        </div>
+        <div class="bullet">
+          <strong>🍷 Четыре бокала</strong>
+          <span>На Седере выпивают четыре бокала вина — по числу обещаний Всевышнего об освобождении Израиля.</span>
+        </div>
+        <div class="bullet">
+          <strong>📜 Агада</strong>
+          <span>Книга Пасхального Седера, рассказывающая историю исхода. Читается за праздничным столом в обе ночи.</span>
+        </div>
+        <div class="bullet">
+          <strong>🌿 Горькие травы</strong>
+          <span>Марор — горькие травы (хрен или салат-ромен) символизируют горечь рабства в Египте.</span>
+        </div>
+        <div class="bullet">
+          <strong>🥚 Пасхальный блюдо</strong>
+          <span>На Седере на особом блюде размещают 6 символических элементов, каждый со своим значением.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ДАТЫ -->
+    <section id="dates" class="section-panel">
+      <h2>📅 Даты Песах 5786</h2>
+      <div class="section-divider"></div>
+      <p>В 5786 году по еврейскому календарю Песах начинается вечером 1 апреля 2026 года.</p>
+      <div class="dates-grid">
+        <div class="date-row">
+          <div class="date-badge">31 марта<br>вторник</div>
+          <div class="date-info">
+            <strong>Бедикат хамец — проверка хамеца</strong>
+            <span>После наступления ночи — обряд проверки дома на наличие хамеца при свете свечи</span>
+          </div>
+        </div>
+        <div class="date-row">
+          <div class="date-badge">1 апреля<br>среда</div>
+          <div class="date-info">
+            <strong>Биур хамец — сожжение хамеца</strong>
+            <span>Утром — уничтожение и аннулирование остатков хамеца. Пост первенцев.</span>
+          </div>
+        </div>
+        <div class="date-row highlight">
+          <div class="date-badge">1 апреля<br>среда</div>
+          <div class="date-info">
+            <strong>🍷 Первый Пасхальный Седер</strong>
+            <span>Начало Песаха с заходом солнца · 19:15 · пр. Раймбека 206-Е</span>
+          </div>
+        </div>
+        <div class="date-row highlight">
+          <div class="date-badge">2 апреля<br>четверг</div>
+          <div class="date-info">
+            <strong>🍷 Второй Пасхальный Седер</strong>
+            <span>Второй праздничный вечер · 19:15 · пр. Раймбека 206-Е</span>
+          </div>
+        </div>
+        <div class="date-row">
+          <div class="date-badge">3–8 апреля</div>
+          <div class="date-info">
+            <strong>Холь ха-Моэд — промежуточные дни</strong>
+            <span>Полурабочие дни праздника. Маца — обязательна, хамец — запрещён.</span>
+          </div>
+        </div>
+        <div class="date-row">
+          <div class="date-badge">8–9 апреля<br>среда–четверг</div>
+          <div class="date-info">
+            <strong>Последние дни Песаха</strong>
+            <span>Шви и Шмини шель Песах. 9 апреля вечером — праздник завершается.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ПАСХАЛЬНЫЙ СЕДЕР -->
+    <section id="seder" class="section-panel">
+      <h2>🍷 Пасхальный Седер</h2>
+      <div class="section-divider"></div>
+      <p>
+        <strong>Седер</strong> (ивр. «порядок») — торжественный праздничный ужин в первые два вечера Песаха. За столом читают Агаду, рассказывают историю исхода, поют песни, едят символические блюда и выпивают четыре бокала вина.
+      </p>
+      <p>
+        Хабад Алматы приглашает всю общину разделить радость Пасхального Седера вместе. Приходите — даже если вы никогда не были на Седере, всё объяснят и помогут!
+      </p>
+
+      <div class="seder-cards">
+        <div class="seder-card">
+          <div class="sc-num">I</div>
+          <div class="sc-label">Первый Седер</div>
+          <div class="sc-date">Среда, 1 апреля 2026</div>
+          <div class="sc-time">19:15</div>
+          <div class="sc-addr">Синагога Хабад<br>пр. Раймбека 206-Е, Алматы</div>
+        </div>
+        <div class="seder-card">
+          <div class="sc-num">II</div>
+          <div class="sc-label">Второй Седер</div>
+          <div class="sc-date">Четверг, 2 апреля 2026</div>
+          <div class="sc-time">19:15</div>
+          <div class="sc-addr">Синагога Хабад<br>пр. Раймбека 206-Е, Алматы</div>
+        </div>
+      </div>
+
+      <div class="bullet-list" style="margin-top:20px;">
+        <div class="bullet navy">
+          <strong>15 этапов Пасхального Седера</strong>
+          <span>Кадеш · Урхац · Карпас · Яхац · Магид · Рохца · Моци-Маца · Марор · Корех · Шулхан Орех · Цафун · Барех · Галель · Нирца</span>
+        </div>
+        <div class="bullet gold">
+          <strong>📝 Записаться на Седер</strong>
+          <span><a href="seder-registration.html" style="color:inherit;font-weight:700;">Открыть онлайн-форму регистрации</a> или позвонить по тел. +7(727)253-0101 / написать в WhatsApp +7 701 226-97-25. Количество мест ограничено!</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- РАЗДАЧА МАЦЫ И ЯРМАРКА -->
+    <section id="matzah" class="section-panel">
+      <h2>🫓 Раздача мацы и ярмарка</h2>
+      <div class="section-divider"></div>
+      <p>
+        Хабад Алматы организует раздачу кошерной мацы для членов общины. Получить мацу можно по предварительной заявке — свяжитесь с нами заранее.
+      </p>
+
+      <div class="fair-block">
+        <h3>🛒 Пасхальная ярмарка</h3>
+        <p>Перед праздником в центре Хабад проходит ярмарка кошерных пасхальных товаров. Здесь можно приобрести всё необходимое для праздничного стола.</p>
+        <div class="fair-items">
+          <span class="fair-item">🫓 Маца</span>
+          <span class="fair-item">🍷 Кошерное вино</span>
+          <span class="fair-item">🌿 Марор (хрен)</span>
+          <span class="fair-item">🍰 Пасхальная выпечка</span>
+          <span class="fair-item">🧴 Бытовая химия кошер ле-Песах</span>
+          <span class="fair-item">📚 Агадот</span>
+          <span class="fair-item">🕯 Свечи</span>
+          <span class="fair-item">🍫 Шоколад без хамеца</span>
+        </div>
+      </div>
+
+      <div class="bullet-list" style="margin-top:16px;">
+        <div class="bullet gold">
+          <strong>📋 Заявка на мацу</strong>
+          <span>Для получения кошерной мацы к Песаху обратитесь в центр Хабад заранее. Телефон: +7(727)253-0101</span>
+        </div>
+        <div class="bullet">
+          <strong>⏰ Часы работы ярмарки</strong>
+          <span>Воскресенье с 12:00 до среды 17:00 (уточняйте актуальное расписание у администратора)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ПОДГОТОВКА К ПЕСАХУ -->
+    <section id="prepare" class="section-panel">
+      <h2>🏠 Подготовка к Песаху</h2>
+      <div class="section-divider"></div>
+      <p>Подготовка к Песаху — важная часть праздника. Основная задача: убрать из дома весь хамец (квасное) и приготовить его к приходу праздника.</p>
+      <div class="bullet-list cols-2">
+        <div class="bullet">
+          <strong>🧹 Генеральная уборка</strong>
+          <span>Тщательно убрать весь дом, особенно кухню, карманы одежды, сумки, автомобиль — везде, где могут быть крошки хамеца.</span>
+        </div>
+        <div class="bullet">
+          <strong>🔥 Кошерование посуды</strong>
+          <span>Перед Песахом металлическую посуду можно откошеровать (хагала). Специальная пасхальная посуда — предпочтительнее.</span>
+        </div>
+        <div class="bullet">
+          <strong>📝 Продажа хамеца</strong>
+          <span>Хамец, который жаль выбрасывать (дорогой алкоголь, продукты), можно символически продать нееврею через раввина.</span>
+        </div>
+        <div class="bullet">
+          <strong>🕯 Проверка хамеца</strong>
+          <span>В ночь 31 марта — Бедикат хамец: обход дома со свечой, гусиным пером и деревянной ложкой. Находки сжигают утром.</span>
+        </div>
+        <div class="bullet">
+          <strong>🛒 Пасхальные покупки</strong>
+          <span>Приобретите мацу, кошерное вино (4 бокала!), марор, харосет и другие продукты с маркировкой «кошер ле-Песах».</span>
+        </div>
+        <div class="bullet">
+          <strong>📖 Изучение Агады</strong>
+          <span>Хорошо заранее познакомиться с текстом Агады, чтобы Седер был наполненным и осмысленным для всей семьи.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ПОСТОЯННЫЕ ПРОГРАММЫ -->
+    <section id="programs" class="section-panel">
+      <h2>🎓 Постоянные программы Хабад Алматы</h2>
+      <div class="section-divider"></div>
+      <p>
+        Кроме событий на Песах, в Хабад Алматы в течение года проходят постоянные образовательные и общинные программы для мужчин, женщин, детей, подростков и старшего поколения. Ниже указаны основные направления, но это не полный список: у общины есть и другие программы.
+      </p>
+
+      <div class="bullet-list cols-2">
+        <div class="bullet navy">
+          <strong>📚 Утренний коллель</strong>
+          <span>Постоянная учебная программа для мужчин. Изучение Торы и еврейских текстов в серьёзной, тёплой общинной атмосфере (со стипендией).</span>
+        </div>
+        <div class="bullet navy">
+          <strong>🌙 Вечерний коллель</strong>
+          <span>Регулярная вечерняя программа для мужчин, которую иногда также называют вечерним коллелем, с учебным графиком и общинной поддержкой (со стипендией).</span>
+        </div>
+        <div class="bullet">
+          <strong>📖 Уроки Торы для мужчин</strong>
+          <span>Регулярные занятия и уроки Торы для мужчин в течение недели, в дополнение к программам коллеля.</span>
+        </div>
+        <div class="bullet">
+          <strong>👩 Женский клуб</strong>
+          <span>Постоянная женская программа по понедельникам: общение, содержание, вдохновение и тёплая общинная атмосфера.</span>
+        </div>
+        <div class="bullet">
+          <strong>🕯 Уроки Торы для женщин</strong>
+          <span>Отдельные уроки и встречи для женщин на еврейские темы, традиции, праздники и семейную жизнь.</span>
+        </div>
+        <div class="bullet">
+          <strong>🧒 SMART J</strong>
+          <span>Программа для детей после школы в центре города: мастерские, насыщенные занятия и интересная развивающая программа с профессиональной и заботливой командой преподавателей.</span>
+        </div>
+        <div class="bullet">
+          <strong>🔥 ENERJEW</strong>
+          <span>Еженедельная программа для мальчиков и подростков 12–16 лет, которая проходит в синагоге и соединяет еврейскую идентичность, дружбу и содержательные встречи.</span>
+        </div>
+        <div class="bullet">
+          <strong>🏕 Летние лагеря</strong>
+          <span>Летние лагеря и каникулы для детей с насыщенной еврейской, образовательной и творческой программой.</span>
+        </div>
+        <div class="bullet">
+          <strong>🍽 Шаббатние и праздничные трапезы</strong>
+          <span>Общинные шаббатние и праздничные трапезы, создающие живую, тёплую и объединяющую атмосферу вокруг синагоги.</span>
+        </div>
+        <div class="bullet">
+          <strong>👴 Клуб золотого возраста</strong>
+          <span>Постоянная программа для старшего поколения с общением, содержанием, поддержкой и праздничными встречами.</span>
+        </div>
+      </div>
+
+      <div class="bullet gold" style="margin-top:16px;">
+        <strong>🖥 Две отдельные презентации</strong>
+        <span>Если Вы хотите присоединиться к жизни общины, заполнить форму на Седер или оставить заявку как гость, все основные формы доступны на этой странице.</span>
+      </div>
+    </section>
+
+
+    <!-- КОНТАКТЫ -->
+    <section id="contacts" class="section-panel">
+      <h2>📞 Контакты Хабад Алматы</h2>
+      <div class="section-divider"></div>
+      <p>Есть вопросы по Песаху, хотите записаться на Седер или получить помощь в подготовке — обращайтесь!</p>
+      <div class="contact-grid">
+        <a href="tel:+77272530101" class="contact-item">
+          <span class="contact-icon">📞</span>
+          <div>
+            <div class="contact-label">Телефон</div>
+            <div class="contact-value">+7 (727) 253-01-01</div>
+          </div>
+        </a>
+        <a href="https://wa.me/77012269725" target="_blank" rel="noopener" class="contact-item">
+          <span class="contact-icon">💬</span>
+          <div>
+            <div class="contact-label">WhatsApp</div>
+            <div class="contact-value">+7 701 226-97-25</div>
+          </div>
+        </a>
+        <a href="https://maps.app.goo.gl/chabadalmaty" target="_blank" rel="noopener" class="contact-item">
+          <span class="contact-icon">📍</span>
+          <div>
+            <div class="contact-label">Адрес</div>
+            <div class="contact-value">пр. Раймбека 206-Е</div>
+          </div>
+        </a>
+        <a href="https://chabadkz.org" target="_blank" rel="noopener" class="contact-item">
+          <span class="contact-icon">🌐</span>
+          <div>
+            <div class="contact-label">Сайт</div>
+            <div class="contact-value">chabadkz.org</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="bullet gold" style="margin-top:16px;">
+        <strong>🕯 Зажигание свечей — Erev Pesach</strong>
+        <span>Среда, 1 апреля 2026 — свечи зажигают до 19:15. Точное время уточняйте у раввина или на сайте chabad.org/calendar.</span>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>
+
+
+
