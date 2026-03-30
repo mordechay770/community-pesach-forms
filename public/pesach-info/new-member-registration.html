@@ -496,6 +496,54 @@
       statusBox.style.background = isError ? "#fff4f4" : "#f4f7fb";
     }
 
+    let personCounter = 0;
+    function makePersonId() {
+      personCounter += 1;
+      return "new_member_person_" + personCounter;
+    }
+
+    function ensureRequiredMarker(target) {
+      if (!target || target.querySelector(".req")) return;
+      const marker = document.createElement("span");
+      marker.className = "req";
+      marker.textContent = "*";
+      target.appendChild(marker);
+    }
+
+    function applyRequiredMarkers(card) {
+      [
+        '[data-field="last_name"]',
+        '[data-field="first_name"]',
+        '[data-field="iin"]',
+        '[data-field="gender"]',
+        '[data-field="birth_date"]'
+      ].forEach((selector) => {
+        const input = card.querySelector(selector);
+        if (!input) return;
+        input.required = true;
+        const label = input.closest("label");
+        if (label) ensureRequiredMarker(label);
+      });
+
+      const relationshipInput = card.querySelector('[data-field="relationship"]');
+      const relationshipWrap = card.querySelector("[data-relationship-wrap]");
+      if (relationshipInput && relationshipWrap && !relationshipWrap.classList.contains("hidden")) {
+        relationshipInput.required = true;
+        const label = relationshipInput.closest("label");
+        if (label) ensureRequiredMarker(label);
+      }
+
+      const sameAddressWrap = card.querySelector("[data-same-address-wrap]");
+      const sameAddressInputs = card.querySelectorAll('[data-field="same_address"]');
+      if (sameAddressWrap && !sameAddressWrap.classList.contains("hidden")) {
+        sameAddressInputs.forEach((input) => {
+          input.required = true;
+        });
+        const heading = sameAddressWrap.querySelector("h4");
+        if (heading) ensureRequiredMarker(heading);
+      }
+    }
+
     function valuesFrom(scope) {
       const result = {};
       scope.querySelectorAll("[data-field]").forEach((input) => {
@@ -691,14 +739,24 @@
 
     function addPerson() {
       const fragment = personTemplate.content.cloneNode(true);
+      const card = fragment.querySelector(".card");
+      const personId = makePersonId();
+      card.dataset.personId = personId;
+      fragment.querySelectorAll('input[type="radio"][data-field]').forEach((input) => {
+        input.name = personId + "__" + input.dataset.field;
+      });
       people.appendChild(fragment);
       addContact(people.lastElementChild);
       addDocument(people.lastElementChild);
+      applyRequiredMarkers(people.lastElementChild);
       refreshPeople();
     }
 
     function refreshPeople() {
-      Array.from(people.querySelectorAll(".card")).forEach((card, index) => syncPersonCard(card, index));
+      Array.from(people.querySelectorAll(".card")).forEach((card, index) => {
+        syncPersonCard(card, index);
+        applyRequiredMarkers(card);
+      });
     }
 
     people.addEventListener("click", (event) => {
