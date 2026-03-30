@@ -551,6 +551,7 @@
     async function handleSubmit() {
       const payload = buildPayload();
       setStatus("Отправляем данные...");
+      if (submitBtn) submitBtn.disabled = true;
       try {
         const response = await fetch(CONFIG.webhookUrl, {
           method: "POST",
@@ -559,8 +560,11 @@
         });
         if (!response.ok) throw new Error("HTTP " + response.status);
         setStatus("Форма успешно отправлена.");
+        window.location.href = "../success.html";
       } catch (error) {
         setStatus("Не удалось отправить форму: " + error.message, true);
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
       }
     }
 
