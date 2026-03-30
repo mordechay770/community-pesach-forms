@@ -47,6 +47,46 @@
       grid-template-columns:repeat(2,minmax(0,1fr));
       gap:16px;
     }
+    .seder-promo{
+      background:linear-gradient(135deg,#fff7e8 0%,#fffdf7 100%);
+      border:1px solid #e4cf9b;
+      border-radius:28px;
+      padding:22px;
+      box-shadow:var(--shadow);
+      display:grid;
+      gap:16px;
+    }
+    .seder-promo h2{
+      margin:0;
+      color:var(--navy);
+      font-size:30px;
+    }
+    .seder-promo p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.75;
+    }
+    .seder-promo-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+    .seder-promo-actions a{
+      text-decoration:none;
+      display:inline-block;
+      border-radius:14px;
+      padding:12px 16px;
+      font-weight:800;
+    }
+    .seder-promo-actions .primary{
+      background:linear-gradient(135deg,var(--gold) 0%,#d8b36b 100%);
+      color:#1c2935;
+    }
+    .seder-promo-actions .secondary{
+      background:#eef4fa;
+      border:1px solid #d0dceb;
+      color:var(--navy);
+    }
     .link-card{
       background:var(--paper);
       border:1px solid var(--line);
@@ -91,6 +131,14 @@
       <p data-content="success-description">Ваши данные получены и сохранены в системе. Если потребуется дополнительная проверка, с вами свяжутся. Ниже можно перейти к полезной информации о Песахе и о программах еврейского центра.</p>
     </section>
 
+    <section class="seder-promo">
+      <h2>Пасхальный Седер в Алматы</h2>
+      <p>Если Вы ещё не записались на Седер, будем рады провести этот особенный вечер вместе с Вами. Ниже можно сразу перейти к регистрации или открыть страницу с подробной информацией о Песахе и программах общины.</p>
+      <div class="seder-promo-actions">
+        <a href="./pesach-info/seder-registration.html" class="primary">Регистрация на Седер</a>
+        <a href="./pesach-info/community-info.html" class="secondary">Информация о Песахе</a>
+      </div>
+    </section>
     <section class="link-grid" data-content="success-cards"></section>
   </main>
   <script src="./content-pages.js"></script>

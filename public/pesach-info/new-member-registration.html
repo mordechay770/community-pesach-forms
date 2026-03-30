@@ -229,16 +229,16 @@
     <section class="hero">
       <h1>Новая регистрация в общину</h1>
       <p>
-        Это живая рабочая версия формы для нового члена общины или новой семьи.
-        Здесь можно проверить структуру, поля и логику до подключения к реальной записи в таблицу форм.
+        Пожалуйста, заполните форму для нового члена общины или новой семьи.
+        При необходимости можно добавить в эту же форму других членов семьи.
       </p>
     </section>
 
     <section class="panel">
       <h2>Форма для нового члена общины</h2>
       <p class="lead">
-        Сначала заполняются данные основного человека. Затем при необходимости можно добавить ещё людей в этой же форме.
-        Для каждого нового человека будет отдельный блок и отдельная строка в таблице форм после интеграции.
+        Сначала заполните данные основного человека. Затем, если это необходимо, можно добавить в эту же форму других членов семьи.
+        Для каждого человека предусмотрен отдельный блок с полями.
       </p>
 
       <div id="people"></div>
@@ -249,8 +249,7 @@
       </div>
 
       <div class="summary">
-        Сейчас это приватная живая форма для проверки структуры.
-        Следующие шаги: отправка полного JSON, запись в <strong>Full_json_form</strong> и создание отдельных строк в таблице форм.
+        Пожалуйста, внимательно заполните все необходимые данные перед отправкой формы.
       </div>
     </section>
   </main>
@@ -376,7 +375,7 @@
           <h4>Контактные данные</h4>
           <div data-contact-list></div>
           <button class="btn ghost" type="button" data-add-contact>Добавить ещё контакт</button>
-          <div class="note">Каждый контакт — отдельной строкой, как в форме обновления личных данных.</div>
+          <div class="note">Каждый контакт указывается в отдельной строке.</div>
         </section>
       </div>
     </article>
@@ -433,6 +432,17 @@
     const submitBtn = document.querySelector(".toolbar .btn.primary");
     const statusBox = document.querySelector(".summary");
 
+    const heroTitle = document.querySelector(".hero h1");
+    const heroText = document.querySelector(".hero p");
+    const panelTitle = document.querySelector(".panel h2");
+    const panelLead = document.querySelector(".panel .lead");
+    const contactNote = document.querySelector(".note");
+
+    if (heroTitle) heroTitle.textContent = "Регистрация нового члена общины";
+    if (heroText) heroText.textContent = "Пожалуйста, заполните форму для нового члена общины или новой семьи. При необходимости можно добавить в эту же форму других членов семьи.";
+    if (panelTitle) panelTitle.textContent = "Форма регистрации";
+    if (panelLead) panelLead.textContent = "Сначала заполните данные основного человека. Затем, если это необходимо, можно добавить в эту же форму других членов семьи.";
+    if (contactNote) contactNote.textContent = "Каждый контакт указывается в отдельной строке.";
     if (submitBtn) submitBtn.textContent = "Отправить форму";
     if (statusBox) statusBox.textContent = "Форма готова к отправке.";
 
