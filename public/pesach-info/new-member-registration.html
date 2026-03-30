@@ -722,7 +722,10 @@
         relationshipWrap.classList.add("hidden");
         sameAddressWrap.classList.add("hidden");
         secondaryAddressWrap.classList.add("hidden");
-        if (primaryAddressSection) primaryAddressSection.style.order = "1";
+        if (primaryAddressSection) {
+          primaryAddressSection.classList.remove("hidden");
+          primaryAddressSection.style.order = "1";
+        }
       } else {
         subtitle.textContent = "Дополнительный человек";
         removeBtn.classList.remove("hidden");
@@ -732,7 +735,10 @@
 
         const selectedSameAddress = card.querySelector('[data-field="same_address"]:checked')?.value || "";
         secondaryAddressWrap.style.order = "2";
-        if (primaryAddressSection) primaryAddressSection.style.order = "3";
+        if (primaryAddressSection) {
+          primaryAddressSection.classList.add("hidden");
+          primaryAddressSection.style.order = "3";
+        }
         secondaryAddressWrap.classList.toggle("hidden", selectedSameAddress !== "no");
       }
     }
