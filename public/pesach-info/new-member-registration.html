@@ -664,6 +664,7 @@
       const relationshipWrap = card.querySelector("[data-relationship-wrap]");
       const sameAddressWrap = card.querySelector("[data-same-address-wrap]");
       const secondaryAddressWrap = card.querySelector("[data-secondary-address-wrap]");
+      const primaryAddressSection = card.querySelector("[data-address-grid]")?.closest(".section");
 
       title.textContent = `Новый человек ${index + 1}`;
 
@@ -673,13 +674,17 @@
         relationshipWrap.classList.add("hidden");
         sameAddressWrap.classList.add("hidden");
         secondaryAddressWrap.classList.add("hidden");
+        if (primaryAddressSection) primaryAddressSection.style.order = "1";
       } else {
         subtitle.textContent = "Дополнительный человек";
         removeBtn.classList.remove("hidden");
         relationshipWrap.classList.remove("hidden");
         sameAddressWrap.classList.remove("hidden");
+        sameAddressWrap.style.order = "1";
 
         const selectedSameAddress = card.querySelector('[data-field="same_address"]:checked')?.value || "";
+        secondaryAddressWrap.style.order = "2";
+        if (primaryAddressSection) primaryAddressSection.style.order = "3";
         secondaryAddressWrap.classList.toggle("hidden", selectedSameAddress !== "no");
       }
     }
