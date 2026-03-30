@@ -42,29 +42,76 @@
       color:#edf3f8;
       line-height:1.7;
     }
-    .link-grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:16px;
-    }
     .seder-promo{
-      background:linear-gradient(135deg,#fff7e8 0%,#fffdf7 100%);
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at top right, rgba(118,88,161,.18), transparent 26%),
+        radial-gradient(circle at 18% 8%, rgba(132,180,74,.14), transparent 24%),
+        linear-gradient(135deg,#fff8eb 0%,#fffdf8 100%);
       border:1px solid #e4cf9b;
-      border-radius:28px;
-      padding:22px;
+      border-radius:32px;
+      padding:26px;
       box-shadow:var(--shadow);
       display:grid;
-      gap:16px;
+      gap:18px;
+    }
+    .seder-kicker{
+      display:inline-block;
+      width:max-content;
+      padding:7px 14px;
+      border-radius:999px;
+      background:#fff5d8;
+      border:1px solid #e5d19d;
+      color:#9e7c25;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
     }
     .seder-promo h2{
       margin:0;
       color:var(--navy);
-      font-size:30px;
+      font-size:clamp(40px,7vw,72px);
+      line-height:.92;
+      max-width:560px;
     }
     .seder-promo p{
       margin:0;
       color:var(--muted);
       line-height:1.75;
+    }
+    .seder-schedule{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+    .seder-card{
+      background:rgba(255,255,255,.7);
+      border:1px solid #e5d8b6;
+      border-radius:24px;
+      padding:18px;
+      display:grid;
+      gap:8px;
+    }
+    .seder-card strong{
+      color:var(--navy);
+      font-size:24px;
+      line-height:1.05;
+    }
+    .seder-card span{
+      color:#45576b;
+      line-height:1.65;
+      font-size:15px;
+    }
+    .seder-address{
+      padding:16px 18px;
+      border-radius:22px;
+      background:#f3f7fc;
+      border:1px solid #d5dfec;
+      color:#30465f;
+      line-height:1.7;
+      font-size:15px;
     }
     .seder-promo-actions{
       display:flex;
@@ -87,36 +134,8 @@
       border:1px solid #d0dceb;
       color:var(--navy);
     }
-    .link-card{
-      background:var(--paper);
-      border:1px solid var(--line);
-      border-radius:24px;
-      padding:20px;
-      box-shadow:var(--shadow);
-      display:grid;
-      gap:12px;
-    }
-    .link-card h2{
-      margin:0;
-      color:var(--navy);
-      font-size:24px;
-    }
-    .link-card p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.6;
-    }
-    .link-card a{
-      text-decoration:none;
-      display:inline-block;
-      border-radius:14px;
-      padding:12px 16px;
-      background:linear-gradient(135deg,var(--gold) 0%,#d8b36b 100%);
-      color:#1c2935;
-      font-weight:800;
-    }
     @media (max-width:680px){
-      .link-grid{grid-template-columns:1fr}
+      .seder-schedule{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -142,5 +161,34 @@
     <section class="link-grid" data-content="success-cards"></section>
   </main>
   <script src="./content-pages.js"></script>
+  <script>
+    const promo = document.querySelector(".seder-promo");
+    const extraCards = document.querySelector("[data-content='success-cards']");
+    if (promo) {
+      promo.innerHTML = `
+        <span class="seder-kicker">С Б-жьей помощью</span>
+        <h2>СЕДЕР ПЕСАХ</h2>
+        <p>Приглашаем Вас провести с нами два вечера Пасхального Седера. Если Вы ещё не записались, можно сразу перейти к регистрации или открыть страницу с полной информацией о Песахе.</p>
+        <div class="seder-schedule">
+          <article class="seder-card">
+            <strong>Первый Седер</strong>
+            <span>среда, 1 апреля 2026</span>
+            <span>14 нисана · 19:15</span>
+          </article>
+          <article class="seder-card">
+            <strong>Второй Седер</strong>
+            <span>четверг, 2 апреля 2026</span>
+            <span>15 нисана · 19:15</span>
+          </article>
+        </div>
+        <div class="seder-address">Адрес: Синагога, Алматы, пр. Райымбека 206-Е.</div>
+        <div class="seder-promo-actions">
+          <a href="./pesach-info/seder-registration.html" class="primary">Регистрация на Седер</a>
+          <a href="./pesach-info/community-info.html" class="secondary">Информация о Песахе</a>
+        </div>
+      `;
+    }
+    if (extraCards) extraCards.remove();
+  </script>
 </body>
 </html>
